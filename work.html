@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About &mdash; Grace &amp; Co</title>
-<meta name="description" content="The story behind Grace & Co: custom cakes and event decor made with care, for celebrations that matter.">
+<title>Our Work &mdash; Grace &amp; Co</title>
+<meta name="description" content="A gallery of Grace & Co cakes, decor and full celebrations. Filter by what you are looking for.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="About &mdash; Grace &amp; Co">
-<meta property="og:description" content="The story behind Grace & Co: custom cakes and event decor made with care, for celebrations that matter.">
+<meta property="og:title" content="Our Work &mdash; Grace &amp; Co">
+<meta property="og:description" content="A gallery of Grace & Co cakes, decor and full celebrations. Filter by what you are looking for.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/img/hero.svg">
 <link rel="icon" href="assets/img/logo-mark.png" type="image/png">
@@ -37,8 +37,8 @@
     </button>
 
     <ul class="nav__list nav__list--right">
-      <li><a class="nav__link" href="work.html">Our Work</a></li>
-      <li><a class="nav__link" href="about.html" aria-current="page">About</a></li>
+      <li><a class="nav__link" href="work.html" aria-current="page">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
       <li><a class="nav__link" href="contact.html">Contact</a></li>
     </ul>
   </nav>
@@ -46,56 +46,48 @@
 <main id="main">
   <section class="page-head">
     <div class="wrap wrap--narrow">
-      <span class="eyebrow">About</span>
-      <h1>Grace &amp; Co</h1>
+      <span class="eyebrow">Our work</span>
+      <h1>Recent celebrations</h1>
       <hr class="rule">
-      <p>Cakes and decor for the celebrations that matter &mdash; made with care, and never rushed.</p>
+      <p>Cakes, decor and full celebrations we have created. Filter to see what you are after.</p>
     </div>
   </section>
 
   <section class="section">
-    <div class="wrap split reveal">
-      <div class="split__media"><img src="assets/img/studio.svg" alt="The Grace &amp; Co studio" width="900" height="1125"></div>
-      <div>
-        <span class="eyebrow">Our story</span>
-        <h2>It started with one cake</h2>
-        <hr class="rule rule--left">
-        <p>Grace &amp; Co began with a single birthday cake for a friend and grew, by word of mouth, into a studio creating custom cakes and full event decor for birthdays, baby showers, weddings, graduations and corporate celebrations.</p>
-        <p>We kept the same approach the whole way through: take fewer bookings, ask better questions, and treat every celebration as though it were our own.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--alt">
     <div class="wrap">
-      <div class="center"><span class="eyebrow">What we believe</span><h2>Our values</h2><hr class="rule"></div>
-      <div class="grid grid--3" style="margin-top:2.5rem">
-        <div><h3>Guided, not complicated</h3><p>You should never have to guess what to ask for. We give you clear options and honest guidance at every step.</p></div>
-        <div><h3>Made properly</h3><p>Cakes baked to order, decor styled and installed on the day. We take on only what we can do well.</p></div>
-        <div><h3>Personal</h3><p>You deal with us directly, from the first message to the moment your cake is handed over.</p></div>
+      <div class="filters" role="group" aria-label="Filter our work">
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter" type="button" data-filter="cakes" aria-pressed="false">Cakes</button>
+        <button class="filter" type="button" data-filter="decor" aria-pressed="false">Decor</button>
+        <button class="filter" type="button" data-filter="celebrations" aria-pressed="false">Full celebrations</button>
       </div>
+
+      <div class="gallery" id="work-gallery">
+        <figure data-tags="cakes celebrations"><img src="assets/img/cake-1.svg" alt="Birthday cake" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor celebrations"><img src="assets/img/decor-1.svg" alt="Balloon backdrop" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="cakes"><img src="assets/img/cake-2.svg" alt="Wedding cake" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor"><img src="assets/img/decor-2.svg" alt="Styled cake table" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="cakes celebrations"><img src="assets/img/work-3.svg" alt="Graduation cake" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor celebrations"><img src="assets/img/work-5.svg" alt="Baby shower setup" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="cakes"><img src="assets/img/cake-4.svg" alt="Kids' party cake" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor"><img src="assets/img/decor-4.svg" alt="Welcome sign and florals" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor celebrations"><img src="assets/img/work-7.svg" alt="Corporate event styling" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="cakes celebrations"><img src="assets/img/cake-6.svg" alt="Anniversary cake" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="decor"><img src="assets/img/decor-6.svg" alt="Guest table styling" width="800" height="800" loading="lazy"></figure>
+        <figure data-tags="cakes"><img src="assets/img/work-8.svg" alt="Two-tier celebration cake" width="800" height="800" loading="lazy"></figure>
+      </div>
+      <p class="form-status" id="work-empty" role="status" hidden>Nothing in this category yet &mdash; please check back soon.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap split split--flip reveal">
-      <div class="split__media"><img src="assets/img/about.svg" alt="Finishing a Grace &amp; Co cake" width="900" height="1125"></div>
-      <div>
-        <span class="eyebrow">How we work</span>
-        <h2>An honest conversation first</h2>
-        <hr class="rule rule--left">
-        <p>If a design will not travel well, or a colour scheme will not photograph the way you are hoping, we will say so and suggest something better. We would rather guide you to the right thing than deliver the wrong one.</p>
-        <p>Quotes are firm before you commit, and nothing is confirmed until you have seen both the design direction and the price.</p>
-        <div class="btn-row"><a class="btn" href="enquiry.html">Plan My Celebration</a></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--alt quote reveal">
+  <section class="section band">
     <div class="wrap wrap--narrow">
-      <span class="eyebrow">Kind words</span>
-      <blockquote>&ldquo;They asked better questions than we knew to ask.&rdquo;</blockquote>
-      <cite>Thandi &amp; Marc &mdash; wedding</cite>
+      <span class="eyebrow">Seen something you like?</span>
+      <h2>Let&rsquo;s make yours</h2>
+      <p>Send us the images that caught your eye and we will design something in the same spirit.</p>
+      <div class="btn-row center">
+        <a class="btn btn--light" href="enquiry.html">Plan My Celebration</a>
+      </div>
     </div>
   </section>
 </main>

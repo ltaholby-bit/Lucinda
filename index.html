@@ -3,13 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lucinda — Cake Boutique | Handcrafted Celebration Cakes</title>
-<meta name="description" content="Small-batch bento, celebration and tiered cakes, baked to order and finished by hand.">
-<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<title>Grace &amp; Co &mdash; Custom Cakes &amp; Event Decor</title>
+<meta name="description" content="Custom cakes and event decor for birthdays, baby showers, weddings, graduations and corporate events. Tell us what you are celebrating and we will do the rest.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Grace &amp; Co &mdash; Custom Cakes &amp; Event Decor">
+<meta property="og:description" content="Custom cakes and event decor for birthdays, baby showers, weddings, graduations and corporate events. Tell us what you are celebrating and we will do the rest.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/hero.svg">
+<link rel="icon" href="assets/img/logo-mark.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/config.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -17,203 +23,302 @@
   <nav class="nav wrap" data-open="false" aria-label="Primary">
     <ul class="nav__list">
       <li><a class="nav__link" href="index.html" aria-current="page">Home</a></li>
-      <li><a class="nav__link" href="cakes.html">Our Cakes</a></li>
-      <li><a class="nav__link" href="about.html">About</a></li>
+      <li><a class="nav__link" href="cakes.html">Cakes</a></li>
+      <li><a class="nav__link" href="decor.html">Decor</a></li>
     </ul>
 
-    <a class="brand" href="index.html" aria-label="Lucinda — home">
-      <!-- Logo: swap assets/img/logo.svg to rebrand every page at once. -->
-      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-      <span class="brand__name">Lucinda</span>
+    <a class="brand" href="index.html" aria-label="Grace &amp; Co — home">
+      <img class="brand__mark" src="assets/img/logo-mark.png" alt="" width="46" height="46">
+      <span class="brand__name">Grace &amp; Co</span>
     </a>
 
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
 
     <ul class="nav__list nav__list--right">
-      <li><a class="nav__link" href="cakes.html#gallery">Gallery</a></li>
+      <li><a class="nav__link" href="work.html">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
       <li><a class="nav__link" href="contact.html">Contact</a></li>
-      <li><a class="nav__link" href="order.html">Order</a></li>
     </ul>
   </nav>
 </header>
 <main id="main">
   <section class="hero">
-    <div class="hero__media">
-      <img src="assets/img/hero.svg" alt="A hand-finished celebration cake on a cake stand" width="1600" height="1000">
-    </div>
+    <div class="hero__media"><img src="assets/img/hero.svg" alt="A Grace &amp; Co celebration cake and styled table" width="1600" height="1000"></div>
     <div class="wrap hero__inner">
-      <span class="eyebrow">Baked to order</span>
-      <h1>Cakes made for the moments worth keeping</h1>
-      <p>From a cake-for-two bento to a three-tier centrepiece &mdash; every order is mixed, baked and finished by hand in small batches.</p>
+      <span class="eyebrow">Cakes &amp; Decor</span>
+      <h1>Beautiful celebrations, thoughtfully made</h1>
+      <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every occasion worth marking.</p>
       <div class="btn-row center">
-        <a class="btn" href="order.html">Order a cake</a>
-        <a class="btn btn--light" href="cakes.html">View the collection</a>
+        <a class="btn" href="#plan">Plan My Celebration</a>
+        <a class="btn btn--light" href="work.html">See Our Work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guided journey: two questions that route the visitor to the right enquiry. -->
+  <section class="section" id="plan">
+    <div class="wrap wrap--narrow">
+      <div class="center">
+        <span class="eyebrow">Let&rsquo;s begin</span>
+        <h2>What are you celebrating?</h2>
+        <hr class="rule">
+        <p class="lede">Two quick questions and we will take you straight to the right place.</p>
+      </div>
+
+      <form id="plan-form" style="margin-top:2.5rem">
+        <fieldset class="fieldset">
+          <legend class="visually-hidden">What are you celebrating?</legend>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="plan-occasion-birthday" name="occasion" value="Birthday">
+              <label class="option__label" for="plan-occasion-birthday">
+                <span class="option__name">Birthday</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-baby-shower" name="occasion" value="Baby shower">
+              <label class="option__label" for="plan-occasion-baby-shower">
+                <span class="option__name">Baby shower</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-wedding" name="occasion" value="Wedding">
+              <label class="option__label" for="plan-occasion-wedding">
+                <span class="option__name">Wedding</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-graduation" name="occasion" value="Graduation">
+              <label class="option__label" for="plan-occasion-graduation">
+                <span class="option__name">Graduation</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-anniversary" name="occasion" value="Anniversary">
+              <label class="option__label" for="plan-occasion-anniversary">
+                <span class="option__name">Anniversary</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-kids-party" name="occasion" value="Kids&rsquo; party">
+              <label class="option__label" for="plan-occasion-kids-party">
+                <span class="option__name">Kids&rsquo; party</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-corporate-event" name="occasion" value="Corporate event">
+              <label class="option__label" for="plan-occasion-corporate-event">
+                <span class="option__name">Corporate event</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-occasion-other" name="occasion" value="Other">
+              <label class="option__label" for="plan-occasion-other">
+                <span class="option__name">Other</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset" style="margin-top:2.5rem">
+          <legend>How can Grace &amp; Co help?</legend>
+          <p class="fieldset__hint">Choose one and we will show you only what is relevant.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="plan-need-i-need-a-cake" name="need" value="I need a cake">
+              <label class="option__label" for="plan-need-i-need-a-cake">
+                <span class="option__name">I need a cake</span>
+                <span class="option__note">Cake portfolio and a short cake enquiry.</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-need-i-need-decor" name="need" value="I need decor">
+              <label class="option__label" for="plan-need-i-need-decor">
+                <span class="option__name">I need decor</span>
+                <span class="option__note">Decor portfolio and a short decor enquiry.</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-need-i-need-cake-and-decor" name="need" value="I need cake and decor">
+              <label class="option__label" for="plan-need-i-need-cake-and-decor">
+                <span class="option__name">I need cake and decor</span>
+                <span class="option__note">One combined enquiry for both.</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-need-show-me-your-work" name="need" value="Show me your work">
+              <label class="option__label" for="plan-need-show-me-your-work">
+                <span class="option__name">Show me your work</span>
+                <span class="option__note">Browse the full gallery first.</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="plan-need-please-contact-me" name="need" value="Please contact me">
+              <label class="option__label" for="plan-need-please-contact-me">
+                <span class="option__name">Please contact me</span>
+                <span class="option__note">A quick form &mdash; we will call or WhatsApp you.</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="btn-row center">
+          <button class="btn" type="submit">Continue</button>
+        </div>
+        <p class="form-status" id="plan-status" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap">
+      <div class="center reveal">
+        <span class="eyebrow">What we do</span>
+        <h2>Cakes, decor, or both</h2>
+        <hr class="rule">
+      </div>
+
+      <div class="grid grid--2 reveal" style="margin-top:3rem">
+        <article class="service">
+          <img src="assets/img/service-cakes.svg" alt="A custom Grace &amp; Co cake" width="1200" height="900">
+          <div class="service__body">
+            <h3>Custom Cakes</h3>
+            <p>From a bento cake for two to a three-tier centrepiece &mdash; designed around your theme, your flavours and your guest count.</p>
+            <a class="btn" href="cakes.html">Explore cakes</a>
+          </div>
+        </article>
+        <article class="service">
+          <img src="assets/img/service-decor.svg" alt="A styled Grace &amp; Co decor setup" width="1200" height="900">
+          <div class="service__body">
+            <h3>Event Decor</h3>
+            <p>Balloons, backdrops, cake tables, welcome signs and full setups &mdash; styled and installed so you can enjoy the day.</p>
+            <a class="btn" href="decor.html">Explore decor</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap split reveal">
-      <div class="split__media">
-        <img src="assets/img/about.svg" alt="Buttercream being smoothed onto a cake" width="900" height="1125">
-      </div>
+      <div class="split__media"><img src="assets/img/about.svg" alt="Grace &amp; Co finishing a cake" width="900" height="1125"></div>
       <div>
-        <span class="eyebrow">Our story</span>
-        <h2>A small kitchen, an unhurried approach</h2>
+        <span class="eyebrow">About Grace &amp; Co</span>
+        <h2>Every celebration deserves care</h2>
         <hr class="rule rule--left">
-        <p>What began as weekend baking for friends became a studio built on one idea: a cake should taste as considered as it looks. We keep our order book deliberately small so that every cake gets the time it deserves.</p>
-        <p>Sponges are baked the day before finishing. Buttercream is made in small batches. Nothing is pre-made, and nothing leaves the kitchen that we would not put on our own table.</p>
-        <div class="btn-row">
-          <a class="btn btn--ghost" href="about.html">More about us</a>
-        </div>
+        <p>Grace &amp; Co creates custom cakes and event decor for the moments that matter. We take a limited number of bookings so that every cake is baked to order and every setup is styled properly, not rushed.</p>
+        <p>Tell us what you are celebrating and we will guide you from there &mdash; you should never have to guess what to ask for.</p>
+        <div class="btn-row"><a class="btn btn--ghost" href="about.html">Our story</a></div>
       </div>
     </div>
   </section>
 
-  <section class="section section--shell">
-    <div class="wrap">
-      <div class="center reveal">
-        <span class="eyebrow">The collection</span>
-        <h2>Signature cakes</h2>
-        <hr class="rule">
-        <p class="lede">Three of our most-requested designs. Each one can be sized from a bento for two to a tiered cake for a hundred.</p>
-      </div>
-
-      <div class="grid grid--3 reveal" style="margin-top:3.5rem">
-        <article class="card">
-          <div class="card__media"><img src="assets/img/signature-1.svg" alt="Vanilla bean and raspberry cake" width="900" height="1200"></div>
-          <h3>Vanilla Bean &amp; Raspberry</h3>
-          <p>Vanilla sponge, raspberry compote and silky vanilla buttercream.</p>
-          <span class="card__meta">From a 4&#8209;inch bento</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/signature-2.svg" alt="Dark chocolate and salted caramel cake" width="900" height="1200"></div>
-          <h3>Dark Chocolate &amp; Salted Caramel</h3>
-          <p>Deep cocoa sponge layered with salted caramel and chocolate ganache.</p>
-          <span class="card__meta">Our most ordered</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/signature-3.svg" alt="Lemon and elderflower cake" width="900" height="1200"></div>
-          <h3>Lemon &amp; Elderflower</h3>
-          <p>Zesty lemon sponge, elderflower syrup and cream cheese frosting.</p>
-          <span class="card__meta">A summer favourite</span>
-        </article>
-      </div>
-
-      <div class="btn-row center reveal">
-        <a class="btn" href="cakes.html">See every cake</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
+  <section class="section section--alt">
     <div class="wrap">
       <div class="center reveal">
         <span class="eyebrow">How it works</span>
-        <h2>From first message to first slice</h2>
+        <h2>Three simple steps</h2>
         <hr class="rule">
       </div>
-      <div class="grid grid--3 steps reveal" style="margin-top:3rem">
-        <div class="step">
-          <span class="step__num">01</span>
-          <h3>Tell us about the day</h3>
-          <p>Share the occasion, the date and a rough guest count. Not sure what size you need? Our serving guide will point you to the right cake.</p>
-        </div>
-        <div class="step">
-          <span class="step__num">02</span>
-          <h3>We design and quote</h3>
-          <p>We come back with a design suggestion, flavour pairing and a firm price. Adjust anything you like before confirming.</p>
-        </div>
-        <div class="step">
-          <span class="step__num">03</span>
-          <h3>Baked and collected</h3>
-          <p>Your cake is baked fresh in the days before your event, then boxed for collection or delivered locally.</p>
-        </div>
+      <div class="grid grid--3 reveal" style="margin-top:2.5rem">
+        <div><span class="step__num">01</span><h3>Tell us about the day</h3><p>Choose your occasion and what you need. Upload any inspiration you have saved &mdash; it helps more than words.</p></div>
+        <div><span class="step__num">02</span><h3>We design and quote</h3><p>We come back with a design direction and a clear price. Adjust anything before you confirm.</p></div>
+        <div><span class="step__num">03</span><h3>We bake and style</h3><p>Your cake is baked fresh and your decor styled on the day. All you do is arrive.</p></div>
       </div>
-    </div>
-  </section>
-
-  <section class="section section--shell quote reveal">
-    <div class="wrap wrap--narrow">
-      <span class="eyebrow">Kind words</span>
-      <blockquote>&ldquo;It looked like something from a magazine and somehow tasted even better.&rdquo;</blockquote>
-      <cite>Nadia &mdash; 40th birthday</cite>
     </div>
   </section>
 
   <section class="section--tight">
-    <div class="center" style="margin-bottom:2rem">
-      <span class="eyebrow">From the kitchen</span>
+    <div class="wrap center" style="margin-bottom:2rem"><span class="eyebrow">Selected work</span><h2>Recent celebrations</h2></div>
+    <div class="wrap">
+      <div class="gallery">
+        <figure><img src="assets/img/work-1.svg" alt="Recent Grace &amp; Co celebration 1" width="800" height="800" loading="lazy"></figure>
+        <figure><img src="assets/img/work-2.svg" alt="Recent Grace &amp; Co celebration 2" width="800" height="800" loading="lazy"></figure>
+        <figure><img src="assets/img/work-3.svg" alt="Recent Grace &amp; Co celebration 3" width="800" height="800" loading="lazy"></figure>
+        <figure><img src="assets/img/work-4.svg" alt="Recent Grace &amp; Co celebration 4" width="800" height="800" loading="lazy"></figure>
+      </div>
+      <div class="btn-row center"><a class="btn btn--ghost" href="work.html">See Our Work</a></div>
     </div>
-    <div class="gallery">
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-1.svg" alt="Cake detail 1" width="600" height="600" loading="lazy"></a>
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-2.svg" alt="Cake detail 2" width="600" height="600" loading="lazy"></a>
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-3.svg" alt="Cake detail 3" width="600" height="600" loading="lazy"></a>
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-4.svg" alt="Cake detail 4" width="600" height="600" loading="lazy"></a>
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-5.svg" alt="Cake detail 5" width="600" height="600" loading="lazy"></a>
-      <a href="cakes.html#gallery"><img src="assets/img/gallery-6.svg" alt="Cake detail 6" width="600" height="600" loading="lazy"></a>
+  </section>
+
+  <section class="section quote reveal">
+    <div class="wrap wrap--narrow">
+      <span class="eyebrow">Kind words</span>
+      <blockquote>&ldquo;They took one photo and a rough idea and turned it into the whole room.&rdquo;</blockquote>
+      <cite>Refilwe &mdash; baby shower</cite>
     </div>
   </section>
 
   <section class="section band">
     <div class="wrap wrap--narrow">
       <span class="eyebrow">Ready when you are</span>
-      <h2>Let&rsquo;s make something lovely</h2>
-      <p>Orders open two weeks ahead for celebration cakes and six weeks ahead for tiered cakes. Bento cakes can often be squeezed in sooner.</p>
+      <h2>Let&rsquo;s plan your celebration</h2>
+      <p>Send through your date and a little inspiration. We will come back with a design and a price.</p>
       <div class="btn-row center">
-        <a class="btn btn--light" href="order.html">Start your order</a>
+        <a class="btn btn--light" href="enquiry.html">Plan My Celebration</a>
+        <a class="btn btn--light" href="contact.html#contact-me">Please Contact Me</a>
       </div>
     </div>
   </section>
 </main>
+
+<a class="wa-fab" data-wa href="#" target="_blank" rel="noopener" aria-label="Chat to Grace &amp; Co on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.23 8.24c0 4.54-3.69 8.2-8.23 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<div class="cookie" id="cookie-notice" role="region" aria-label="Cookie notice" hidden>
+  <p>We use cookies to understand how the site is used and to measure our advertising. See our <a href="privacy.html">privacy notice</a>.</p>
+  <div class="cookie__actions">
+    <button class="btn" type="button" data-cookie="accept">Accept</button>
+    <button class="btn btn--ghost" type="button" data-cookie="decline">Decline</button>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer__grid">
       <div class="footer__brand">
-        <span class="brand">
-          <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-          <span class="brand__name">Lucinda</span>
-        </span>
-        <p>Small-batch celebration cakes, baked to order and finished by hand. Every cake begins with a conversation.</p>
+        <img src="assets/img/logo-lockup-light.png" alt="Grace &amp; Co" width="190" height="122">
+        <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every celebration in between.</p>
       </div>
 
       <div>
         <h2 class="footer__title">Explore</h2>
         <ul class="footer__list">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="cakes.html">Our Cakes</a></li>
+          <li><a href="cakes.html">Cakes</a></li>
+          <li><a href="decor.html">Decor</a></li>
+          <li><a href="work.html">Our Work</a></li>
           <li><a href="about.html">About</a></li>
-          <li><a href="contact.html">Contact</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Order</h2>
+        <h2 class="footer__title">Enquire</h2>
         <ul class="footer__list">
-          <li><a href="order.html">Place an order</a></li>
-          <li><a href="cakes.html#sizes">Size &amp; serving guide</a></li>
-          <li><a href="contact.html#faq">FAQs</a></li>
+          <li><a href="enquiry.html">Plan My Celebration</a></li>
+          <li><a href="cakes.html#enquiry">Request a cake</a></li>
+          <li><a href="decor.html#enquiry">Request decor</a></li>
+          <li><a href="contact.html#contact-me">Please contact me</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Studio</h2>
+        <h2 class="footer__title">Get in touch</h2>
         <ul class="footer__list">
-          <li><a href="mailto:hello@lucinda.example">hello@lucinda.example</a></li>
-          <li><a href="tel:+270000000">+27 (0)00 000 0000</a></li>
-          <li>Collection by appointment</li>
-          <li>Tue &ndash; Sat, 9am &ndash; 4pm</li>
+          <li><a data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+          <li><a data-email href="#">hello@graceandco.co.za</a></li>
+          <li><a data-phone href="#">+27 (0)00 000 0000</a></li>
+          <li>Mon &ndash; Sat, 9am &ndash; 5pm</li>
         </ul>
       </div>
     </div>
 
     <div class="footer__bottom">
-      <span>&copy; <span id="year">2026</span> Lucinda Cake Boutique. All rights reserved.</span>
-      <span>Baked fresh to order.</span>
+      <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
+      <span><a href="privacy.html">Privacy notice</a></span>
     </div>
   </div>
 </footer>

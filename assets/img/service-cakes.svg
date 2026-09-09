@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1125" role="img" aria-label="OUR STORY">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="CAKES">
   <defs>
-    <linearGradient id="g-about" x1="0" y1="0" x2="0.55" y2="1">
-      <stop offset="0%" stop-color="#D2C2AD"/>
-      <stop offset="100%" stop-color="#A98A6E"/>
+    <linearGradient id="g-service-cakes" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0%" stop-color="#D5C6B2"/>
+      <stop offset="100%" stop-color="#AD8F73"/>
     </linearGradient>
   </defs>
-  <rect width="900" height="1125" fill="url(#g-about)"/>
+  <rect width="1200" height="900" fill="url(#g-service-cakes)"/>
   <g fill="none" stroke="#4A342A" stroke-opacity="0.28" stroke-width="2.5"
      stroke-linecap="round" stroke-linejoin="round"
-     transform="translate(450.00 562.50) scale(1.5000) translate(-150 -150)">
+     transform="translate(600.00 450.00) scale(1.5000) translate(-150 -150)">
     <ellipse cx="150" cy="214" rx="88" ry="14"/>
     <path d="M62 214 V152 h176 v62"/>
     <path d="M62 152 q44 20 88 0 t88 0"/>
@@ -17,7 +17,7 @@
     <path d="M150 110 V88"/>
     <path d="M150 88 q-10 -12 0 -22 q10 10 0 22 Z"/>
   </g>
-  <text x="900" y="1107" text-anchor="end" font-family="Jost, system-ui, sans-serif"
+  <text x="1200" y="882" text-anchor="end" font-family="Jost, system-ui, sans-serif"
         font-size="12" letter-spacing="3" fill="#4A342A" fill-opacity="0.42"
-        transform="translate(-20 0)">OUR STORY</text>
+        transform="translate(-20 0)">CAKES</text>
 </svg>

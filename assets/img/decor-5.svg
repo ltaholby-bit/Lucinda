@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="DECOR 05">
+  <defs>
+    <linearGradient id="g-decor-5" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0%" stop-color="#D5C5B1"/>
+      <stop offset="100%" stop-color="#AE9077"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#g-decor-5)"/>
+  <g fill="none" stroke="#4A342A" stroke-opacity="0.28" stroke-width="2.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     transform="translate(450.00 600.00) scale(1.5000) translate(-150 -150)">
+    <path d="M60 236 h180"/>
+    <circle cx="104" cy="126" r="40"/>
+    <circle cx="188" cy="104" r="32"/>
+    <circle cx="196" cy="170" r="26"/>
+    <path d="M104 166 q6 24 -8 70"/>
+    <path d="M188 136 q4 30 4 100"/>
+    <path d="M196 196 q-2 22 -6 40"/>
+    <path d="M132 236 v-26 h56 v26"/>
+  </g>
+  <text x="900" y="1182" text-anchor="end" font-family="Jost, system-ui, sans-serif"
+        font-size="12" letter-spacing="3" fill="#4A342A" fill-opacity="0.42"
+        transform="translate(-20 0)">DECOR 05</text>
+</svg>

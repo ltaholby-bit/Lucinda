@@ -1,25 +1,64 @@
-# Lucinda — Cake Boutique
+# Grace & Co — Cakes & Decor
 
-A static website for a cake studio. Plain HTML, CSS and JavaScript — no build
-step, no dependencies. Open `index.html` in a browser, or serve the folder:
+Static website for Grace & Co, built to the *Grace & Co Website Design &
+Development Brief*. Plain HTML, CSS and JavaScript — no build step, no
+dependencies, no framework.
 
 ```
-python3 -m http.server 8000
+python3 -m http.server 8000     # then open http://localhost:8000
 ```
 
 ## Pages
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Home — hero, story, signature cakes, how it works, gallery |
-| `cakes.html` | Full collection, size &amp; serving guide (`#sizes`), gallery (`#gallery`) |
-| `order.html` | Order form with the cake size / serving picker |
-| `about.html` | Studio story |
-| `contact.html` | Contact details and FAQs |
+| `index.html` | Home — hero, the two-step guided journey, service cards, how it works, selected work |
+| `cakes.html` | Cake portfolio, size &amp; serving guide, simple cake enquiry |
+| `decor.html` | Decor portfolio, what we offer, simple decor enquiry |
+| `enquiry.html` | "Plan My Celebration" — combined enquiry with conditional cake/decor sections |
+| `work.html` | Filterable gallery: all / cakes / decor / full celebrations |
+| `about.html` | Story and values |
+| `contact.html` | Contact details, "Please contact me" form, FAQs |
+| `thank-you.html` | Post-submission confirmation (conversion tracking fires here) |
+| `privacy.html` | Privacy notice |
+
+## The guided journey
+
+The homepage asks two questions and routes accordingly:
+
+1. **What are you celebrating?** — Birthday, Baby shower, Wedding, Graduation,
+   Anniversary, Kids' party, Corporate event, Other.
+2. **How can Grace & Co help?**
+
+| Choice | Goes to |
+| --- | --- |
+| I need a cake | `cakes.html#enquiry` |
+| I need decor | `decor.html#enquiry` |
+| I need cake and decor | `enquiry.html?need=both` |
+| Show me your work | `work.html` |
+| Please contact me | `contact.html#contact-me` |
+
+The chosen occasion is carried through as `?occasion=` and pre-selected on the
+destination page.
+
+## Conditional form logic
+
+On `enquiry.html`, "What do you need?" controls which blocks appear:
+
+| Selection | Cake questions | Decor questions |
+| --- | --- | --- |
+| A cake | shown | hidden |
+| Decor | hidden | shown |
+| Cake and decor | shown | shown |
+
+Hidden blocks are also **disabled**, so their fields are excluded from
+validation and from the submitted data — a hidden required field can never
+block a submission.
 
 ## Cake sizes and approximate servings
 
-Used on the order form and repeated in the size guide on `cakes.html`:
+Shown under each cake label on the enquiry forms, and repeated as a reference
+block on `cakes.html#sizes`:
 
 | Cake | Approximate servings |
 | --- | --- |
@@ -31,73 +70,112 @@ Used on the order form and repeated in the size guide on `cakes.html`:
 | Three-tier Cake | 60–100+ people |
 | I’m not sure | We’ll recommend the best size. |
 
-To change the list, edit the `.sizes` block in **both** `order.html` and
-`cakes.html`.
+These are generated from the `CAKE_SIZES` list — to change them, edit the
+`.options--sizes` blocks in `cakes.html` and `enquiry.html`.
 
 ---
 
-## Placeholders to replace
+## Configuration
 
-Three things in this repository are stand-ins, because the source material was
-not available when the site was built. Each is isolated so it can be swapped
-without touching layout or markup.
+Everything site-specific lives in **`assets/js/config.js`**:
 
-### 1. Colour palette
-
-Every colour is derived from a seven-value block at the top of
-`assets/css/styles.css`. Nothing else in the stylesheet hard-codes a colour,
-so replacing these values re-skins the whole site:
-
-```css
-:root {
-  --c-cream:  #FBF6F0;  /* page background */
-  --c-shell:  #F1E6DC;  /* alternating section background */
-  --c-blush:  #E3C8BE;  /* soft accent, borders */
-  --c-rose:   #B4796B;  /* primary accent — buttons, links */
-  --c-gold:   #A98B5D;  /* secondary accent — rules, eyebrows */
-  --c-ink:    #2B2622;  /* headings and primary text */
-  --c-muted:  #776C64;  /* body copy */
-}
+```js
+window.GRACE_CONFIG = {
+  whatsappNumber: "27000000000",   // international format, digits only
+  phone: "+27 (0)00 000 0000",
+  email: "hello@graceandco.co.za",
+  formEndpoint: "",                // see below
+  ga4Id: "",                       // "G-XXXXXXXXXX"
+  metaPixelId: "",                 // "123456789012345"
+  maxFiles: 3,
+  maxFileBytes: 5 * 1024 * 1024
+};
 ```
 
-The current values are placeholders and should be replaced with the brand
-colours from the reference screenshot.
+The WhatsApp button, footer links and contact page all read from here — there
+are no hard-coded contact details in the HTML.
 
-### 2. Logo
+### Form submissions — action required
 
-`assets/img/logo.svg` is a placeholder monogram. Replace that one file —
-keeping the filename — and the header, footer and favicon on every page pick it
-up automatically.
+The site is static, so it has no server of its own.
 
-### 3. Photography
+- **`formEndpoint` empty (current state):** forms validate, then open the
+  visitor's email client with the answers filled in. **Uploaded images cannot
+  be attached this way** — the visitor is told to attach them manually.
+- **`formEndpoint` set:** forms POST `multipart/form-data` to that URL,
+  including the uploaded images, then redirect to `thank-you.html`. Any backend
+  that accepts multipart form posts works (Formspree, Basin, Netlify Forms, or
+  your own).
 
-Every file in `assets/img/` other than `logo.svg` is a generated placeholder
-panel, sized to the aspect ratio the layout expects. Replace each with a real
-photograph of the same name. `.svg` can be swapped for `.jpg`/`.webp` as long as
-the `src` in the markup is updated to match.
+**Set `formEndpoint` before going live** — image upload is a brief requirement
+and only works with a backend.
+
+### Analytics and consent
+
+GA4 and the Meta Pixel load **only** after the visitor accepts the cookie
+notice, and only if the corresponding ID is set. With both IDs empty, no
+notice appears and no tracking scripts load at all.
+
+A `enquiry_submitted` GA4 event and a Meta `Lead` event fire on each completed
+enquiry, tagged with the type (`cake`, `decor`, `both`, `contact`).
+
+For separate campaign links, point ads at:
+`enquiry.html?need=cake`, `enquiry.html?need=decor`, `enquiry.html?need=both`.
+
+---
+
+## Brand assets
+
+### Palette
+
+Taken from the supplied palette board. All colours derive from these five
+values at the top of `assets/css/styles.css`:
+
+| Name | Hex | Used for |
+| --- | --- | --- |
+| Linen | `#F5F1EA` | Page background |
+| Khaki | `#D7C9B8` | Alternating sections, borders, inputs |
+| Camel | `#B2967D` | Rules, eyebrows, decorative accents |
+| Cocoa | `#7D5A44` | Buttons, links, selected states |
+| Espresso | `#4A342A` | Headings, dark bands, footer |
+
+### Logo
+
+Extracted from the supplied PDF to transparent PNGs:
+
+| File | Where |
+| --- | --- |
+| `logo-mark.png` | Header, favicon, thank-you page |
+| `logo-lockup.png` | Full lockup, gold — for light backgrounds |
+| `logo-lockup-light.png` | Full lockup, linen — used in the dark footer |
+| `logo-mark-light.png` | Mark in linen — for dark backgrounds |
+
+### Photography — still placeholders
+
+Every `.svg` in `assets/img/` is a generated placeholder panel in the brand
+palette, sized to the aspect ratio the layout expects. **These need replacing
+with real photographs.** Keep the filename (or update the `src`); `.svg` can
+be swapped for `.jpg`/`.webp`.
 
 | File | Used on | Aspect |
 | --- | --- | --- |
-| `hero.svg` | Home hero | 16:10, full-bleed |
-| `about.svg` | Home + About | 4:5 |
-| `workshop.svg` | About | 4:5 |
-| `signature-1…3.svg` | Home signature cards | 3:4 |
-| `cake-bento`, `cake-celebration`, `cake-wedding`, `cake-cupcakes`, `cake-seasonal`, `cake-bespoke` | Cakes grid | 3:4 |
-| `gallery-1…6.svg` | Gallery strips | 1:1 |
-| `order-banner.svg` | Contact | 4:5 |
+| `hero.svg` | Home hero | 16:10 full-bleed |
+| `service-cakes.svg`, `service-decor.svg` | Home service cards | 4:3 |
+| `about.svg`, `studio.svg` | Home, About | 4:5 |
+| `cake-1…6.svg` | Cakes portfolio | 3:4 |
+| `decor-1…6.svg` | Decor portfolio | 3:4 |
+| `work-1…8.svg` | Our Work, home strip | 1:1 |
+| `contact-banner.svg` | Contact | 4:5 |
 
----
+The images from the reference site could not be retrieved — that host is
+blocked by the build environment's network policy — so they are not included.
 
-## Order form
+## Before going live
 
-The site is static, so `assets/js/main.js` validates the form and then hands the
-details to the visitor's mail client via `mailto:`. Set the destination address
-in `STUDIO_EMAIL` at the top of that block.
-
-To move to a real backend instead, give the `<form>` an `action` and `method`
-and delete the submit handler.
-
-## Contact details
-
-Placeholder email (`hello@lucinda.example`), phone and opening hours appear in
-the footer of every page and on `contact.html`.
+- [ ] Replace placeholder photography with real images
+- [ ] Set `whatsappNumber`, `phone` and `email` in `config.js`
+- [ ] Set `formEndpoint` so enquiries and image uploads are actually delivered
+- [ ] Add `ga4Id` and `metaPixelId`
+- [ ] Review `privacy.html` against POPIA
+- [ ] Replace the placeholder testimonials with real ones
+- [ ] Add spam protection (the form backend's honeypot or captcha)

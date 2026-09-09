@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan My Celebration &mdash; Grace &amp; Co</title>
+<meta name="description" content="One guided enquiry for a cake, decor, or both. Choose what you need and only the relevant questions appear.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Plan My Celebration &mdash; Grace &amp; Co">
+<meta property="og:description" content="One guided enquiry for a cake, decor, or both. Choose what you need and only the relevant questions appear.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/hero.svg">
+<link rel="icon" href="assets/img/logo-mark.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <nav class="nav wrap" data-open="false" aria-label="Primary">
+    <ul class="nav__list">
+      <li><a class="nav__link" href="index.html">Home</a></li>
+      <li><a class="nav__link" href="cakes.html">Cakes</a></li>
+      <li><a class="nav__link" href="decor.html">Decor</a></li>
+    </ul>
+
+    <a class="brand" href="index.html" aria-label="Grace &amp; Co — home">
+      <img class="brand__mark" src="assets/img/logo-mark.png" alt="" width="46" height="46">
+      <span class="brand__name">Grace &amp; Co</span>
+    </a>
+
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+
+    <ul class="nav__list nav__list--right">
+      <li><a class="nav__link" href="work.html">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
+      <li><a class="nav__link" href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+<main id="main">
+  <section class="page-head">
+    <div class="wrap wrap--narrow">
+      <span class="eyebrow">Plan my celebration</span>
+      <h1>Tell us about your day</h1>
+      <hr class="rule">
+      <p>Choose what you need and only those questions will appear. Most of it is clicking, not typing.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap wrap--narrow">
+      <form class="form" id="enquiry-form" data-enquiry="both">
+        <fieldset class="fieldset">
+          <legend>Your details</legend>
+          <p class="fieldset__hint">So Grace &amp; Co can come back to you.</p>
+
+          <div class="field">
+            <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="whatsapp">WhatsApp number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" id="whatsapp" name="whatsapp" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email">
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend>What are you celebrating?</legend>
+          <p class="fieldset__hint">Pick the closest match.</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="eq-occasion-birthday" name="occasion" value="Birthday">
+              <label class="option__label" for="eq-occasion-birthday">
+                <span class="option__name">Birthday</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-baby-shower" name="occasion" value="Baby shower">
+              <label class="option__label" for="eq-occasion-baby-shower">
+                <span class="option__name">Baby shower</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-wedding" name="occasion" value="Wedding">
+              <label class="option__label" for="eq-occasion-wedding">
+                <span class="option__name">Wedding</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-graduation" name="occasion" value="Graduation">
+              <label class="option__label" for="eq-occasion-graduation">
+                <span class="option__name">Graduation</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-anniversary" name="occasion" value="Anniversary">
+              <label class="option__label" for="eq-occasion-anniversary">
+                <span class="option__name">Anniversary</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-kids-party" name="occasion" value="Kids&rsquo; party">
+              <label class="option__label" for="eq-occasion-kids-party">
+                <span class="option__name">Kids&rsquo; party</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-corporate-event" name="occasion" value="Corporate event">
+              <label class="option__label" for="eq-occasion-corporate-event">
+                <span class="option__name">Corporate event</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-occasion-other" name="occasion" value="Other">
+              <label class="option__label" for="eq-occasion-other">
+                <span class="option__name">Other</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>What do you need? <span class="req" aria-hidden="true">*</span></legend>
+          <p class="fieldset__hint">This decides which questions you see next.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="eq-need-a-cake" name="need" value="A cake" required>
+              <label class="option__label" for="eq-need-a-cake">
+                <span class="option__name">A cake</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-need-decor" name="need" value="Decor">
+              <label class="option__label" for="eq-need-decor">
+                <span class="option__name">Decor</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="eq-need-cake-and-decor" name="need" value="Cake and decor">
+              <label class="option__label" for="eq-need-cake-and-decor">
+                <span class="option__name">Cake and decor</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Shown only when the visitor asks for a cake. -->
+        <div data-conditional="cake" hidden>
+          <div class="form-part"><h2>Your cake</h2></div>
+        <fieldset class="fieldset">
+          <legend>Cake size</legend>
+          <p class="fieldset__hint">Approximate servings are shown under each size. Between two sizes? Size up.</p>
+          <div class="options options--sizes">
+            <div class="option">
+              <input type="radio" id="ec-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake" required>
+              <label class="option__label" for="ec-size-4-inch-bento-cake">
+                <span class="option__name">4-inch Bento Cake</span>
+                <span class="option__note">2&ndash;4 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-6-inch-cake" name="cake_size" value="6-inch Cake">
+              <label class="option__label" for="ec-size-6-inch-cake">
+                <span class="option__name">6-inch Cake</span>
+                <span class="option__note">8&ndash;12 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-8-inch-cake" name="cake_size" value="8-inch Cake">
+              <label class="option__label" for="ec-size-8-inch-cake">
+                <span class="option__name">8-inch Cake</span>
+                <span class="option__note">15&ndash;20 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-10-inch-cake" name="cake_size" value="10-inch Cake">
+              <label class="option__label" for="ec-size-10-inch-cake">
+                <span class="option__name">10-inch Cake</span>
+                <span class="option__note">25&ndash;35 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-two-tier-cake" name="cake_size" value="Two-tier Cake">
+              <label class="option__label" for="ec-size-two-tier-cake">
+                <span class="option__name">Two-tier Cake</span>
+                <span class="option__note">35&ndash;50 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-three-tier-cake" name="cake_size" value="Three-tier Cake">
+              <label class="option__label" for="ec-size-three-tier-cake">
+                <span class="option__name">Three-tier Cake</span>
+                <span class="option__note">60&ndash;100+ people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-size-im-not-sure" name="cake_size" value="I&rsquo;m not sure">
+              <label class="option__label" for="ec-size-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+                <span class="option__note">We&rsquo;ll recommend the best size.</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Guest count</legend>
+          <p class="fieldset__hint">Roughly how many people are you feeding?</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="ec-guests-1-10" name="cake_guests" value="1-10">
+              <label class="option__label" for="ec-guests-1-10">
+                <span class="option__name">1-10</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-guests-11-20" name="cake_guests" value="11-20">
+              <label class="option__label" for="ec-guests-11-20">
+                <span class="option__name">11-20</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-guests-21-30" name="cake_guests" value="21-30">
+              <label class="option__label" for="ec-guests-21-30">
+                <span class="option__name">21-30</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-guests-31-50" name="cake_guests" value="31-50">
+              <label class="option__label" for="ec-guests-31-50">
+                <span class="option__name">31-50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-guests-more-than-50" name="cake_guests" value="More than 50">
+              <label class="option__label" for="ec-guests-more-than-50">
+                <span class="option__name">More than 50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-guests-im-not-sure" name="cake_guests" value="I&rsquo;m not sure">
+              <label class="option__label" for="ec-guests-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Flavour</legend>
+          <p class="fieldset__hint">Not sure? Choose &lsquo;Please recommend&rsquo; and we will suggest something.</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="ec-flavour-vanilla" name="cake_flavour" value="Vanilla">
+              <label class="option__label" for="ec-flavour-vanilla">
+                <span class="option__name">Vanilla</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-flavour-chocolate" name="cake_flavour" value="Chocolate">
+              <label class="option__label" for="ec-flavour-chocolate">
+                <span class="option__name">Chocolate</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-flavour-red-velvet" name="cake_flavour" value="Red velvet">
+              <label class="option__label" for="ec-flavour-red-velvet">
+                <span class="option__name">Red velvet</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-flavour-carrot" name="cake_flavour" value="Carrot">
+              <label class="option__label" for="ec-flavour-carrot">
+                <span class="option__name">Carrot</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-flavour-other" name="cake_flavour" value="Other">
+              <label class="option__label" for="ec-flavour-other">
+                <span class="option__name">Other</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-flavour-please-recommend" name="cake_flavour" value="Please recommend">
+              <label class="option__label" for="ec-flavour-please-recommend">
+                <span class="option__name">Please recommend</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Style</legend>
+          <p class="fieldset__hint">The overall look you have in mind.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="ec-style-simple-and-elegant" name="cake_style" value="Simple and elegant">
+              <label class="option__label" for="ec-style-simple-and-elegant">
+                <span class="option__name">Simple and elegant</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-luxury" name="cake_style" value="Luxury">
+              <label class="option__label" for="ec-style-luxury">
+                <span class="option__name">Luxury</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-floral" name="cake_style" value="Floral">
+              <label class="option__label" for="ec-style-floral">
+                <span class="option__name">Floral</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-kids-themed" name="cake_style" value="Kids&rsquo; themed">
+              <label class="option__label" for="ec-style-kids-themed">
+                <span class="option__name">Kids&rsquo; themed</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-character" name="cake_style" value="Character">
+              <label class="option__label" for="ec-style-character">
+                <span class="option__name">Character</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-minimal" name="cake_style" value="Minimal">
+              <label class="option__label" for="ec-style-minimal">
+                <span class="option__name">Minimal</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-custom" name="cake_style" value="Custom">
+              <label class="option__label" for="ec-style-custom">
+                <span class="option__name">Custom</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-style-im-not-sure" name="cake_style" value="I&rsquo;m not sure">
+              <label class="option__label" for="ec-style-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Final details</legend>
+          <p class="fieldset__hint">Just a few last things.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="ec-date">Required date <span class="req" aria-hidden="true">*</span></label>
+              <input type="date" id="ec-date" name="cake_date" required>
+            </div>
+            <div class="field">
+              <label for="ec-collection">Collection or delivery</label>
+              <select id="ec-collection" name="cake_collection">
+                <option>Collection</option>
+                <option>Delivery</option>
+                <option>I&rsquo;m not sure</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="ec-wording">Cake wording</label>
+            <input type="text" id="ec-wording" name="cake_wording" placeholder="e.g. Happy 30th, Sarah">
+          </div>
+
+          <div class="field">
+            <label for="ec-notes">Short notes</label>
+            <textarea id="ec-notes" name="cake_notes" placeholder="Colours, allergies, anything else we should know&hellip;"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset" data-conditional-keep>
+          <legend>Inspiration</legend>
+          <p class="fieldset__hint">Upload up to three images that show the look you love.</p>
+
+          <div class="upload" data-upload data-max="3">
+            <input type="file" id="ec-files" name="inspiration" accept="image/*" multiple>
+            <label class="upload__cta btn btn--ghost" for="ec-files">Upload your inspiration</label>
+            <p class="form__note">JPG, PNG or WEBP &mdash; up to 3 images, 5&nbsp;MB each.</p>
+            <div class="upload__list" data-upload-list></div>
+          </div>
+
+          <div class="field" style="margin-top:1.5rem">
+            <label for="ec-note">What do you like about these images?</label>
+            <textarea id="ec-note" name="inspiration_note" placeholder="The colours, the shape, the flowers&hellip;"></textarea>
+          </div>
+
+          <p class="callout">Inspiration images are used as a creative reference only. Your final cake will be designed by Grace &amp; Co and may differ from the images you share.</p>
+        </fieldset>
+        </div>
+
+        <!-- Shown only when the visitor asks for decor. -->
+        <div data-conditional="decor" hidden>
+          <div class="form-part"><h2>Your decor</h2></div>
+        <fieldset class="fieldset">
+          <legend>Guest count</legend>
+          <p class="fieldset__hint">Roughly how many guests are you expecting?</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="ed-guests-up-to-10" name="decor_guests" value="Up to 10">
+              <label class="option__label" for="ed-guests-up-to-10">
+                <span class="option__name">Up to 10</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-11-20" name="decor_guests" value="11-20">
+              <label class="option__label" for="ed-guests-11-20">
+                <span class="option__name">11-20</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-21-30" name="decor_guests" value="21-30">
+              <label class="option__label" for="ed-guests-21-30">
+                <span class="option__name">21-30</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-31-50" name="decor_guests" value="31-50">
+              <label class="option__label" for="ed-guests-31-50">
+                <span class="option__name">31-50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-51-100" name="decor_guests" value="51-100">
+              <label class="option__label" for="ed-guests-51-100">
+                <span class="option__name">51-100</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-more-than-100" name="decor_guests" value="More than 100">
+              <label class="option__label" for="ed-guests-more-than-100">
+                <span class="option__name">More than 100</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-guests-im-not-sure" name="decor_guests" value="I&rsquo;m not sure">
+              <label class="option__label" for="ed-guests-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Decor needed</legend>
+          <p class="fieldset__hint">Choose as many as you like.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="checkbox" id="ed-items-balloons" name="decor_items" value="Balloons">
+              <label class="option__label" for="ed-items-balloons">
+                <span class="option__name">Balloons</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-backdrop" name="decor_items" value="Backdrop">
+              <label class="option__label" for="ed-items-backdrop">
+                <span class="option__name">Backdrop</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-cake-table" name="decor_items" value="Cake table">
+              <label class="option__label" for="ed-items-cake-table">
+                <span class="option__name">Cake table</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-guest-tables" name="decor_items" value="Guest tables">
+              <label class="option__label" for="ed-items-guest-tables">
+                <span class="option__name">Guest tables</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-welcome-sign" name="decor_items" value="Welcome sign">
+              <label class="option__label" for="ed-items-welcome-sign">
+                <span class="option__name">Welcome sign</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-flowers" name="decor_items" value="Flowers">
+              <label class="option__label" for="ed-items-flowers">
+                <span class="option__name">Flowers</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-kids-setup" name="decor_items" value="Kids&rsquo; setup">
+              <label class="option__label" for="ed-items-kids-setup">
+                <span class="option__name">Kids&rsquo; setup</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-full-decor" name="decor_items" value="Full decor">
+              <label class="option__label" for="ed-items-full-decor">
+                <span class="option__name">Full decor</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="ed-items-please-guide-me" name="decor_items" value="Please guide me">
+              <label class="option__label" for="ed-items-please-guide-me">
+                <span class="option__name">Please guide me</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Style</legend>
+          <p class="fieldset__hint">The mood you are going for.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="ed-style-soft-and-elegant" name="decor_style" value="Soft and elegant">
+              <label class="option__label" for="ed-style-soft-and-elegant">
+                <span class="option__name">Soft and elegant</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-modern-and-minimal" name="decor_style" value="Modern and minimal">
+              <label class="option__label" for="ed-style-modern-and-minimal">
+                <span class="option__name">Modern and minimal</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-colourful-and-fun" name="decor_style" value="Colourful and fun">
+              <label class="option__label" for="ed-style-colourful-and-fun">
+                <span class="option__name">Colourful and fun</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-luxury" name="decor_style" value="Luxury">
+              <label class="option__label" for="ed-style-luxury">
+                <span class="option__name">Luxury</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-floral" name="decor_style" value="Floral">
+              <label class="option__label" for="ed-style-floral">
+                <span class="option__name">Floral</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-kids-theme" name="decor_style" value="Kids&rsquo; theme">
+              <label class="option__label" for="ed-style-kids-theme">
+                <span class="option__name">Kids&rsquo; theme</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ed-style-custom" name="decor_style" value="Custom">
+              <label class="option__label" for="ed-style-custom">
+                <span class="option__name">Custom</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Final details</legend>
+          <p class="fieldset__hint">Where and when.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="ed-date">Event date <span class="req" aria-hidden="true">*</span></label>
+              <input type="date" id="ed-date" name="decor_date" required>
+            </div>
+            <div class="field">
+              <label for="ed-venue">Venue or area</label>
+              <input type="text" id="ed-venue" name="decor_venue" placeholder="Venue name or suburb">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="ed-setting">Indoor or outdoor</label>
+              <select id="ed-setting" name="decor_setting">
+                <option>Indoor</option>
+                <option>Outdoor</option>
+                <option>Both</option>
+                <option>I&rsquo;m not sure</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ed-colours">Preferred colours</label>
+              <input type="text" id="ed-colours" name="decor_colours" placeholder="e.g. sage, cream and gold">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="ed-notes">Short notes</label>
+            <textarea id="ed-notes" name="decor_notes" placeholder="Anything else that would help us plan&hellip;"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset" data-conditional-keep>
+          <legend>Inspiration</legend>
+          <p class="fieldset__hint">Upload up to three images that show the look you love.</p>
+
+          <div class="upload" data-upload data-max="3">
+            <input type="file" id="ed-files" name="inspiration" accept="image/*" multiple>
+            <label class="upload__cta btn btn--ghost" for="ed-files">Upload your inspiration</label>
+            <p class="form__note">JPG, PNG or WEBP &mdash; up to 3 images, 5&nbsp;MB each.</p>
+            <div class="upload__list" data-upload-list></div>
+          </div>
+
+          <div class="field" style="margin-top:1.5rem">
+            <label for="ed-note">What do you like about these images?</label>
+            <textarea id="ed-note" name="inspiration_note" placeholder="The colours, the shape, the flowers&hellip;"></textarea>
+          </div>
+
+          <p class="callout">Inspiration images are used as a creative reference only. Your final setup will be designed by Grace &amp; Co and may differ from the images you share.</p>
+        </fieldset>
+        </div>
+
+        <div>
+          <button class="btn" type="submit">Send my enquiry</button>
+          <p class="form__note">We reply within one working day. Nothing is confirmed until you approve the design and the price.</p>
+          <p class="form-status" id="enquiry-status" role="status" hidden></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<a class="wa-fab" data-wa href="#" target="_blank" rel="noopener" aria-label="Chat to Grace &amp; Co on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.23 8.24c0 4.54-3.69 8.2-8.23 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<div class="cookie" id="cookie-notice" role="region" aria-label="Cookie notice" hidden>
+  <p>We use cookies to understand how the site is used and to measure our advertising. See our <a href="privacy.html">privacy notice</a>.</p>
+  <div class="cookie__actions">
+    <button class="btn" type="button" data-cookie="accept">Accept</button>
+    <button class="btn btn--ghost" type="button" data-cookie="decline">Decline</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img src="assets/img/logo-lockup-light.png" alt="Grace &amp; Co" width="190" height="122">
+        <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every celebration in between.</p>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Explore</h2>
+        <ul class="footer__list">
+          <li><a href="cakes.html">Cakes</a></li>
+          <li><a href="decor.html">Decor</a></li>
+          <li><a href="work.html">Our Work</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Enquire</h2>
+        <ul class="footer__list">
+          <li><a href="enquiry.html">Plan My Celebration</a></li>
+          <li><a href="cakes.html#enquiry">Request a cake</a></li>
+          <li><a href="decor.html#enquiry">Request decor</a></li>
+          <li><a href="contact.html#contact-me">Please contact me</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Get in touch</h2>
+        <ul class="footer__list">
+          <li><a data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+          <li><a data-email href="#">hello@graceandco.co.za</a></li>
+          <li><a data-phone href="#">+27 (0)00 000 0000</a></li>
+          <li>Mon &ndash; Sat, 9am &ndash; 5pm</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
+      <span><a href="privacy.html">Privacy notice</a></span>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

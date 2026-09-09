@@ -3,13 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Our Cakes &mdash; Lucinda</title>
-<meta name="description" content="Bento cakes, celebration cakes, wedding tiers and bespoke designs, with a size and serving guide.">
-<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<title>Custom Cakes &mdash; Grace &amp; Co</title>
+<meta name="description" content="Bento, celebration and tiered cakes with an approximate serving guide. Request a cake in a few clicks.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Custom Cakes &mdash; Grace &amp; Co">
+<meta property="og:description" content="Bento, celebration and tiered cakes with an approximate serving guide. Request a cake in a few clicks.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/hero.svg">
+<link rel="icon" href="assets/img/logo-mark.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/config.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -17,212 +23,407 @@
   <nav class="nav wrap" data-open="false" aria-label="Primary">
     <ul class="nav__list">
       <li><a class="nav__link" href="index.html">Home</a></li>
-      <li><a class="nav__link" href="cakes.html" aria-current="page">Our Cakes</a></li>
-      <li><a class="nav__link" href="about.html">About</a></li>
+      <li><a class="nav__link" href="cakes.html" aria-current="page">Cakes</a></li>
+      <li><a class="nav__link" href="decor.html">Decor</a></li>
     </ul>
 
-    <a class="brand" href="index.html" aria-label="Lucinda — home">
-      <!-- Logo: swap assets/img/logo.svg to rebrand every page at once. -->
-      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-      <span class="brand__name">Lucinda</span>
+    <a class="brand" href="index.html" aria-label="Grace &amp; Co — home">
+      <img class="brand__mark" src="assets/img/logo-mark.png" alt="" width="46" height="46">
+      <span class="brand__name">Grace &amp; Co</span>
     </a>
 
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
 
     <ul class="nav__list nav__list--right">
-      <li><a class="nav__link" href="cakes.html#gallery">Gallery</a></li>
+      <li><a class="nav__link" href="work.html">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
       <li><a class="nav__link" href="contact.html">Contact</a></li>
-      <li><a class="nav__link" href="order.html">Order</a></li>
     </ul>
   </nav>
 </header>
 <main id="main">
   <section class="page-head">
     <div class="wrap wrap--narrow">
-      <span class="eyebrow">The collection</span>
-      <h1>Our cakes</h1>
+      <span class="eyebrow">Cakes</span>
+      <h1>Custom cakes</h1>
       <hr class="rule">
-      <p>Every cake below can be made in any of our sizes &mdash; from a bento cake for two to a three-tier centrepiece for a hundred.</p>
+      <p>Designed around your theme, your flavours and your guest count &mdash; from a bento cake for two to three tiers for a hundred.</p>
+      <div class="btn-row center"><a class="btn" href="#enquiry">Request a cake</a></div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap">
-      <div class="grid grid--3 reveal">
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-bento.svg" alt="A small bento cake in its box" width="900" height="1200"></div>
-          <h3>Bento Cakes</h3>
-          <p>A 4&#8209;inch cake-for-two, hand-piped and boxed with a fork. Perfect for a small surprise or an intimate celebration.</p>
-          <span class="card__meta">Serves 2&ndash;4</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-celebration.svg" alt="A single-tier celebration cake" width="900" height="1200"></div>
-          <h3>Celebration Cakes</h3>
-          <p>Single-tier cakes in 6, 8 or 10&#8209;inch, finished in smooth buttercream with fresh flowers or hand-piped detail.</p>
-          <span class="card__meta">Serves 8&ndash;35</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-wedding.svg" alt="A tiered wedding cake" width="900" height="1200"></div>
-          <h3>Wedding &amp; Tiered</h3>
-          <p>Two- and three-tier cakes designed around your day, with a tasting box sent ahead of the final decision.</p>
-          <span class="card__meta">Serves 35&ndash;100+</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-cupcakes.svg" alt="A tray of cupcakes" width="900" height="1200"></div>
-          <h3>Cupcakes &amp; Minis</h3>
-          <p>Boxes of six or twelve, matched to your cake or ordered on their own for favours and dessert tables.</p>
-          <span class="card__meta">By the box</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-seasonal.svg" alt="A seasonal cake" width="900" height="1200"></div>
-          <h3>Seasonal</h3>
-          <p>A short menu that changes with what&rsquo;s good &mdash; stone fruit in summer, spiced sponges as it cools.</p>
-          <span class="card__meta">Limited runs</span>
-        </article>
-        <article class="card">
-          <div class="card__media"><img src="assets/img/cake-bespoke.svg" alt="A bespoke sculpted cake" width="900" height="1200"></div>
-          <h3>Bespoke</h3>
-          <p>Sculpted, painted or entirely your own idea. Send us the brief and we&rsquo;ll tell you honestly whether we can do it well.</p>
-          <span class="card__meta">By consultation</span>
-        </article>
+      <div class="gallery">
+        <figure><img src="assets/img/cake-1.svg" alt="Grace &amp; Co custom cake 1" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/cake-2.svg" alt="Grace &amp; Co custom cake 2" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/cake-3.svg" alt="Grace &amp; Co custom cake 3" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/cake-4.svg" alt="Grace &amp; Co custom cake 4" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/cake-5.svg" alt="Grace &amp; Co custom cake 5" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/cake-6.svg" alt="Grace &amp; Co custom cake 6" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
       </div>
     </div>
   </section>
 
-  <section class="section section--shell" id="sizes">
+  <section class="section section--alt" id="sizes">
+    <div class="wrap wrap--narrow center">
+      <span class="eyebrow">Size guide</span>
+      <h2>Which size do I need?</h2>
+      <hr class="rule">
+      <p class="lede">Approximate servings, based on standard dessert portions. If you are between two sizes, size up.</p>
+      <div class="options options--sizes" style="margin-top:2.5rem; text-align:left">
+        <div class="option"><span class="option__label"><span class="option__name">4-inch Bento Cake</span><span class="option__note">2&ndash;4 people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">6-inch Cake</span><span class="option__note">8&ndash;12 people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">8-inch Cake</span><span class="option__note">15&ndash;20 people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">10-inch Cake</span><span class="option__note">25&ndash;35 people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">Two-tier Cake</span><span class="option__note">35&ndash;50 people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">Three-tier Cake</span><span class="option__note">60&ndash;100+ people</span></span></div>
+        <div class="option"><span class="option__label"><span class="option__name">I&rsquo;m not sure</span><span class="option__note">We&rsquo;ll recommend the best size.</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="enquiry">
     <div class="wrap wrap--narrow">
       <div class="center">
-        <span class="eyebrow">Size guide</span>
-        <h2>Which size do I need?</h2>
+        <span class="eyebrow">Cake enquiry</span>
+        <h2>Request a cake</h2>
         <hr class="rule">
-        <p class="lede">Approximate servings, based on standard dessert portions. Between two sizes? Size up.</p>
+        <p class="lede">Click through the options below &mdash; there is very little to type.</p>
       </div>
 
-      <div class="sizes" style="margin-top:3rem">
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">4-inch Bento Cake</span>
-            <span class="size__serves">2&ndash;4 people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">6-inch Cake</span>
-            <span class="size__serves">8&ndash;12 people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">8-inch Cake</span>
-            <span class="size__serves">15&ndash;20 people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">10-inch Cake</span>
-            <span class="size__serves">25&ndash;35 people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">Two-tier Cake</span>
-            <span class="size__serves">35&ndash;50 people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">Three-tier Cake</span>
-            <span class="size__serves">60&ndash;100+ people</span>
-          </span>
-        </div>
-        <div class="size">
-          <span class="size__label">
-            <span class="size__name">I&rsquo;m not sure</span>
-            <span class="size__serves">We&rsquo;ll recommend the best size.</span>
-          </span>
-        </div>
-      </div>
+      <form class="form" id="cake-form" data-enquiry="cake" style="margin-top:3rem">
+        <fieldset class="fieldset">
+          <legend>Your details</legend>
+          <p class="fieldset__hint">So Grace &amp; Co can come back to you.</p>
 
-      <div class="btn-row center">
-        <a class="btn" href="order.html">Order your size</a>
-      </div>
-    </div>
-  </section>
+          <div class="field">
+            <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+          </div>
 
-  <section class="section--tight" id="gallery">
-    <div class="wrap center" style="margin-bottom:2.5rem">
-      <span class="eyebrow">Gallery</span>
-      <h2>Recent work</h2>
-    </div>
-    <div class="gallery">
-      <a href="order.html"><img src="assets/img/gallery-1.svg" alt="Recent cake 1" width="600" height="600" loading="lazy"></a>
-      <a href="order.html"><img src="assets/img/gallery-2.svg" alt="Recent cake 2" width="600" height="600" loading="lazy"></a>
-      <a href="order.html"><img src="assets/img/gallery-3.svg" alt="Recent cake 3" width="600" height="600" loading="lazy"></a>
-      <a href="order.html"><img src="assets/img/gallery-4.svg" alt="Recent cake 4" width="600" height="600" loading="lazy"></a>
-      <a href="order.html"><img src="assets/img/gallery-5.svg" alt="Recent cake 5" width="600" height="600" loading="lazy"></a>
-      <a href="order.html"><img src="assets/img/gallery-6.svg" alt="Recent cake 6" width="600" height="600" loading="lazy"></a>
-    </div>
-  </section>
+          <div class="field-row">
+            <div class="field">
+              <label for="whatsapp">WhatsApp number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" id="whatsapp" name="whatsapp" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email">
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend>Cake size</legend>
+          <p class="fieldset__hint">Approximate servings are shown under each size. Between two sizes? Size up.</p>
+          <div class="options options--sizes">
+            <div class="option">
+              <input type="radio" id="cake-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake" required>
+              <label class="option__label" for="cake-size-4-inch-bento-cake">
+                <span class="option__name">4-inch Bento Cake</span>
+                <span class="option__note">2&ndash;4 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-6-inch-cake" name="cake_size" value="6-inch Cake">
+              <label class="option__label" for="cake-size-6-inch-cake">
+                <span class="option__name">6-inch Cake</span>
+                <span class="option__note">8&ndash;12 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-8-inch-cake" name="cake_size" value="8-inch Cake">
+              <label class="option__label" for="cake-size-8-inch-cake">
+                <span class="option__name">8-inch Cake</span>
+                <span class="option__note">15&ndash;20 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-10-inch-cake" name="cake_size" value="10-inch Cake">
+              <label class="option__label" for="cake-size-10-inch-cake">
+                <span class="option__name">10-inch Cake</span>
+                <span class="option__note">25&ndash;35 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-two-tier-cake" name="cake_size" value="Two-tier Cake">
+              <label class="option__label" for="cake-size-two-tier-cake">
+                <span class="option__name">Two-tier Cake</span>
+                <span class="option__note">35&ndash;50 people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-three-tier-cake" name="cake_size" value="Three-tier Cake">
+              <label class="option__label" for="cake-size-three-tier-cake">
+                <span class="option__name">Three-tier Cake</span>
+                <span class="option__note">60&ndash;100+ people</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-size-im-not-sure" name="cake_size" value="I&rsquo;m not sure">
+              <label class="option__label" for="cake-size-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+                <span class="option__note">We&rsquo;ll recommend the best size.</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
 
-  <section class="section band">
-    <div class="wrap wrap--narrow">
-      <span class="eyebrow">Found something you like?</span>
-      <h2>Tell us about your cake</h2>
-      <p>Send through the date, the guest count and any inspiration you&rsquo;ve saved. We&rsquo;ll do the rest.</p>
-      <div class="btn-row center">
-        <a class="btn btn--light" href="order.html">Start your order</a>
-      </div>
+        <fieldset class="fieldset">
+          <legend>Guest count</legend>
+          <p class="fieldset__hint">Roughly how many people are you feeding?</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cake-guests-1-10" name="cake_guests" value="1-10">
+              <label class="option__label" for="cake-guests-1-10">
+                <span class="option__name">1-10</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-guests-11-20" name="cake_guests" value="11-20">
+              <label class="option__label" for="cake-guests-11-20">
+                <span class="option__name">11-20</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-guests-21-30" name="cake_guests" value="21-30">
+              <label class="option__label" for="cake-guests-21-30">
+                <span class="option__name">21-30</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-guests-31-50" name="cake_guests" value="31-50">
+              <label class="option__label" for="cake-guests-31-50">
+                <span class="option__name">31-50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-guests-more-than-50" name="cake_guests" value="More than 50">
+              <label class="option__label" for="cake-guests-more-than-50">
+                <span class="option__name">More than 50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-guests-im-not-sure" name="cake_guests" value="I&rsquo;m not sure">
+              <label class="option__label" for="cake-guests-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Flavour</legend>
+          <p class="fieldset__hint">Not sure? Choose &lsquo;Please recommend&rsquo; and we will suggest something.</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cake-flavour-vanilla" name="cake_flavour" value="Vanilla">
+              <label class="option__label" for="cake-flavour-vanilla">
+                <span class="option__name">Vanilla</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-flavour-chocolate" name="cake_flavour" value="Chocolate">
+              <label class="option__label" for="cake-flavour-chocolate">
+                <span class="option__name">Chocolate</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-flavour-red-velvet" name="cake_flavour" value="Red velvet">
+              <label class="option__label" for="cake-flavour-red-velvet">
+                <span class="option__name">Red velvet</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-flavour-carrot" name="cake_flavour" value="Carrot">
+              <label class="option__label" for="cake-flavour-carrot">
+                <span class="option__name">Carrot</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-flavour-other" name="cake_flavour" value="Other">
+              <label class="option__label" for="cake-flavour-other">
+                <span class="option__name">Other</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-flavour-please-recommend" name="cake_flavour" value="Please recommend">
+              <label class="option__label" for="cake-flavour-please-recommend">
+                <span class="option__name">Please recommend</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Style</legend>
+          <p class="fieldset__hint">The overall look you have in mind.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="cake-style-simple-and-elegant" name="cake_style" value="Simple and elegant">
+              <label class="option__label" for="cake-style-simple-and-elegant">
+                <span class="option__name">Simple and elegant</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-luxury" name="cake_style" value="Luxury">
+              <label class="option__label" for="cake-style-luxury">
+                <span class="option__name">Luxury</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-floral" name="cake_style" value="Floral">
+              <label class="option__label" for="cake-style-floral">
+                <span class="option__name">Floral</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-kids-themed" name="cake_style" value="Kids&rsquo; themed">
+              <label class="option__label" for="cake-style-kids-themed">
+                <span class="option__name">Kids&rsquo; themed</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-character" name="cake_style" value="Character">
+              <label class="option__label" for="cake-style-character">
+                <span class="option__name">Character</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-minimal" name="cake_style" value="Minimal">
+              <label class="option__label" for="cake-style-minimal">
+                <span class="option__name">Minimal</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-custom" name="cake_style" value="Custom">
+              <label class="option__label" for="cake-style-custom">
+                <span class="option__name">Custom</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-style-im-not-sure" name="cake_style" value="I&rsquo;m not sure">
+              <label class="option__label" for="cake-style-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Final details</legend>
+          <p class="fieldset__hint">Just a few last things.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="cake-date">Required date <span class="req" aria-hidden="true">*</span></label>
+              <input type="date" id="cake-date" name="cake_date" required>
+            </div>
+            <div class="field">
+              <label for="cake-collection">Collection or delivery</label>
+              <select id="cake-collection" name="cake_collection">
+                <option>Collection</option>
+                <option>Delivery</option>
+                <option>I&rsquo;m not sure</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cake-wording">Cake wording</label>
+            <input type="text" id="cake-wording" name="cake_wording" placeholder="e.g. Happy 30th, Sarah">
+          </div>
+
+          <div class="field">
+            <label for="cake-notes">Short notes</label>
+            <textarea id="cake-notes" name="cake_notes" placeholder="Colours, allergies, anything else we should know&hellip;"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset" data-conditional-keep>
+          <legend>Inspiration</legend>
+          <p class="fieldset__hint">Upload up to three images that show the look you love.</p>
+
+          <div class="upload" data-upload data-max="3">
+            <input type="file" id="cake-files" name="inspiration" accept="image/*" multiple>
+            <label class="upload__cta btn btn--ghost" for="cake-files">Upload your inspiration</label>
+            <p class="form__note">JPG, PNG or WEBP &mdash; up to 3 images, 5&nbsp;MB each.</p>
+            <div class="upload__list" data-upload-list></div>
+          </div>
+
+          <div class="field" style="margin-top:1.5rem">
+            <label for="cake-note">What do you like about these images?</label>
+            <textarea id="cake-note" name="inspiration_note" placeholder="The colours, the shape, the flowers&hellip;"></textarea>
+          </div>
+
+          <p class="callout">Inspiration images are used as a creative reference only. Your final cake will be designed by Grace &amp; Co and may differ from the images you share.</p>
+        </fieldset>
+        <div>
+          <button class="btn" type="submit">Send my cake enquiry</button>
+          <p class="form__note">We reply within one working day. Nothing is confirmed until you approve the design and price.</p>
+          <p class="form-status" id="cake-status" role="status" hidden></p>
+        </div>
+      </form>
     </div>
   </section>
 </main>
+
+<a class="wa-fab" data-wa href="#" target="_blank" rel="noopener" aria-label="Chat to Grace &amp; Co on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.23 8.24c0 4.54-3.69 8.2-8.23 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<div class="cookie" id="cookie-notice" role="region" aria-label="Cookie notice" hidden>
+  <p>We use cookies to understand how the site is used and to measure our advertising. See our <a href="privacy.html">privacy notice</a>.</p>
+  <div class="cookie__actions">
+    <button class="btn" type="button" data-cookie="accept">Accept</button>
+    <button class="btn btn--ghost" type="button" data-cookie="decline">Decline</button>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer__grid">
       <div class="footer__brand">
-        <span class="brand">
-          <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-          <span class="brand__name">Lucinda</span>
-        </span>
-        <p>Small-batch celebration cakes, baked to order and finished by hand. Every cake begins with a conversation.</p>
+        <img src="assets/img/logo-lockup-light.png" alt="Grace &amp; Co" width="190" height="122">
+        <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every celebration in between.</p>
       </div>
 
       <div>
         <h2 class="footer__title">Explore</h2>
         <ul class="footer__list">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="cakes.html">Our Cakes</a></li>
+          <li><a href="cakes.html">Cakes</a></li>
+          <li><a href="decor.html">Decor</a></li>
+          <li><a href="work.html">Our Work</a></li>
           <li><a href="about.html">About</a></li>
-          <li><a href="contact.html">Contact</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Order</h2>
+        <h2 class="footer__title">Enquire</h2>
         <ul class="footer__list">
-          <li><a href="order.html">Place an order</a></li>
-          <li><a href="cakes.html#sizes">Size &amp; serving guide</a></li>
-          <li><a href="contact.html#faq">FAQs</a></li>
+          <li><a href="enquiry.html">Plan My Celebration</a></li>
+          <li><a href="cakes.html#enquiry">Request a cake</a></li>
+          <li><a href="decor.html#enquiry">Request decor</a></li>
+          <li><a href="contact.html#contact-me">Please contact me</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Studio</h2>
+        <h2 class="footer__title">Get in touch</h2>
         <ul class="footer__list">
-          <li><a href="mailto:hello@lucinda.example">hello@lucinda.example</a></li>
-          <li><a href="tel:+270000000">+27 (0)00 000 0000</a></li>
-          <li>Collection by appointment</li>
-          <li>Tue &ndash; Sat, 9am &ndash; 4pm</li>
+          <li><a data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+          <li><a data-email href="#">hello@graceandco.co.za</a></li>
+          <li><a data-phone href="#">+27 (0)00 000 0000</a></li>
+          <li>Mon &ndash; Sat, 9am &ndash; 5pm</li>
         </ul>
       </div>
     </div>
 
     <div class="footer__bottom">
-      <span>&copy; <span id="year">2026</span> Lucinda Cake Boutique. All rights reserved.</span>
-      <span>Baked fresh to order.</span>
+      <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
+      <span><a href="privacy.html">Privacy notice</a></span>
     </div>
   </div>
 </footer>

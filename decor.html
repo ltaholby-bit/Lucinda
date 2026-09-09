@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Decor &mdash; Grace &amp; Co</title>
+<meta name="description" content="Balloons, backdrops, cake tables, welcome signs and full event styling. Request decor in a few clicks.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Event Decor &mdash; Grace &amp; Co">
+<meta property="og:description" content="Balloons, backdrops, cake tables, welcome signs and full event styling. Request decor in a few clicks.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/hero.svg">
+<link rel="icon" href="assets/img/logo-mark.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <nav class="nav wrap" data-open="false" aria-label="Primary">
+    <ul class="nav__list">
+      <li><a class="nav__link" href="index.html">Home</a></li>
+      <li><a class="nav__link" href="cakes.html">Cakes</a></li>
+      <li><a class="nav__link" href="decor.html" aria-current="page">Decor</a></li>
+    </ul>
+
+    <a class="brand" href="index.html" aria-label="Grace &amp; Co — home">
+      <img class="brand__mark" src="assets/img/logo-mark.png" alt="" width="46" height="46">
+      <span class="brand__name">Grace &amp; Co</span>
+    </a>
+
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+
+    <ul class="nav__list nav__list--right">
+      <li><a class="nav__link" href="work.html">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
+      <li><a class="nav__link" href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+<main id="main">
+  <section class="page-head">
+    <div class="wrap wrap--narrow">
+      <span class="eyebrow">Decor</span>
+      <h1>Event decor</h1>
+      <hr class="rule">
+      <p>Balloons, backdrops, cake tables, guest tables, welcome signs and full setups &mdash; styled and installed for you.</p>
+      <div class="btn-row center"><a class="btn" href="#enquiry">Request decor</a></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="gallery">
+        <figure><img src="assets/img/decor-1.svg" alt="Grace &amp; Co event decor 1" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/decor-2.svg" alt="Grace &amp; Co event decor 2" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/decor-3.svg" alt="Grace &amp; Co event decor 3" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/decor-4.svg" alt="Grace &amp; Co event decor 4" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/decor-5.svg" alt="Grace &amp; Co event decor 5" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+        <figure><img src="assets/img/decor-6.svg" alt="Grace &amp; Co event decor 6" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap">
+      <div class="center"><span class="eyebrow">What we offer</span><h2>Styled from table to backdrop</h2><hr class="rule"></div>
+      <div class="grid grid--3" style="margin-top:2.5rem">
+        <div><h3>Balloons &amp; backdrops</h3><p>Organic garlands, arches and backdrops built to suit your colours and your venue.</p></div>
+        <div><h3>Cake &amp; guest tables</h3><p>Styled cake tables and dressed guest tables, with linen, florals and finishing detail.</p></div>
+        <div><h3>Full celebration setup</h3><p>Welcome signage, florals, kids&rsquo; setups and everything in between, installed on the day.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="enquiry">
+    <div class="wrap wrap--narrow">
+      <div class="center">
+        <span class="eyebrow">Decor enquiry</span>
+        <h2>Request decor</h2>
+        <hr class="rule">
+        <p class="lede">Choose what you need &mdash; you can pick more than one.</p>
+      </div>
+
+      <form class="form" id="decor-form" data-enquiry="decor" style="margin-top:3rem">
+        <fieldset class="fieldset">
+          <legend>Your details</legend>
+          <p class="fieldset__hint">So Grace &amp; Co can come back to you.</p>
+
+          <div class="field">
+            <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="whatsapp">WhatsApp number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" id="whatsapp" name="whatsapp" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email">
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend>Guest count</legend>
+          <p class="fieldset__hint">Roughly how many guests are you expecting?</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="decor-guests-up-to-10" name="decor_guests" value="Up to 10">
+              <label class="option__label" for="decor-guests-up-to-10">
+                <span class="option__name">Up to 10</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-11-20" name="decor_guests" value="11-20">
+              <label class="option__label" for="decor-guests-11-20">
+                <span class="option__name">11-20</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-21-30" name="decor_guests" value="21-30">
+              <label class="option__label" for="decor-guests-21-30">
+                <span class="option__name">21-30</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-31-50" name="decor_guests" value="31-50">
+              <label class="option__label" for="decor-guests-31-50">
+                <span class="option__name">31-50</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-51-100" name="decor_guests" value="51-100">
+              <label class="option__label" for="decor-guests-51-100">
+                <span class="option__name">51-100</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-more-than-100" name="decor_guests" value="More than 100">
+              <label class="option__label" for="decor-guests-more-than-100">
+                <span class="option__name">More than 100</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-guests-im-not-sure" name="decor_guests" value="I&rsquo;m not sure">
+              <label class="option__label" for="decor-guests-im-not-sure">
+                <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Decor needed</legend>
+          <p class="fieldset__hint">Choose as many as you like.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="checkbox" id="decor-items-balloons" name="decor_items" value="Balloons">
+              <label class="option__label" for="decor-items-balloons">
+                <span class="option__name">Balloons</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-backdrop" name="decor_items" value="Backdrop">
+              <label class="option__label" for="decor-items-backdrop">
+                <span class="option__name">Backdrop</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-cake-table" name="decor_items" value="Cake table">
+              <label class="option__label" for="decor-items-cake-table">
+                <span class="option__name">Cake table</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-guest-tables" name="decor_items" value="Guest tables">
+              <label class="option__label" for="decor-items-guest-tables">
+                <span class="option__name">Guest tables</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-welcome-sign" name="decor_items" value="Welcome sign">
+              <label class="option__label" for="decor-items-welcome-sign">
+                <span class="option__name">Welcome sign</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-flowers" name="decor_items" value="Flowers">
+              <label class="option__label" for="decor-items-flowers">
+                <span class="option__name">Flowers</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-kids-setup" name="decor_items" value="Kids&rsquo; setup">
+              <label class="option__label" for="decor-items-kids-setup">
+                <span class="option__name">Kids&rsquo; setup</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-full-decor" name="decor_items" value="Full decor">
+              <label class="option__label" for="decor-items-full-decor">
+                <span class="option__name">Full decor</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="decor-items-please-guide-me" name="decor_items" value="Please guide me">
+              <label class="option__label" for="decor-items-please-guide-me">
+                <span class="option__name">Please guide me</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Style</legend>
+          <p class="fieldset__hint">The mood you are going for.</p>
+          <div class="options options--wide">
+            <div class="option">
+              <input type="radio" id="decor-style-soft-and-elegant" name="decor_style" value="Soft and elegant">
+              <label class="option__label" for="decor-style-soft-and-elegant">
+                <span class="option__name">Soft and elegant</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-modern-and-minimal" name="decor_style" value="Modern and minimal">
+              <label class="option__label" for="decor-style-modern-and-minimal">
+                <span class="option__name">Modern and minimal</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-colourful-and-fun" name="decor_style" value="Colourful and fun">
+              <label class="option__label" for="decor-style-colourful-and-fun">
+                <span class="option__name">Colourful and fun</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-luxury" name="decor_style" value="Luxury">
+              <label class="option__label" for="decor-style-luxury">
+                <span class="option__name">Luxury</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-floral" name="decor_style" value="Floral">
+              <label class="option__label" for="decor-style-floral">
+                <span class="option__name">Floral</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-kids-theme" name="decor_style" value="Kids&rsquo; theme">
+              <label class="option__label" for="decor-style-kids-theme">
+                <span class="option__name">Kids&rsquo; theme</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="decor-style-custom" name="decor_style" value="Custom">
+              <label class="option__label" for="decor-style-custom">
+                <span class="option__name">Custom</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Final details</legend>
+          <p class="fieldset__hint">Where and when.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="decor-date">Event date <span class="req" aria-hidden="true">*</span></label>
+              <input type="date" id="decor-date" name="decor_date" required>
+            </div>
+            <div class="field">
+              <label for="decor-venue">Venue or area</label>
+              <input type="text" id="decor-venue" name="decor_venue" placeholder="Venue name or suburb">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="decor-setting">Indoor or outdoor</label>
+              <select id="decor-setting" name="decor_setting">
+                <option>Indoor</option>
+                <option>Outdoor</option>
+                <option>Both</option>
+                <option>I&rsquo;m not sure</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="decor-colours">Preferred colours</label>
+              <input type="text" id="decor-colours" name="decor_colours" placeholder="e.g. sage, cream and gold">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="decor-notes">Short notes</label>
+            <textarea id="decor-notes" name="decor_notes" placeholder="Anything else that would help us plan&hellip;"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset" data-conditional-keep>
+          <legend>Inspiration</legend>
+          <p class="fieldset__hint">Upload up to three images that show the look you love.</p>
+
+          <div class="upload" data-upload data-max="3">
+            <input type="file" id="decor-files" name="inspiration" accept="image/*" multiple>
+            <label class="upload__cta btn btn--ghost" for="decor-files">Upload your inspiration</label>
+            <p class="form__note">JPG, PNG or WEBP &mdash; up to 3 images, 5&nbsp;MB each.</p>
+            <div class="upload__list" data-upload-list></div>
+          </div>
+
+          <div class="field" style="margin-top:1.5rem">
+            <label for="decor-note">What do you like about these images?</label>
+            <textarea id="decor-note" name="inspiration_note" placeholder="The colours, the shape, the flowers&hellip;"></textarea>
+          </div>
+
+          <p class="callout">Inspiration images are used as a creative reference only. Your final setup will be designed by Grace &amp; Co and may differ from the images you share.</p>
+        </fieldset>
+        <div>
+          <button class="btn" type="submit">Send my decor enquiry</button>
+          <p class="form__note">We reply within one working day with a styling direction and a price.</p>
+          <p class="form-status" id="decor-status" role="status" hidden></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<a class="wa-fab" data-wa href="#" target="_blank" rel="noopener" aria-label="Chat to Grace &amp; Co on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.23 8.24c0 4.54-3.69 8.2-8.23 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<div class="cookie" id="cookie-notice" role="region" aria-label="Cookie notice" hidden>
+  <p>We use cookies to understand how the site is used and to measure our advertising. See our <a href="privacy.html">privacy notice</a>.</p>
+  <div class="cookie__actions">
+    <button class="btn" type="button" data-cookie="accept">Accept</button>
+    <button class="btn btn--ghost" type="button" data-cookie="decline">Decline</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img src="assets/img/logo-lockup-light.png" alt="Grace &amp; Co" width="190" height="122">
+        <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every celebration in between.</p>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Explore</h2>
+        <ul class="footer__list">
+          <li><a href="cakes.html">Cakes</a></li>
+          <li><a href="decor.html">Decor</a></li>
+          <li><a href="work.html">Our Work</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Enquire</h2>
+        <ul class="footer__list">
+          <li><a href="enquiry.html">Plan My Celebration</a></li>
+          <li><a href="cakes.html#enquiry">Request a cake</a></li>
+          <li><a href="decor.html#enquiry">Request decor</a></li>
+          <li><a href="contact.html#contact-me">Please contact me</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__title">Get in touch</h2>
+        <ul class="footer__list">
+          <li><a data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+          <li><a data-email href="#">hello@graceandco.co.za</a></li>
+          <li><a data-phone href="#">+27 (0)00 000 0000</a></li>
+          <li>Mon &ndash; Sat, 9am &ndash; 5pm</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
+      <span><a href="privacy.html">Privacy notice</a></span>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

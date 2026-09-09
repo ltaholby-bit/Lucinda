@@ -3,13 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contact &mdash; Lucinda</title>
-<meta name="description" content="Studio hours, collection details and answers to the questions we are asked most.">
-<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<title>Contact &mdash; Grace &amp; Co</title>
+<meta name="description" content="WhatsApp, phone, email, operating area and hours &mdash; or ask Grace & Co to contact you.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Contact &mdash; Grace &amp; Co">
+<meta property="og:description" content="WhatsApp, phone, email, operating area and hours &mdash; or ask Grace & Co to contact you.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/hero.svg">
+<link rel="icon" href="assets/img/logo-mark.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/config.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -17,26 +23,23 @@
   <nav class="nav wrap" data-open="false" aria-label="Primary">
     <ul class="nav__list">
       <li><a class="nav__link" href="index.html">Home</a></li>
-      <li><a class="nav__link" href="cakes.html">Our Cakes</a></li>
-      <li><a class="nav__link" href="about.html">About</a></li>
+      <li><a class="nav__link" href="cakes.html">Cakes</a></li>
+      <li><a class="nav__link" href="decor.html">Decor</a></li>
     </ul>
 
-    <a class="brand" href="index.html" aria-label="Lucinda — home">
-      <!-- Logo: swap assets/img/logo.svg to rebrand every page at once. -->
-      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-      <span class="brand__name">Lucinda</span>
+    <a class="brand" href="index.html" aria-label="Grace &amp; Co — home">
+      <img class="brand__mark" src="assets/img/logo-mark.png" alt="" width="46" height="46">
+      <span class="brand__name">Grace &amp; Co</span>
     </a>
 
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
 
     <ul class="nav__list nav__list--right">
-      <li><a class="nav__link" href="cakes.html#gallery">Gallery</a></li>
+      <li><a class="nav__link" href="work.html">Our Work</a></li>
+      <li><a class="nav__link" href="about.html">About</a></li>
       <li><a class="nav__link" href="contact.html" aria-current="page">Contact</a></li>
-      <li><a class="nav__link" href="order.html">Order</a></li>
     </ul>
   </nav>
 </header>
@@ -46,113 +49,219 @@
       <span class="eyebrow">Contact</span>
       <h1>Get in touch</h1>
       <hr class="rule">
-      <p>For orders, please use the order form so nothing gets missed. For anything else, we&rsquo;re here.</p>
+      <p>Message us directly, or leave your details below and we will come back to you.</p>
+      <div class="btn-row center">
+        <a class="btn btn--wa" data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a>
+        <a class="btn btn--ghost" href="#contact-me">Please Contact Me</a>
+      </div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap split">
-      <div class="split__media">
-        <img src="assets/img/order-banner.svg" alt="Cakes boxed for collection" width="1600" height="700" style="aspect-ratio:4/5">
-      </div>
+      <div class="split__media"><img src="assets/img/contact-banner.svg" alt="A Grace &amp; Co celebration" width="1200" height="1500"></div>
       <div>
         <span class="eyebrow">Studio</span>
         <h2>Details</h2>
         <hr class="rule rule--left">
         <dl class="info">
-          <dt>Email</dt>
-          <dd><a href="mailto:hello@lucinda.example">hello@lucinda.example</a></dd>
-          <dt>Phone / WhatsApp</dt>
-          <dd><a href="tel:+270000000">+27 (0)00 000 0000</a></dd>
-          <dt>Collection</dt>
-          <dd>By appointment, Tuesday to Saturday</dd>
-          <dt>Studio hours</dt>
-          <dd>Tue &ndash; Sat, 9am &ndash; 4pm</dd>
+          <dt>WhatsApp</dt><dd><a data-wa href="#" target="_blank" rel="noopener">Message us on WhatsApp</a></dd>
+          <dt>Phone</dt><dd><a data-phone href="#">+27 (0)00 000 0000</a></dd>
+          <dt>Email</dt><dd><a data-email href="#">hello@graceandco.co.za</a></dd>
+          <dt>Operating area</dt><dd>Johannesburg and surrounds, with delivery quoted by distance</dd>
+          <dt>Hours</dt><dd>Monday &ndash; Saturday, 9am &ndash; 5pm</dd>
         </dl>
-        <div class="btn-row">
-          <a class="btn" href="order.html">Place an order</a>
-        </div>
       </div>
     </div>
   </section>
 
-  <section class="section section--shell" id="faq">
+  <!-- The fast option: returning or undecided customers. -->
+  <section class="section section--alt" id="contact-me">
     <div class="wrap wrap--narrow">
       <div class="center">
-        <span class="eyebrow">FAQs</span>
-        <h2>Asked most often</h2>
+        <span class="eyebrow">The quick option</span>
+        <h2>Please contact me</h2>
         <hr class="rule">
+        <p class="lede">Not sure what you need yet? Leave your details and we will reach out.</p>
       </div>
 
-      <div style="margin-top:2.5rem">
-        <div class="faq__item">
-          <h3>How far ahead should I order?</h3>
-          <p>Bento cakes need 3&ndash;5 days. Single-tier celebration cakes need about two weeks. Two- and three-tier cakes need six weeks. If your date is sooner, ask anyway &mdash; we sometimes have space.</p>
+      <form class="form" id="contact-me-form" data-enquiry="contact" style="margin-top:2.5rem">
+        <fieldset class="fieldset">
+          <legend class="visually-hidden">Your details</legend>
+          <div class="field">
+            <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="whatsapp">WhatsApp number <span class="req" aria-hidden="true">*</span></label>
+            <input type="tel" id="whatsapp" name="whatsapp" autocomplete="tel" required>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>What do you need?</legend>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cm-need-cake" name="need" value="Cake">
+              <label class="option__label" for="cm-need-cake">
+                <span class="option__name">Cake</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-need-decor" name="need" value="Decor">
+              <label class="option__label" for="cm-need-decor">
+                <span class="option__name">Decor</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-need-both" name="need" value="Both">
+              <label class="option__label" for="cm-need-both">
+                <span class="option__name">Both</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-need-other" name="need" value="Other">
+              <label class="option__label" for="cm-need-other">
+                <span class="option__name">Other</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Preferred contact method</legend>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cm-method-call" name="contact_method" value="Call">
+              <label class="option__label" for="cm-method-call">
+                <span class="option__name">Call</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-method-whatsapp" name="contact_method" value="WhatsApp">
+              <label class="option__label" for="cm-method-whatsapp">
+                <span class="option__name">WhatsApp</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Best time to contact you</legend>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cm-time-morning" name="contact_time" value="Morning">
+              <label class="option__label" for="cm-time-morning">
+                <span class="option__name">Morning</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-time-afternoon" name="contact_time" value="Afternoon">
+              <label class="option__label" for="cm-time-afternoon">
+                <span class="option__name">Afternoon</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-time-evening" name="contact_time" value="Evening">
+              <label class="option__label" for="cm-time-evening">
+                <span class="option__name">Evening</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cm-time-anytime" name="contact_time" value="Anytime">
+              <label class="option__label" for="cm-time-anytime">
+                <span class="option__name">Anytime</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Anything else?</legend>
+          <p class="fieldset__hint">Optional &mdash; a sentence is plenty.</p>
+          <div class="field">
+            <label class="visually-hidden" for="cm-message">Short message</label>
+            <textarea id="cm-message" name="message" placeholder="Optional short message&hellip;"></textarea>
+          </div>
+        </fieldset>
+
+        <div>
+          <button class="btn" type="submit">Send my request</button>
+          <p class="form-status" id="contact-me-status" role="status" hidden></p>
         </div>
-        <div class="faq__item">
-          <h3>What size cake do I need?</h3>
-          <p>Our size guide lists approximate servings for every size, from a 4&#8209;inch bento (2&ndash;4 people) to a three-tier cake (60&ndash;100+ people). If you are unsure, choose &ldquo;I&rsquo;m not sure&rdquo; on the order form and we will recommend the best size for your guest count.</p>
-        </div>
-        <div class="faq__item">
-          <h3>Do you cater for dietary requirements?</h3>
-          <p>We can do eggless, gluten-free, dairy-free and nut-free on most designs. Tell us on the order form and we will confirm what is possible. We bake in a kitchen that handles nuts, gluten and dairy, so we cannot guarantee zero traces.</p>
-        </div>
-        <div class="faq__item">
-          <h3>Do you deliver?</h3>
-          <p>Collection from the studio is free and preferred, especially for tiered cakes. Local delivery is available and quoted per order based on distance.</p>
-        </div>
-        <div class="faq__item">
-          <h3>How do I confirm my order?</h3>
-          <p>Once you have approved the design and quote, a 50% deposit secures your date. The balance is due on collection or delivery.</p>
-        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap wrap--narrow">
+      <div class="center"><span class="eyebrow">FAQs</span><h2>Asked most often</h2><hr class="rule"></div>
+      <div style="margin-top:2rem">
+        <div class="faq__item"><h3>How far ahead should I book?</h3><p>Cakes need about two weeks, tiered cakes about six. Decor setups need three to four weeks. If your date is sooner, ask anyway &mdash; we sometimes have space.</p></div>
+        <div class="faq__item"><h3>What size cake do I need?</h3><p>Our size guide shows approximate servings for every size, from a 4&#8209;inch bento (2&ndash;4 people) to a three-tier cake (60&ndash;100+ people). If you are unsure, choose &lsquo;I&rsquo;m not sure&rsquo; and we will recommend the right size for your guest count.</p></div>
+        <div class="faq__item"><h3>Can I send pictures of what I like?</h3><p>Yes, and we encourage it. You can upload up to three images with any enquiry. They are used as a creative reference &mdash; your final design will be our own and may differ.</p></div>
+        <div class="faq__item"><h3>Do you do cake and decor together?</h3><p>Often, and it is usually the better result. Choose &lsquo;Cake and decor&rsquo; on the enquiry form and we will quote both together.</p></div>
+        <div class="faq__item"><h3>How do I confirm a booking?</h3><p>Once you have approved the design direction and the quote, a deposit secures your date. The balance is due before collection or setup.</p></div>
       </div>
     </div>
   </section>
 </main>
+
+<a class="wa-fab" data-wa href="#" target="_blank" rel="noopener" aria-label="Chat to Grace &amp; Co on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.23 8.24c0 4.54-3.69 8.2-8.23 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<div class="cookie" id="cookie-notice" role="region" aria-label="Cookie notice" hidden>
+  <p>We use cookies to understand how the site is used and to measure our advertising. See our <a href="privacy.html">privacy notice</a>.</p>
+  <div class="cookie__actions">
+    <button class="btn" type="button" data-cookie="accept">Accept</button>
+    <button class="btn btn--ghost" type="button" data-cookie="decline">Decline</button>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer__grid">
       <div class="footer__brand">
-        <span class="brand">
-          <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
-          <span class="brand__name">Lucinda</span>
-        </span>
-        <p>Small-batch celebration cakes, baked to order and finished by hand. Every cake begins with a conversation.</p>
+        <img src="assets/img/logo-lockup-light.png" alt="Grace &amp; Co" width="190" height="122">
+        <p>Custom cakes and event decor for birthdays, baby showers, weddings, graduations and every celebration in between.</p>
       </div>
 
       <div>
         <h2 class="footer__title">Explore</h2>
         <ul class="footer__list">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="cakes.html">Our Cakes</a></li>
+          <li><a href="cakes.html">Cakes</a></li>
+          <li><a href="decor.html">Decor</a></li>
+          <li><a href="work.html">Our Work</a></li>
           <li><a href="about.html">About</a></li>
-          <li><a href="contact.html">Contact</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Order</h2>
+        <h2 class="footer__title">Enquire</h2>
         <ul class="footer__list">
-          <li><a href="order.html">Place an order</a></li>
-          <li><a href="cakes.html#sizes">Size &amp; serving guide</a></li>
-          <li><a href="contact.html#faq">FAQs</a></li>
+          <li><a href="enquiry.html">Plan My Celebration</a></li>
+          <li><a href="cakes.html#enquiry">Request a cake</a></li>
+          <li><a href="decor.html#enquiry">Request decor</a></li>
+          <li><a href="contact.html#contact-me">Please contact me</a></li>
         </ul>
       </div>
 
       <div>
-        <h2 class="footer__title">Studio</h2>
+        <h2 class="footer__title">Get in touch</h2>
         <ul class="footer__list">
-          <li><a href="mailto:hello@lucinda.example">hello@lucinda.example</a></li>
-          <li><a href="tel:+270000000">+27 (0)00 000 0000</a></li>
-          <li>Collection by appointment</li>
-          <li>Tue &ndash; Sat, 9am &ndash; 4pm</li>
+          <li><a data-wa href="#" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+          <li><a data-email href="#">hello@graceandco.co.za</a></li>
+          <li><a data-phone href="#">+27 (0)00 000 0000</a></li>
+          <li>Mon &ndash; Sat, 9am &ndash; 5pm</li>
         </ul>
       </div>
     </div>
 
     <div class="footer__bottom">
-      <span>&copy; <span id="year">2026</span> Lucinda Cake Boutique. All rights reserved.</span>
-      <span>Baked fresh to order.</span>
+      <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
+      <span><a href="privacy.html">Privacy notice</a></span>
     </div>
   </div>
 </footer>

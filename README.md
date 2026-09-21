@@ -16,7 +16,8 @@ python3 -m http.server 8000     # then open http://localhost:8000
 | `cakes.html` | Cake portfolio, size &amp; serving guide, simple cake enquiry |
 | `decor.html` | Decor portfolio, what we offer, simple decor enquiry |
 | `enquiry.html` | "Plan My Celebration" — combined enquiry with conditional cake/decor sections |
-| `work.html` | Filterable gallery: all / cakes / decor / full celebrations |
+| `work.html` | Filterable gallery: all / cakes / cupcakes / decor / full celebrations |
+| `ordering.html` | Price guide, deposit &amp; payment, cancellation, collection, delivery, allergens |
 | `about.html` | Story and values |
 | `contact.html` | Contact details, "Please contact me" form, FAQs |
 | `thank-you.html` | Post-submission confirmation (conversion tracking fires here) |
@@ -54,6 +55,23 @@ On `enquiry.html`, "What do you need?" controls which blocks appear:
 Hidden blocks are also **disabled**, so their fields are excluded from
 validation and from the submitted data — a hidden required field can never
 block a submission.
+
+## Required fields
+
+Exactly these are required, and each is marked with a red asterisk. Markers and
+enforcement are kept in sync — a browser test asserts the two lists match, so a
+field can never *say* required without *being* required:
+
+| Form | Required |
+| --- | --- |
+| Cake enquiry (`cakes.html`) | Full name, WhatsApp number, Required date |
+| Decor enquiry (`decor.html`) | Full name, WhatsApp number, Event date |
+| Combined (`enquiry.html`) | Full name, WhatsApp number, What do you need?, and the date for each section shown |
+| Please contact me (`contact.html`) | Full name, WhatsApp number |
+
+Everything else is optional, including cake size — every choice list has an
+"I'm not sure" option, so a customer is never blocked. Fields inside a hidden
+conditional block are disabled and never validated.
 
 ## Cake sizes and approximate servings
 
@@ -108,7 +126,9 @@ The site is static, so it has no server of its own.
   your own).
 
 **Set `formEndpoint` before going live** — image upload is a brief requirement
-and only works with a backend.
+and only works with a backend. Until it is set, each upload box displays a
+visible warning telling the customer their pictures are not being delivered
+automatically, so nobody is misled into thinking their images arrived.
 
 ### Analytics and consent
 
@@ -170,6 +190,29 @@ be swapped for `.jpg`/`.webp`.
 The images from the reference site could not be retrieved — that host is
 blocked by the build environment's network policy — so they are not included.
 
+## Search engines and sharing
+
+- **`robots.txt`** allows everything except `thank-you.html` and points to the sitemap.
+- **`sitemap.xml`** lists all nine public pages. Regenerate `lastmod` when content changes.
+- **`<link rel="canonical">`** on every page, plus `og:url`, `og:image` and
+  `twitter:card`. The homepage's canonical is the bare origin, not `/index.html`.
+- **Per-page share images**: cakes → a cake, decor → decor, Our Work → gallery,
+  About → the studio. No page falls back to a single generic image.
+
+### One hostname
+
+`SITE_URL` in the build script and the canonical tags both use the **non-www**
+address. `_redirects` (Netlify/Cloudflare Pages) and `.htaccess` (Apache) send
+`www` and `http` traffic there with a 301.
+
+**Change `SITE_URL` (in the generator), `robots.txt`, `sitemap.xml`,
+`_redirects` and `.htaccess` together if the real domain differs from
+`graceandco.co.za`** — they must all agree or Google will keep seeing two sites.
+
+Google Search Console has to be done by hand: verify the non-www property,
+submit `sitemap.xml`, and set the other host as a redirect rather than a
+separate property.
+
 ## Before going live
 
 - [ ] Replace placeholder photography with real images
@@ -177,5 +220,11 @@ blocked by the build environment's network policy — so they are not included.
 - [ ] Set `formEndpoint` so enquiries and image uploads are actually delivered
 - [ ] Add `ga4Id` and `metaPixelId`
 - [ ] Review `privacy.html` against POPIA
-- [ ] Replace the placeholder testimonials with real ones
+- [ ] **Fill in every `R___` price in `ordering.html`** — all are placeholders
+- [ ] Confirm the deposit %, cancellation and delivery terms in `ordering.html`
+- [ ] Confirm the collection wording: "Melrose, Sandton — collection by appointment only"
+- [ ] Add real testimonials (the invented ones were removed; markup is commented in `index.html`)
+- [ ] Point `SITE_URL`, `robots.txt`, `sitemap.xml`, `_redirects` and `.htaccess` at the real domain
+- [ ] Verify the non-www property in Google Search Console and submit the sitemap
+- [ ] Send a real test enquiry from a phone once `formEndpoint` is live, and confirm the images arrive
 - [ ] Add spam protection (the form backend's honeypot or captcha)

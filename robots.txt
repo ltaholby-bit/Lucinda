@@ -1,0 +1,8 @@
+# Grace & Co
+User-agent: *
+Allow: /
+
+# The thank-you page is a post-submission endpoint, not a landing page.
+Disallow: /thank-you.html
+
+Sitemap: https://graceandco.co.za/sitemap.xml

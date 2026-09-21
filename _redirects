@@ -1,0 +1,5 @@
+# Force ONE canonical hostname so Google indexes a single address.
+# The canonical tags point at the non-www host, so www redirects to it.
+https://www.graceandco.co.za/*    https://graceandco.co.za/:splat    301!
+http://www.graceandco.co.za/*     https://graceandco.co.za/:splat    301!
+http://graceandco.co.za/*         https://graceandco.co.za/:splat    301!

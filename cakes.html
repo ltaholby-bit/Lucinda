@@ -9,7 +9,10 @@
 <meta property="og:title" content="Custom Cakes &mdash; Grace &amp; Co">
 <meta property="og:description" content="Bento, celebration and tiered cakes with an approximate serving guide. Request a cake in a few clicks.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets/img/hero.svg">
+<meta property="og:image" content="https://graceandco.co.za/assets/img/service-cakes.svg">
+<meta property="og:url" content="https://graceandco.co.za/cakes.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://graceandco.co.za/cakes.html">
 <link rel="icon" href="assets/img/logo-mark.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +53,7 @@
       <h1>Custom cakes</h1>
       <hr class="rule">
       <p>Designed around your theme, your flavours and your guest count &mdash; from a bento cake for two to three tiers for a hundred.</p>
-      <div class="btn-row center"><a class="btn" href="#enquiry">Request a cake</a></div>
+      <div class="btn-row center"><a class="btn" href="#enquiry">Request a cake</a><a class="btn btn--ghost" href="ordering.html#prices">Price guide</a></div>
     </div>
   </section>
 
@@ -63,6 +66,28 @@
         <figure><img src="assets/img/cake-4.svg" alt="Grace &amp; Co custom cake 4" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
         <figure><img src="assets/img/cake-5.svg" alt="Grace &amp; Co custom cake 5" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
         <figure><img src="assets/img/cake-6.svg" alt="Grace &amp; Co custom cake 6" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="cupcakes">
+    <div class="wrap">
+      <div class="center">
+        <span class="eyebrow">Cupcakes</span>
+        <h2>Cupcakes &amp; minis</h2>
+        <hr class="rule">
+        <p class="lede">Boxed by the six or the dozen, iced to match your cake or ordered on their own for dessert tables, favours and office celebrations.</p>
+      </div>
+
+      <div class="grid grid--3" style="margin-top:2.5rem">
+        <figure style="margin:0"><img src="assets/img/cupcake-1.svg" alt="A box of Grace &amp; Co cupcakes" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4; object-fit:cover; border-radius:2px"></figure>
+        <figure style="margin:0"><img src="assets/img/cupcake-2.svg" alt="Cupcakes iced to match a celebration cake" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4; object-fit:cover; border-radius:2px"></figure>
+        <figure style="margin:0"><img src="assets/img/cupcake-3.svg" alt="Mini cupcakes on a dessert table" width="900" height="1200" loading="lazy" style="aspect-ratio:3/4; object-fit:cover; border-radius:2px"></figure>
+      </div>
+
+      <div class="center">
+        <p class="lede" style="margin-top:2rem">Cupcakes can be added to any cake order, or ordered on their own &mdash; choose a quantity in the enquiry form below.</p>
+        <div class="btn-row"><a class="btn btn--ghost" href="ordering.html#prices">See cupcake prices</a></div>
       </div>
     </div>
   </section>
@@ -120,7 +145,7 @@
           <p class="fieldset__hint">Approximate servings are shown under each size. Between two sizes? Size up.</p>
           <div class="options options--sizes">
             <div class="option">
-              <input type="radio" id="cake-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake" required>
+              <input type="radio" id="cake-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake">
               <label class="option__label" for="cake-size-4-inch-bento-cake">
                 <span class="option__name">4-inch Bento Cake</span>
                 <span class="option__note">2&ndash;4 people</span>
@@ -209,6 +234,44 @@
               <input type="radio" id="cake-guests-im-not-sure" name="cake_guests" value="I&rsquo;m not sure">
               <label class="option__label" for="cake-guests-im-not-sure">
                 <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Add cupcakes?</legend>
+          <p class="fieldset__hint">Optional &mdash; iced to match your cake. Ordering cupcakes only? Choose a quantity and leave the cake size unselected.</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="cake-cupcakes-no-cupcakes" name="cake_cupcakes" value="No cupcakes">
+              <label class="option__label" for="cake-cupcakes-no-cupcakes">
+                <span class="option__name">No cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-cupcakes-6-cupcakes" name="cake_cupcakes" value="6 cupcakes">
+              <label class="option__label" for="cake-cupcakes-6-cupcakes">
+                <span class="option__name">6 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-cupcakes-12-cupcakes" name="cake_cupcakes" value="12 cupcakes">
+              <label class="option__label" for="cake-cupcakes-12-cupcakes">
+                <span class="option__name">12 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-cupcakes-24-cupcakes" name="cake_cupcakes" value="24 cupcakes">
+              <label class="option__label" for="cake-cupcakes-24-cupcakes">
+                <span class="option__name">24 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="cake-cupcakes-more-than-24" name="cake_cupcakes" value="More than 24">
+              <label class="option__label" for="cake-cupcakes-more-than-24">
+                <span class="option__name">More than 24</span>
+                <span class="option__note">Tell us how many in the notes</span>
               </label>
             </div>
           </div>
@@ -340,6 +403,8 @@
             <label for="cake-notes">Short notes</label>
             <textarea id="cake-notes" name="cake_notes" placeholder="Colours, allergies, anything else we should know&hellip;"></textarea>
           </div>
+
+          <p class="callout">Our kitchen handles nuts, eggs, dairy, gluten, soya and sesame, so we cannot guarantee any order is free from them. Please read the <a href="ordering.html#allergens">allergen notice</a> before ordering if anyone has an allergy.</p>
         </fieldset>
         <fieldset class="fieldset" data-conditional-keep>
           <legend>Inspiration</legend>
@@ -396,6 +461,7 @@
           <li><a href="cakes.html">Cakes</a></li>
           <li><a href="decor.html">Decor</a></li>
           <li><a href="work.html">Our Work</a></li>
+          <li><a href="ordering.html">Prices &amp; Ordering</a></li>
           <li><a href="about.html">About</a></li>
         </ul>
       </div>
@@ -407,6 +473,7 @@
           <li><a href="cakes.html#enquiry">Request a cake</a></li>
           <li><a href="decor.html#enquiry">Request decor</a></li>
           <li><a href="contact.html#contact-me">Please contact me</a></li>
+          <li><a href="ordering.html#allergens">Allergens</a></li>
         </ul>
       </div>
 
@@ -423,7 +490,7 @@
 
     <div class="footer__bottom">
       <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
-      <span><a href="privacy.html">Privacy notice</a></span>
+      <span><a href="privacy.html">Privacy notice</a> &middot; <a href="ordering.html#payment">Ordering terms</a></span>
     </div>
   </div>
 </footer>

@@ -296,6 +296,11 @@ a:hover { color: var(--accent-deep); }
 }
 .upload input[type="file"] { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .upload__cta { display: inline-block; cursor: pointer; }
+.upload__warning {
+  border: 1px solid var(--cocoa); border-radius: var(--radius);
+  background: color-mix(in srgb, var(--khaki) 40%, var(--surface));
+  padding: .8rem 1rem; margin-top: 1rem; text-align: left;
+}
 .upload__list { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; margin-top: 1.25rem; }
 .upload__thumb { position: relative; width: 92px; }
 .upload__thumb img { width: 92px; height: 92px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--line-strong); }
@@ -334,6 +339,27 @@ a:hover { color: var(--accent-deep); }
 
 /* Conditional blocks toggled by the enquiry type. */
 [data-conditional][hidden] { display: none !important; }
+
+/* ============================== Prices / policy ========================= */
+
+.price-list { list-style: none; margin: 0; padding: 0; }
+.price-list li {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 1.5rem; padding: .9rem 0; border-bottom: 1px solid var(--line);
+}
+.price-list .price-name { color: var(--text); }
+.price-list .price-note { display: block; font-size: .85rem; color: var(--text-muted); }
+.price-list .price { color: var(--text); white-space: nowrap; font-family: var(--f-display); font-size: 1.2rem; }
+
+.notice {
+  border: 1px solid var(--camel); border-radius: var(--radius);
+  background: color-mix(in srgb, var(--khaki) 30%, var(--surface));
+  padding: 1.25rem 1.4rem; margin-bottom: 2rem;
+}
+.notice h3 { font-size: 1.15rem; margin-bottom: .4rem; }
+.notice p:last-child { margin-bottom: 0; }
+
+.notice--warning { border-left: 3px solid var(--cocoa); }
 
 /* ============================== Info / FAQ ============================= */
 

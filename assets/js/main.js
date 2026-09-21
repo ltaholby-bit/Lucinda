@@ -183,6 +183,18 @@
 
     uploadState.set(input, []);
 
+    /* Without a form backend there is nowhere for the files to go: the mailto
+       fallback cannot attach them. Say so here rather than letting a customer
+       believe their pictures were sent. */
+    if (!CFG.formEndpoint) {
+      var warn = document.createElement("p");
+      warn.className = "form__note upload__warning";
+      warn.innerHTML = "<strong>Note:</strong> picture uploads are not connected yet. " +
+        "You can still choose images, but you will be asked to attach them to the " +
+        "email yourself. Set <code>formEndpoint</code> in config.js to deliver them automatically.";
+      box.insertBefore(warn, list);
+    }
+
     var render = function () {
       var files = uploadState.get(input);
       list.innerHTML = "";

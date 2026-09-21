@@ -9,7 +9,10 @@
 <meta property="og:title" content="Plan My Celebration &mdash; Grace &amp; Co">
 <meta property="og:description" content="One guided enquiry for a cake, decor, or both. Choose what you need and only the relevant questions appear.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets/img/hero.svg">
+<meta property="og:image" content="https://graceandco.co.za/assets/img/service-cakes.svg">
+<meta property="og:url" content="https://graceandco.co.za/enquiry.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://graceandco.co.za/enquiry.html">
 <link rel="icon" href="assets/img/logo-mark.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,7 +167,7 @@
           <p class="fieldset__hint">Approximate servings are shown under each size. Between two sizes? Size up.</p>
           <div class="options options--sizes">
             <div class="option">
-              <input type="radio" id="ec-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake" required>
+              <input type="radio" id="ec-size-4-inch-bento-cake" name="cake_size" value="4-inch Bento Cake">
               <label class="option__label" for="ec-size-4-inch-bento-cake">
                 <span class="option__name">4-inch Bento Cake</span>
                 <span class="option__note">2&ndash;4 people</span>
@@ -253,6 +256,44 @@
               <input type="radio" id="ec-guests-im-not-sure" name="cake_guests" value="I&rsquo;m not sure">
               <label class="option__label" for="ec-guests-im-not-sure">
                 <span class="option__name">I&rsquo;m not sure</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Add cupcakes?</legend>
+          <p class="fieldset__hint">Optional &mdash; iced to match your cake. Ordering cupcakes only? Choose a quantity and leave the cake size unselected.</p>
+          <div class="options">
+            <div class="option">
+              <input type="radio" id="ec-cupcakes-no-cupcakes" name="cake_cupcakes" value="No cupcakes">
+              <label class="option__label" for="ec-cupcakes-no-cupcakes">
+                <span class="option__name">No cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-cupcakes-6-cupcakes" name="cake_cupcakes" value="6 cupcakes">
+              <label class="option__label" for="ec-cupcakes-6-cupcakes">
+                <span class="option__name">6 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-cupcakes-12-cupcakes" name="cake_cupcakes" value="12 cupcakes">
+              <label class="option__label" for="ec-cupcakes-12-cupcakes">
+                <span class="option__name">12 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-cupcakes-24-cupcakes" name="cake_cupcakes" value="24 cupcakes">
+              <label class="option__label" for="ec-cupcakes-24-cupcakes">
+                <span class="option__name">24 cupcakes</span>
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" id="ec-cupcakes-more-than-24" name="cake_cupcakes" value="More than 24">
+              <label class="option__label" for="ec-cupcakes-more-than-24">
+                <span class="option__name">More than 24</span>
+                <span class="option__note">Tell us how many in the notes</span>
               </label>
             </div>
           </div>
@@ -384,6 +425,8 @@
             <label for="ec-notes">Short notes</label>
             <textarea id="ec-notes" name="cake_notes" placeholder="Colours, allergies, anything else we should know&hellip;"></textarea>
           </div>
+
+          <p class="callout">Our kitchen handles nuts, eggs, dairy, gluten, soya and sesame, so we cannot guarantee any order is free from them. Please read the <a href="ordering.html#allergens">allergen notice</a> before ordering if anyone has an allergy.</p>
         </fieldset>
         <fieldset class="fieldset" data-conditional-keep>
           <legend>Inspiration</legend>
@@ -660,6 +703,7 @@
           <li><a href="cakes.html">Cakes</a></li>
           <li><a href="decor.html">Decor</a></li>
           <li><a href="work.html">Our Work</a></li>
+          <li><a href="ordering.html">Prices &amp; Ordering</a></li>
           <li><a href="about.html">About</a></li>
         </ul>
       </div>
@@ -671,6 +715,7 @@
           <li><a href="cakes.html#enquiry">Request a cake</a></li>
           <li><a href="decor.html#enquiry">Request decor</a></li>
           <li><a href="contact.html#contact-me">Please contact me</a></li>
+          <li><a href="ordering.html#allergens">Allergens</a></li>
         </ul>
       </div>
 
@@ -687,7 +732,7 @@
 
     <div class="footer__bottom">
       <span>&copy; <span id="year">2026</span> Grace &amp; Co. All rights reserved.</span>
-      <span><a href="privacy.html">Privacy notice</a></span>
+      <span><a href="privacy.html">Privacy notice</a> &middot; <a href="ordering.html#payment">Ordering terms</a></span>
     </div>
   </div>
 </footer>

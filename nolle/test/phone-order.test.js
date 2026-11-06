@@ -47,6 +47,13 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     assert.match(await page.content(), /deliver nationwide/i);
     assert.ok(await page.locator('[data-wa-float]').isVisible());
     await shot(page, 'home');
+    for (const u of ['/', '/shop', '/product/body-wave-13x4-frontal-wig', '/contact', '/delivery']) {
+      await page.goto(BASE + u);
+      const [sw, cw] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+      assert.ok(sw <= cw, `${u} scrolls sideways on a phone (${sw}px > ${cw}px)`);
+    }
+    await page.goto(BASE + '/');
+    log('No sideways scrolling on phone pages');
     log('Homepage: slogan, Shop button, WhatsApp button, nationwide note');
 
     // 2. Shop: ready vs pre-order separated; bundle price note

@@ -20,6 +20,16 @@ const ICON = {
 };
 
 const PLACEHOLDER = '/static/img/photo-coming-soon.svg';
+const LOOKBOOK = [
+  ['brown-straight-portrait', 'Long silky straight hair in rich brown', 'tall'],
+  ['backs-five-textures', 'Five Nolle’ textures from behind: brown straight, body wave, straight, deep curly and bone straight', 'wide'],
+  ['wavy-black-portrait', 'Shoulder-length black body wave', 'tall'],
+  ['duo-curly-and-wavy', 'Deep curly and body wave hair side by side', 'wide'],
+  ['straight-black-portrait', 'Long black straight hair with face-framing layers', 'tall'],
+  ['group-styling-tools', 'Nolle’ models styling their hair with a brush and dryer', 'wide'],
+  ['straight-black-styling', 'Long black straight hair being styled', 'tall'],
+  ['trio-profiles', 'Three profiles showing long straight black and brown hair', 'wide'],
+];
 const img0 = (p) => (p.images && p.images[0]) || PLACEHOLDER;
 
 function priceLabel(p) {
@@ -158,10 +168,10 @@ function fillPolicy(text, s) {
 
 /* ------------------------------ Pages ------------------------------ */
 function home(s, { featured, reviews, base }) {
-  const hero = s.hero_image || '/static/img/hero.svg';
+  const hero = s.hero_image || '/static/img/brand/group-holding-box.jpg';
   const body = html`
 <section class="hero">
-  <div class="hero-media"><img src="${hero}" alt="Nolle’ Luxury Hair – luxury wig" width="900" height="1100" fetchpriority="high"></div>
+  <div class="hero-media"><img src="${hero}" alt="Five women wearing Nolle’ Luxury Hair, holding the Nolle’ gift box" width="1600" height="1067" fetchpriority="high"></div>
   <div class="hero-copy">
     <p class="eyebrow">Nolle’ Luxury Hair</p>
     <h1 class="slogan">${s.slogan.split('. ').map((part, i, a) => html`<span>${part}${i < a.length - 1 ? '.' : ''}</span>`)}</h1>
@@ -198,6 +208,14 @@ function home(s, { featured, reviews, base }) {
 </section>
 
 <section class="section wrap">
+  <div class="section-head center"><p class="eyebrow">Real hair, real women</p><h2>The Nolle’ Look</h2><p class="muted">Bone straight, body wave, deep curly and rich brown – every texture photographed on our own models.</p></div>
+  <div class="lookbook">
+    ${LOOKBOOK.map(([src, alt, cls]) => html`<figure class="${cls || ''}"><img src="/static/img/brand/${src}.jpg" alt="${alt}" loading="lazy"></figure>`)}
+  </div>
+  ${s.instagram || s.tiktok ? html`<p class="center follow">See more on ${s.instagram ? html`<a href="${s.instagram}" target="_blank" rel="noopener">Instagram</a>` : ''}${s.instagram && s.tiktok ? ' and ' : ''}${s.tiktok ? html`<a href="${s.tiktok}" target="_blank" rel="noopener">TikTok</a>` : ''}</p>` : ''}
+</section>
+
+<section class="section wrap">
   <div class="section-head center"><p class="eyebrow">Simple ordering</p><h2>How it works</h2></div>
   ${steps()}
 </section>
@@ -207,7 +225,7 @@ ${reviews.length ? html`<section class="section wrap">
   <div class="reviews">${reviews.map((r) => html`<figure class="review"><div class="stars" aria-label="${r.rating} out of 5">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div><blockquote>${r.text}</blockquote><figcaption>– ${r.name}${r.source ? html` <span class="muted">(${r.source})</span>` : ''}</figcaption></figure>`)}</div>
 </section>` : ''}
 
-<section class="help-band">
+<section class="help-band photo">
   <div class="wrap help">
     <h2>Not sure which hair to choose?</h2>
     <p>Tell us the look you want, your budget and when you need it – we’ll help you choose the right texture, length and lace.</p>

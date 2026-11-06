@@ -342,7 +342,7 @@ function seed() {
       description: 'A glamorous everyday body wave with natural movement and a soft, melt-in HD lace frontal. Pre-plucked hairline with baby hair, adjustable strap and combs for a secure fit.',
       texture: 'Body wave', colour: 'Natural black (1B)', lace: '13x4 HD lace frontal', density: '180%',
       includes: 'Complete wig, adjustable strap, 4 combs, satin storage bag', option_names: ['Length'],
-      images: ['/static/img/sample-wig.svg'],
+      images: ['/static/img/brand/wavy-black-portrait.jpg', '/static/img/brand/duo-curly-and-wavy.jpg', '/static/img/brand/backs-curly-and-wavy.jpg'],
       variants: [[{ Length: '18"' }, 320000, 2], [{ Length: '20"' }, 360000, 1], [{ Length: '24"' }, 430000, 0]],
     },
     {
@@ -351,7 +351,7 @@ function seed() {
       description: 'Silky, full-bodied straight bundles that blend beautifully with relaxed or pressed leave-out. Sold as a set of three bundles.',
       texture: 'Silky straight', colour: 'Natural black (1B)', lace: '', density: '',
       includes: '3 bundles (approx. 100 g each)', option_names: ['Lengths'],
-      images: ['/static/img/sample-bundles.svg'],
+      images: ['/static/img/brand/straight-black-styling.jpg', '/static/img/brand/straight-black-portrait.jpg', '/static/img/brand/backs-five-textures.jpg'],
       variants: [[{ Lengths: '16" / 18" / 20"' }, 210000, 2], [{ Lengths: '20" / 22" / 24"' }, 290000, 1]],
     },
     {
@@ -360,7 +360,7 @@ function seed() {
       description: 'Pre-plucked 5x5 HD lace closure for a natural parting. Pairs with our deep wave bundles.',
       texture: 'Deep wave', colour: 'Natural black (1B)', lace: '5x5 HD lace closure', density: '150%',
       includes: '1 closure only (bundles not included)', option_names: ['Length'],
-      images: ['/static/img/sample-closure.svg'],
+      images: ['/static/img/brand/backs-curly-and-wavy.jpg', '/static/img/brand/duo-curly-and-wavy.jpg'],
       variants: [[{ Length: '16"' }, 130000, 0], [{ Length: '18"' }, 145000, 0]],
     },
   ];
@@ -376,6 +376,16 @@ function seed() {
   });
 }
 seed();
+
+/* Sample products created before the brand photos existed: swap in the photos. */
+for (const [slug, imgs] of Object.entries({
+  'body-wave-13x4-frontal-wig': ['wavy-black-portrait', 'duo-curly-and-wavy', 'backs-curly-and-wavy'],
+  'straight-bundle-set': ['straight-black-styling', 'straight-black-portrait', 'backs-five-textures'],
+  'deep-wave-5x5-hd-closure': ['backs-curly-and-wavy', 'duo-curly-and-wavy'],
+})) {
+  db.prepare("UPDATE products SET images = ? WHERE slug = ? AND is_sample = 1 AND images LIKE '%/sample-%'")
+    .run(JSON.stringify(imgs.map((n) => `/static/img/brand/${n}.jpg`)), slug);
+}
 
 module.exports = {
   db, DATA_DIR, CATEGORIES, ShopError, tx, safeJSON,

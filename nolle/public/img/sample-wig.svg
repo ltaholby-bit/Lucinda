@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdf6f4"/><stop offset="1" stop-color="#f1d6d1"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a15f"/><stop offset=".5" stop-color="#e9d29d"/><stop offset="1" stop-color="#b48a4c"/></linearGradient>
+<linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a26"/><stop offset="1" stop-color="#1f1513"/></linearGradient>
+</defs>
+<rect width="600" height="750" fill="url(#bg)"/>
+<rect x="22" y="22" width="556" height="706" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
+<path d="M300 120c-95 0-150 70-150 170 0 70 10 150-5 250 40 20 85 20 115-5-15-80-20-170-5-230 10 40 35 60 45 65 10-5 35-25 45-65 15 60 10 150-5 230 30 25 75 25 115 5-15-100-5-180-5-250 0-100-55-170-150-170z" fill="url(#hair)" opacity=".92"/><path d="M180 260c30 60 20 150 5 250M420 260c-30 60-20 150-5 250M240 200c20 80 10 200 0 320M360 200c-20 80-10 200 0 320" stroke="#5a4038" stroke-width="3" fill="none" opacity=".55"/><path d="M300 120c-60 0-105 30-125 80h250c-20-50-65-80-125-80z" fill="url(#gold)" opacity=".18"/>
+<text x="300" y="640" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="#8a6630" letter-spacing="2">Body Wave Wig</text>
+<text x="300" y="678" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="14" fill="#a07a50" letter-spacing="5">PHOTO COMING SOON</text>
+</svg>

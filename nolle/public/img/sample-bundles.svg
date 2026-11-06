@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdf6f4"/><stop offset="1" stop-color="#f1d6d1"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a15f"/><stop offset=".5" stop-color="#e9d29d"/><stop offset="1" stop-color="#b48a4c"/></linearGradient>
+<linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a26"/><stop offset="1" stop-color="#1f1513"/></linearGradient>
+</defs>
+<rect width="600" height="750" fill="url(#bg)"/>
+<rect x="22" y="22" width="556" height="706" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
+<g fill="url(#hair)" opacity=".92"><path d="M175 150h50c10 120 15 260 0 420-20 10-40 10-55 0 10-160 10-300 5-420z"/><path d="M275 130h50c10 130 15 280 0 450-20 10-40 10-55 0 10-170 10-320 5-450z"/><path d="M375 150h50c10 120 15 260 0 420-20 10-40 10-55 0 10-160 10-300 5-420z"/></g><g fill="url(#gold)"><rect x="168" y="140" width="64" height="16" rx="3"/><rect x="268" y="120" width="64" height="16" rx="3"/><rect x="368" y="140" width="64" height="16" rx="3"/></g>
+<text x="300" y="640" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="#8a6630" letter-spacing="2">Bundle Set</text>
+<text x="300" y="678" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="14" fill="#a07a50" letter-spacing="5">PHOTO COMING SOON</text>
+</svg>

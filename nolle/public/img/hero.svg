@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e6e2"/><stop offset="1" stop-color="#ecc9c2"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a15f"/><stop offset=".5" stop-color="#ecd7a6"/><stop offset="1" stop-color="#b48a4c"/></linearGradient>
+<linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2a26"/><stop offset="1" stop-color="#1b1210"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy=".35" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="900" height="1100" fill="url(#bg)"/>
+<circle cx="450" cy="380" r="420" fill="url(#glow)"/>
+<circle cx="450" cy="470" r="330" fill="none" stroke="url(#gold)" stroke-width="2" opacity=".8"/>
+<path d="M450 170c-150 0-235 110-235 270 0 120 15 250-10 420 60 40 140 35 190-5-25-140-30-290-5-390 15 70 45 100 60 110 15-10 45-40 60-110 25 100 20 250-5 390 50 40 130 45 190 5-25-170-10-300-10-420 0-160-85-270-235-270z" fill="url(#hair)"/>
+<path d="M260 420c40 100 30 260 5 420M640 420c-40 100-30 260-5 420M350 300c30 140 15 340 0 540M550 300c-30 140-15 340 0 540" stroke="#6b4c42" stroke-width="4" fill="none" opacity=".5"/>
+<path d="M450 170c-90 0-155 40-190 105h380c-35-65-100-105-190-105z" fill="#fff" opacity=".08"/>
+<g transform="translate(450 150)" fill="url(#gold)"><path d="M-70 0l20-55 25 35 25-50 25 50 25-35 20 55z"/><rect x="-72" y="2" width="144" height="12" rx="3"/></g>
+</svg>

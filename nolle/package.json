@@ -1,0 +1,16 @@
+{
+  "name": "nolle-luxury-hair",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nolle' Luxury Hair online shop: products, stock, guest checkout, EFT/PayFast, admin.",
+  "main": "server.js",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --no-warnings server.js",
+    "dev": "node --no-warnings --watch server.js",
+    "test:phone": "node test/phone-order.test.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}

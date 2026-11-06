@@ -52,6 +52,9 @@ const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
     assert.match(wa, /Raw Indian Hair Bundles – Straight & Wavy/); assert.match(wa, /Wavy · 20"/); assert.match(wa, /for 3 bundles/);
     assert.match(wa, /Delivery: Courier to your door \(R120\)/); assert.match(wa, /Total with delivery: R8 457/);
     assert.match(await page.locator('[data-wa-total]').innerText(), /Total with delivery: R8 457/);
+    await page.locator('[data-delivery=paxi]').click();
+    const wa2 = decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
+    assert.match(wa2, /Delivery: PEP PAXI \(collect at a PEP store\) \(R60\)/); assert.match(wa2, /Total with delivery: R8 397/);
     assert.match(await page.locator('.ship-box').innerText(), /Pre-order lead time/i);
     log(`Raw 20" set of 3 = ${R(2779 * 3)}; WhatsApp message has product, texture, length and “for 3 bundles”`);
 
@@ -85,6 +88,7 @@ const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
     }
     await page.goto(BASE + '/delivery');
     assert.match(await page.locator('.prose').innerText(), /Courier to your door: R120/);
+    assert.match(await page.locator('.prose').innerText(), /PEP PAXI \(collect at a PEP store\): R60/);
     log('No sideways scrolling');
     assert.deepEqual(errors, []);
     log('No JavaScript errors');

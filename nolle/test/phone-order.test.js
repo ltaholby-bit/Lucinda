@@ -105,10 +105,10 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     await page.goto(BASE + '/cart');
     await page.locator('.cart-line').nth(1).waitFor();
     assert.equal(await page.locator('[data-subtotal]').innerText(), 'R5 700');
-    assert.equal(await page.locator('[data-delivery]').innerText(), 'R120');
-    assert.equal(await page.locator('[data-total]').innerText(), 'R5 820');
+    assert.equal(await page.locator('[data-delivery]').innerText(), 'from R60');
+    assert.equal(await page.locator('[data-total]').innerText(), 'from R5 760');
     await shot(page, 'cart');
-    log('Cart: subtotal R5 700 + delivery R120 = R5 820');
+    log('Cart: subtotal R5 700; delivery from R60 (PEP PAXI) – courier R120 – chosen at checkout');
 
     // 5. Guest checkout
     await page.getByRole('link', { name: 'Checkout' }).click();

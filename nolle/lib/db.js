@@ -91,7 +91,7 @@ for (const [col, def] of [['delivery_method', "TEXT DEFAULT ''"], ['delivery_typ
    type 'address' asks for a street address; 'paxi' asks for a PEP store (PAXI point). */
 const DEFAULT_DELIVERY_METHODS = [
   { id: 'courier', name: 'Courier to your door', fee: '12000', time: '2–4 business days', type: 'address' },
-  { id: 'paxi', name: 'PEP PAXI (collect at a PEP store)', fee: '', time: '', type: 'paxi' },
+  { id: 'paxi', name: 'PEP PAXI (collect at a PEP store)', fee: '6000', time: '', type: 'paxi' },
   { id: 'local', name: 'Local delivery (Johannesburg)', fee: '', time: '', type: 'address' },
 ];
 const DEFAULT_SETTINGS = {

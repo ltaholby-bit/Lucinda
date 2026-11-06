@@ -4,40 +4,41 @@ These steps install the shop on your cPanel hosting so it runs at **https://noll
 They take about 15 minutes. Never write your passwords in this file or anywhere in the code.
 
 **Before you start:** in cPanel, look in the *Software* section for **Setup Node.js App**.
-If it is not there, ask your host to enable Node.js (version 22.13 or newer) for your account.
+(It may be called **Node.js**.) If it is not there, ask your host to enable Node.js (version 22.13 or newer) for your account.
 The shop needs a Node.js server; plain HTML hosting is not enough for stock, orders and the admin.
 
-## 1. Upload the files
+## 1. Create the Node.js app
 
-1. In cPanel open **File Manager** and go to your home folder (the folder *above* `public_html`).
-2. Create a folder called **`nolle-shop`** and open it.
-3. Click **Upload**, choose **`nolle-shop-upload.zip`**, then right-click the zip and choose **Extract**.
-   You should now see `server.js`, `package.json`, `lib` and `public` inside `nolle-shop`.
-
-Do **not** put the files inside `public_html`.
-
-## 2. Create the Node.js app
-
-In cPanel open **Setup Node.js App** and click **Create Application**:
+In cPanel open **Setup Node.js App** (or **Node.js**) and click **Create Application**:
 
 | Setting | Value |
 | --- | --- |
-| Node.js version | **22.x** (22.13 or newer – the shop will not start on 20 or older) |
+| Node.js version | **22.13 or newer** (e.g. 24 or 26) – the shop will not start on 20 or older |
 | Application mode | Production |
 | Application root | `nolle-shop` |
-| Application URL | `nolleluxuryhair.co.za` |
+| Application URL | `nolleluxuryhair.co.za` (leave the box next to it empty) |
 | Application startup file | `server.js` |
+| Passenger log file | `/home/YOUR-CPANEL-USERNAME/logs/nolle-shop.log` |
 
-Under **Environment variables**, click **Add Variable** for each of these:
+Click **Create**. Then, on the app's page under **Environment variables**, click **Add Variable** for each of these and **Save**
+(`NODE_ENV` is set automatically by Production mode):
 
 | Name | Value |
 | --- | --- |
-| `NODE_ENV` | `production` |
 | `BASE_URL` | `https://nolleluxuryhair.co.za` |
 | `DATA_DIR` | `/home/YOUR-CPANEL-USERNAME/nolle-data` (outside `nolle-shop`, so updates never touch orders) |
 | `ADMIN_PASSWORD` | a strong password for your shop admin (not your cPanel password) |
 
-Click **Create**, then **Run NPM Install**, then **Restart**.
+## 2. Upload the files
+
+1. In cPanel open **File Manager** and open the **`nolle-shop`** folder (cPanel created it in your home folder).
+2. Click **Upload**, choose **`nolle-shop-upload.zip`**, then right-click the zip and choose **Extract**.
+   If cPanel put a sample `server.js` there, choose to **replace** existing files.
+   You should now see `server.js`, `package.json`, `lib` and `public` inside `nolle-shop`.
+
+Do **not** put the files inside `public_html`.
+
+Back in **Setup Node.js App**, open the app, click **Run NPM Install**, wait for it to finish, then click **Restart**.
 
 ## 3. Turn on HTTPS
 
@@ -52,7 +53,7 @@ Click **Create**, then **Run NPM Install**, then **Restart**.
 4. On your phone, open a product, tap **Enquire on WhatsApp**, and check that the message arrives with the product, options, delivery and total.
 
 If the page shows an error, open **Setup Node.js App** → your app → check the Node.js version (22.13+) and press **Restart**.
-The error log is in `nolle-shop/stderr.log`.
+The error log is the Passenger log file you chose (e.g. `logs/nolle-shop.log`) or `nolle-shop/stderr.log`.
 
 ## Optional: order emails
 

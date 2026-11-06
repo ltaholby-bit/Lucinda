@@ -197,6 +197,7 @@ ${!isNew ? html`<p class="a-links">Shop page: <a href="/product/${p.slug}" targe
   <div class="two">${f('texture', 'Texture', 'e.g. Body wave')}${f('colour', 'Colour', 'e.g. Natural black (1B)')}</div>
   <div class="two">${f('lace', 'Lace size / type', 'e.g. 13x4 HD lace frontal (wigs & closures)')}${f('density', 'Density', 'e.g. 180% (wigs)')}</div>
   <div class="two">${f('length', 'Length', 'Only if length is NOT an option below')}${f('includes', 'What’s included', 'e.g. 3 bundles, approx. 100 g each')}</div>
+  ${f('lead_time', 'Pre-order lead time', 'Shown on pre-order products, e.g. “7–10 working days, plus delivery”. Empty = the default from Settings')}
   <label>Hair-care notes<small>Leave empty to use the standard care text from Settings</small><textarea name="care" rows="3">${p.care}</textarea></label>
 
   <h2>Options, prices &amp; stock</h2>
@@ -293,7 +294,8 @@ function settings(s, { flash, cardEnabled, mailOn }) {
   <div class="two"><label>Delivery fee (R)<small>Nationwide flat rate, shown before payment</small><input name="delivery_fee" value="${rands('delivery_fee_cents')}" inputmode="decimal"></label>
   <label>Free delivery over (R)<small>0 = never free</small><input name="free_delivery_over" value="${rands('free_delivery_over_cents')}" inputmode="decimal"></label></div>
   <div class="two">${t('prep_time', 'Time to prepare an order', 'Your time, after payment. e.g. 1–2 business days')}${t('courier_time', 'Courier delivery time', 'After dispatch. e.g. 2–4 business days')}</div>
-  ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch')}
+  ${t('preorder_time', 'Default pre-order lead time', 'Used when a pre-order product has no lead time of its own')}
+  ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch, e.g. Courier Guy or PEP PAXI')}
 </section>
 <section class="a-card"><h2>EFT payment</h2>
   ${t('payment_hours', 'Hours a client has to pay', 'Unpaid orders are cancelled after this and stock is released', 'number')}

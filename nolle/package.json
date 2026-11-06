@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node --no-warnings server.js",
     "dev": "node --no-warnings --watch server.js",
-    "test:phone": "node test/phone-order.test.js"
+    "test:phone": "node test/phone-order.test.js",
+    "test:catalogue": "node test/catalogue.test.js"
   },
   "dependencies": {
     "nodemailer": "^6.9.16"

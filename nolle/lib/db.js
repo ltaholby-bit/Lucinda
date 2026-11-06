@@ -78,6 +78,10 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 `);
 
+if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'lead_time')) {
+  db.exec("ALTER TABLE products ADD COLUMN lead_time TEXT DEFAULT ''");
+}
+
 /* ---------------- Settings ---------------- */
 const DEFAULT_SETTINGS = {
   shop_name: 'Nolle’ Luxury Hair',
@@ -94,7 +98,8 @@ const DEFAULT_SETTINGS = {
   free_delivery_over_cents: '0',
   prep_time: '1–2 business days',
   courier_time: '2–4 business days',
-  courier_name: 'The Courier Guy',
+  courier_name: 'Courier',
+  preorder_time: 'Confirmed when you order',
   payment_hours: '24',
   bank_name: '', bank_account_name: '', bank_account_number: '', bank_branch_code: '', bank_account_type: '',
   policies_confirmed: '0',
@@ -113,8 +118,14 @@ We deliver nationwide by courier. The delivery fee is shown in your cart and at 
 ## Tracking
 Once your order is dispatched we will send you the courier name and tracking number. You can also check your order at any time on our Track Order page.
 
+## Pre-orders
+Full payment is required to confirm a pre-order. Pre-order lead times are shown on each product (for example 7–10 working days for our Premium Virgin collection), plus delivery time. Wig making requires additional preparation time; your completion date will be confirmed when you order.
+
+## Delivery options
+Local delivery, PEP PAXI or courier shipping are available. Transit time depends on the service chosen.
+
 ## Collection
-Collection is not available yet. We will add it here once arrangements are confirmed.`,
+Delivery only – we do not offer collection.`,
   policy_returns: `## Returns and refunds (DRAFT – to be confirmed)
 For hygiene reasons hair that has been worn, cut, coloured, washed, or had the lace cut cannot be returned.
 
@@ -180,8 +191,20 @@ function hydrateProduct(p) {
   p.max_price = prices.length ? Math.max(...prices) : 0;
   p.total_stock = p.variants.reduce((a, v) => a + Math.max(0, v.stock), 0);
   p.sold_out = p.availability === 'ready' && p.total_stock <= 0;
-  p.cat = CATEGORIES[p.category] || { label: p.category, kind: '', kindLong: '' };
+  p.cat = kindFor(p.category, p.name);
   return p;
+}
+/* Closures and frontals share a category but are labelled separately. */
+function kindFor(category, name) {
+  const c = CATEGORIES[category] || { label: category, kind: '', kindLong: '' };
+  if (category !== 'closures') return c;
+  const frontal = /frontal/i.test(name || '');
+  const w = frontal ? 'frontal' : 'closure';
+  return { ...c, kind: frontal ? 'Frontal only' : 'Closure only', kindLong: `You are buying the ${w} on its own. Bundles are not included.` };
+}
+function usedCategories() {
+  const used = new Set(db.prepare('SELECT DISTINCT category FROM products WHERE active = 1').all().map((r) => r.category));
+  return Object.keys(CATEGORIES).filter((k) => used.has(k));
 }
 function safeJSON(s, d) { try { return JSON.parse(s); } catch { return d; } }
 
@@ -239,7 +262,7 @@ function priceCart(lines) {
     items.push({
       variant_id: row.id, product_id: row.product_id, slug: row.slug,
       product_name: row.name, variant_label: variantLabel(product, variant),
-      kind_label: (CATEGORIES[row.category] || {}).kind || '',
+      kind_label: kindFor(row.category, row.name).kind,
       category: row.category,
       unit_cents: row.price_cents, qty, stock: row.stock,
       purchasable: row.active === 1 && row.availability === 'ready',
@@ -332,9 +355,34 @@ function expireUnpaid() {
 }
 
 /* ---------------- Seed sample products (first run only) ---------------- */
+function insertProducts(list, isSample) {
+  list.forEach((s, i) => {
+    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, option_names, images, featured, is_sample, sort)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      s.slug, s.name, s.category, s.availability, s.short || '', s.description || '', s.texture || '', s.colour || '', s.lace || '', s.density || '',
+      s.includes || '', s.lead_time || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, i);
+    s.variants.forEach((v, j) => {
+      const [opts, price, stock] = Array.isArray(v) ? v : [v.options, v.price, v.stock || 0];
+      db.prepare('INSERT INTO variants (product_id, options, price_cents, stock, sort) VALUES (?, ?, ?, ?, ?)')
+        .run(Number(r.lastInsertRowid), JSON.stringify(opts), price, stock, j);
+    });
+  });
+}
+
+const OLD_SAMPLE_SLUGS = ['body-wave-13x4-frontal-wig', 'straight-bundle-set', 'deep-wave-5x5-hd-closure'];
+const TEST_FIXTURES = process.env.SEED_FIXTURES === 'test';
+
 function seed() {
+  const { CATALOGUE } = require('./catalogue');
+  if (!TEST_FIXTURES) {
+    // Remove the original placeholder products, if this database still has them.
+    db.prepare(`DELETE FROM products WHERE is_sample = 1 AND slug IN (${OLD_SAMPLE_SLUGS.map(() => '?').join(',')})`).run(...OLD_SAMPLE_SLUGS);
+    const have = db.prepare('SELECT COUNT(*) AS n FROM products').get().n;
+    if (have === 0 && process.env.NO_SAMPLE_PRODUCTS !== '1') insertProducts(CATALOGUE, false);
+    return;
+  }
   if (db.prepare('SELECT COUNT(*) AS n FROM products').get().n > 0) return;
-  if (process.env.NO_SAMPLE_PRODUCTS === '1') return;
+  /* Test fixtures: ready-to-ship stock so the automated phone test can buy. */
   const samples = [
     {
       slug: 'body-wave-13x4-frontal-wig', name: 'Body Wave 13x4 HD Frontal Wig', category: 'wigs', availability: 'ready', featured: 1,
@@ -364,33 +412,15 @@ function seed() {
       variants: [[{ Length: '16"' }, 130000, 0], [{ Length: '18"' }, 145000, 0]],
     },
   ];
-  samples.forEach((s, i) => {
-    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, option_names, images, featured, is_sample, sort)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`).run(
-      s.slug, s.name, s.category, s.availability, s.short, s.description, s.texture, s.colour, s.lace, s.density, s.includes,
-      JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured, i);
-    s.variants.forEach(([opts, price, stock], j) => {
-      db.prepare('INSERT INTO variants (product_id, options, price_cents, stock, sort) VALUES (?, ?, ?, ?, ?)')
-        .run(Number(r.lastInsertRowid), JSON.stringify(opts), price, stock, j);
-    });
-  });
+  insertProducts(samples, true);
 }
 seed();
 
-/* Sample products created before the brand photos existed: swap in the photos. */
-for (const [slug, imgs] of Object.entries({
-  'body-wave-13x4-frontal-wig': ['wavy-black-portrait', 'duo-curly-and-wavy', 'backs-curly-and-wavy'],
-  'straight-bundle-set': ['straight-black-styling', 'straight-black-portrait', 'backs-five-textures'],
-  'deep-wave-5x5-hd-closure': ['backs-curly-and-wavy', 'duo-curly-and-wavy'],
-})) {
-  db.prepare("UPDATE products SET images = ? WHERE slug = ? AND is_sample = 1 AND images LIKE '%/sample-%'")
-    .run(JSON.stringify(imgs.map((n) => `/static/img/brand/${n}.jpg`)), slug);
-}
 
 module.exports = {
   db, DATA_DIR, CATEGORIES, ShopError, tx, safeJSON,
   getSettings, setSetting, DEFAULT_SETTINGS,
-  listProducts, getProduct, getProductBySlug, hydrateProduct, variantLabel,
+  listProducts, usedCategories, kindFor, getProduct, getProductBySlug, hydrateProduct, variantLabel,
   priceCart, deliveryFor, createOrder, getOrder, getOrderByRef,
   markPaid, markDispatched, markDelivered, cancelOrder, extendDeadline, expireUnpaid,
 };

@@ -41,6 +41,20 @@ Choose product → select options → add to cart → enter delivery details →
 - **Pre-order items** show “Enquire on WhatsApp” instead of “Add to cart”. Paid pre-orders can be added later.
 - **Collection** is not offered yet (as requested). It can be added once you confirm the arrangements.
 
+### The catalogue
+
+The shop starts with 12 products from the three price lists (`lib/catalogue.js`). All are **Pre-order (“Enquire on WhatsApp”)**:
+
+| Range | Products | Options |
+| --- | --- | --- |
+| Raw Indian Hair | Straight & Wavy bundles, Curly bundles, HD closure (5x5/6x6), HD frontal (13x4/13x6) | Texture, size, length. Curly closures/frontals +R87 |
+| Premium Virgin | Straight bundles, Curly bundles, 4x4 closure, 13x4 frontal, 5x5 & HD closures | Texture/size, length. Lead time 7–10 working days |
+| SDD Indian | Bundles (straight, bouncy curl, Caribbean curl +R43/bundle), HD closure, HD frontal | Texture/size, length |
+
+- Bundles are priced as a **set of 3 bundles of the same length**. Where a price list gives a per-bundle price, the set price is 3 × that price. Each bundle product also lists the single-bundle prices, and invites clients to ask on WhatsApp for mixed lengths.
+- Combinations that are not on a price list (e.g. 13x4 HD frontal in 24") are greyed out.
+- When you have hair in hand, open the product in the admin, change it to **Ready to ship** and enter the stock. It then moves to “Ready to Ship” with an Add to cart button.
+
 ---
 
 ## Your admin (`/admin`)
@@ -86,18 +100,20 @@ Environment variables:
 | --- | --- | --- |
 | `ADMIN_PASSWORD` | **yes** | Your admin password |
 | `NODE_ENV` | yes | `production` |
-| `BASE_URL` | yes | e.g. `https://nolleluxuryhair.co.za`, used in emails, PayFast and social previews |
+| `BASE_URL` | yes | `https://nolleluxuryhair.co.za`, used in emails, PayFast, links and social previews |
 | `DATA_DIR` | recommended | Path on the persistent disk, e.g. `/var/data` |
 | `SESSION_SECRET` | optional | Long random string. One is generated automatically if not set |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | for emails | Order confirmation / paid / dispatched emails. Without these, emails are skipped and the confirmation page still works |
 | `SHOP_NOTIFY_EMAIL` | optional | Where *you* get new-order emails. Defaults to the shop email in Settings |
 | `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` | for card payments | Turns on “Card or Instant EFT (PayFast)” at checkout. Orders are marked paid automatically when PayFast confirms |
 | `PAYFAST_SANDBOX` | testing | `1` to use the PayFast sandbox |
-| `NO_SAMPLE_PRODUCTS` | optional | `1` = start with an empty shop instead of the 3 sample products |
+| `NO_SAMPLE_PRODUCTS` | optional | `1` = start with an empty shop instead of loading the price-list catalogue |
 
 ### Before launch checklist
 
-- [ ] Replace the 3 **sample products** (marked “Sample listing”) with your real stock, photos and prices, or delete them
+- [ ] Check the 12 catalogue products and prices (loaded from the Raw Indian, Premium Virgin and SDD Indian price lists)
+- [ ] Switch any hair you physically have to **Ready to ship** and enter its stock, so clients can buy it online
+- [ ] Add close-up photos of each product (lace, wefts, hair on a stand) if you have them
 - [ ] Settings: WhatsApp number, email, area, Instagram/TikTok links
 - [ ] Settings: bank details and the delivery fee
 - [ ] Upload the homepage photo
@@ -107,7 +123,9 @@ Environment variables:
 
 ### Automated phone test
 
-`npm run test:phone` runs a complete order on an emulated iPhone 13 using a temporary database. It checks:
+`npm run test:catalogue` checks the real catalogue on a phone: prices (set of 3 = 3 × per-bundle), the +R87 curly and +R43 Caribbean-curl surcharges, combinations that are not on the price lists (greyed out), lead times and the WhatsApp message.
+
+`npm run test:phone` runs a complete order on an emulated iPhone 13 using a temporary database and test stock (`SEED_FIXTURES=test`). It checks:
 - homepage, shop and product pages
 - price changes, sold-out blocking and the WhatsApp text
 - cart and delivery fee, guest checkout, and the confirmation page

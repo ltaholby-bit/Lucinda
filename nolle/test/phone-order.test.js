@@ -22,7 +22,7 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
 (async () => {
   const srv = spawn(process.execPath, ['--no-warnings', 'server.js'], {
     cwd: path.join(__dirname, '..'),
-    env: { ...process.env, PORT, DATA_DIR: DATA, ADMIN_PASSWORD: 'test-pass', NODE_ENV: 'test' },
+    env: { ...process.env, PORT, DATA_DIR: DATA, ADMIN_PASSWORD: 'test-pass', NODE_ENV: 'test', SEED_FIXTURES: 'test' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let srvLog = '';

@@ -72,6 +72,12 @@
           var val = b.getAttribute('data-value');
           b.classList.toggle('on', sel[name] === val);
           b.setAttribute('aria-pressed', sel[name] === val);
+          // Grey out values that don't exist with the other choices made (e.g. 13x4 in 24")
+          var exists = P.variants.some(function (x) {
+            return x.options[name] === val && P.optionNames.every(function (n) { return n === name || !sel[n] || x.options[n] === sel[n]; });
+          });
+          b.classList.toggle('na', !exists);
+          b.title = exists ? '' : 'Not available with your other choices';
           if (!P.enquire && P.optionNames.length === 1) {
             var vv = P.variants.find(function (x) { return x.options[name] === val; });
             b.classList.toggle('out', !!vv && vv.stock <= 0);
@@ -106,7 +112,10 @@
         }
       } else {
         stockEl.className = 'stock';
-        stockEl.textContent = 'Please choose your ' + P.optionNames.filter(function (n) { return !sel[n]; }).join(' and ').toLowerCase() + '.';
+        var missing = P.optionNames.filter(function (n) { return !sel[n]; });
+        stockEl.textContent = missing.length
+          ? 'Please choose your ' + missing.join(' and ').toLowerCase() + '.'
+          : 'This combination is not available - please choose another option, or ask us on WhatsApp.';
         if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Choose an option'; }
       }
       waText += '. ' + P.url + (v ? '?v=' + v.id : '');
@@ -115,7 +124,15 @@
 
     $$('.opt-btn').forEach(function (b) {
       b.addEventListener('click', function () {
-        sel[b.closest('[data-opt]').getAttribute('data-opt')] = b.getAttribute('data-value');
+        var name = b.closest('[data-opt]').getAttribute('data-opt');
+        sel[name] = b.getAttribute('data-value');
+        // If this choice makes the combination impossible, keep it and move the other options to a valid match
+        if (!current()) {
+          var fit = P.variants.find(function (x) {
+            return x.options[name] === sel[name] && P.optionNames.every(function (n) { return n === name || x.options[n] === sel[n] || !P.variants.some(function (y) { return y.options[name] === sel[name] && y.options[n] === sel[n]; }); });
+          }) || P.variants.find(function (x) { return x.options[name] === sel[name]; });
+          if (fit) P.optionNames.forEach(function (n) { sel[n] = fit.options[n]; });
+        }
         if (addedEl) addedEl.hidden = true;
         render();
       });
@@ -123,8 +140,8 @@
 
     // Preselect: ?v= link from social media, or first in-stock option, or only option
     var pre = P.variants.find(function (v) { return v.id === P.preselect; })
-      || (P.optionNames.length && P.variants.filter(function (v) { return v.stock > 0; }).length === 1 ? P.variants.find(function (v) { return v.stock > 0; }) : null)
-      || (P.variants.length === 1 ? P.variants[0] : null);
+      || (P.enquire ? P.variants[0] : P.variants.find(function (v) { return v.stock > 0; }))
+      || P.variants[0];
     if (pre) P.optionNames.forEach(function (n) { sel[n] = pre.options[n]; });
     render();
 

@@ -163,10 +163,12 @@ async function handlePublic(req, res, url) {
 
   if (p === '/' && req.method === 'GET') {
     const products = store.listProducts();
-    let featured = products.filter((x) => x.availability === 'ready' && !x.sold_out && x.featured);
-    if (featured.length < 4) featured = featured.concat(products.filter((x) => x.availability === 'ready' && !x.sold_out && !featured.includes(x)));
+    const pickFour = (list) => list.filter((x) => x.featured).concat(list.filter((x) => !x.featured)).slice(0, 4);
+    const ready = products.filter((x) => x.availability === 'ready' && !x.sold_out);
+    const mode = ready.length ? 'ready' : 'pre';
+    const featured = pickFour(ready.length ? ready : products.filter((x) => x.availability !== 'ready'));
     const reviews = store.db.prepare('SELECT * FROM reviews WHERE visible = 1 ORDER BY id DESC LIMIT 6').all();
-    return page(res, views.home(s, { featured: featured.slice(0, 4), reviews, base }));
+    return page(res, views.home(s, { featured, reviews, base, mode }));
   }
   if (p === '/shop') return page(res, views.shop(s, { products: store.listProducts(), cat: url.searchParams.get('cat'), base }));
 
@@ -421,7 +423,7 @@ async function handleAdmin(req, res, url) {
   if (p === '/admin/settings') {
     if (req.method === 'POST') {
       const b = await formBody(req);
-      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'courier_time', 'courier_name', 'payment_hours',
+      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'preorder_time', 'courier_time', 'courier_name', 'payment_hours',
         'bank_name', 'bank_account_name', 'bank_account_number', 'bank_branch_code', 'bank_account_type', 'care_default', 'policy_haircare', 'policy_delivery', 'policy_returns', 'policy_privacy'];
       for (const k of keys) if (k in b) store.setSetting(k, String(b[k]).trim());
       store.setSetting('whatsapp', String(b.whatsapp || '').replace(/\D/g, '').replace(/^0/, '27'));
@@ -443,6 +445,7 @@ function saveProduct(id, b) {
     availability: b.availability === 'enquire' ? 'enquire' : 'ready',
     short: b.short || '', description: b.description || '', texture: b.texture || '', colour: b.colour || '', length: b.length || '',
     lace: b.lace || '', density: b.density || '', includes: b.includes || '', care: b.care || '', video: b.video || '',
+    lead_time: String(b.lead_time || '').slice(0, 80),
     option_names: String(b.option_names || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3),
     images: store.safeJSON(b.images, []).filter((x) => typeof x === 'string' && /^\/(uploads|static)\//.test(x)).slice(0, 12),
     active: b.active === '1' ? 1 : 0, featured: b.featured === '1' ? 1 : 0, sort: parseInt(b.sort, 10) || 0,
@@ -469,7 +472,7 @@ function saveProduct(id, b) {
   if (clash) draft.slug = `${draft.slug}-${Date.now().toString(36).slice(-4)}`;
 
   return store.tx(() => {
-    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'active', 'featured', 'sort'];
+    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'active', 'featured', 'sort'];
     const vals = cols.map((c) => draft[c]);
     if (id) {
       store.db.prepare(`UPDATE products SET ${cols.map((c) => c + ' = ?').join(', ')}, option_names = ?, images = ?, is_sample = 0 WHERE id = ?`)

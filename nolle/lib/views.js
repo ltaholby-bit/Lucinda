@@ -1,6 +1,6 @@
 'use strict';
 const { html, raw, esc, money, fmtDate, waLink, richText } = require('./util');
-const { CATEGORIES } = require('./db');
+const { CATEGORIES, usedCategories } = require('./db');
 
 const STATUS = {
   awaiting_payment: { label: 'Awaiting payment', tone: 'warn' },
@@ -77,8 +77,7 @@ ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).repl
     <a class="logo" href="/" aria-label="${s.shop_name} home"><span class="logo-name">Nolle’</span><span class="logo-sub">Luxury Hair</span></a>
     <nav id="site-nav" class="site-nav" aria-label="Main">
       <a href="/shop">Shop</a>
-      <a href="/shop?cat=wigs">Wigs</a>
-      <a href="/shop?cat=bundles">Bundles</a>
+      ${usedCategories().map((k) => html`<a href="/shop?cat=${k}">${CATEGORIES[k].label}</a>`)}
       <a href="/hair-care">Hair Care</a>
       <a href="/delivery">Delivery</a>
       <a href="/track">Track Order</a>
@@ -105,7 +104,7 @@ ${body}
     <div>
       <h4>Shop</h4>
       <a href="/shop">All available hair</a>
-      ${Object.entries(CATEGORIES).map(([k, c]) => html`<a href="/shop?cat=${k}">${c.label}</a>`)}
+      ${usedCategories().map((k) => html`<a href="/shop?cat=${k}">${CATEGORIES[k].label}</a>`)}
       <a href="/track">Track my order</a>
     </div>
     <div>
@@ -167,7 +166,7 @@ function fillPolicy(text, s) {
 }
 
 /* ------------------------------ Pages ------------------------------ */
-function home(s, { featured, reviews, base }) {
+function home(s, { featured, reviews, base, mode = 'ready' }) {
   const hero = s.hero_image || '/static/img/brand/group-holding-box.jpg';
   const body = html`
 <section class="hero">
@@ -186,8 +185,9 @@ function home(s, { featured, reviews, base }) {
 
 <section class="section wrap">
   <div class="section-head">
-    <p class="eyebrow">Available now</p>
-    <h2>Ready to Ship</h2>
+    <p class="eyebrow">${mode === 'ready' ? 'Available now' : 'Order now'}</p>
+    <h2>${mode === 'ready' ? 'Ready to Ship' : 'Available to Pre-order'}</h2>
+    ${mode === 'ready' ? '' : html`<p class="muted">Prices in rands. Bundle prices are for a set of 3 bundles. Enquire on WhatsApp to confirm your order and lead time.</p>`}
     <a class="link-gold" href="/shop">View all available hair →</a>
   </div>
   ${featured.length ? html`<div class="grid">${featured.map(productCard)}</div>`
@@ -258,11 +258,11 @@ function shop(s, { products, cat, base }) {
 
   <section class="section" id="ready">
     <div class="section-head"><h2>Ready to Ship</h2><p class="muted">In stock now. Dispatched within ${s.prep_time} of payment.</p></div>
-    ${ready.length ? html`<div class="grid">${ready.map(productCard)}</div>` : html`<p class="empty">Nothing in this category is in stock right now.</p>`}
+    ${ready.length ? html`<div class="grid">${ready.map(productCard)}</div>` : html`<p class="empty">Ready-to-ship stock will be listed here as it arrives. ${pre.length ? 'Right now our hair is available to pre-order below.' : ''}</p>`}
   </section>
 
   ${pre.length ? html`<section class="section" id="pre-order">
-    <div class="section-head"><h2>Pre-order</h2><p class="muted">Not in stock yet – please enquire on WhatsApp for availability and lead time.</p></div>
+    <div class="section-head"><h2>Pre-order</h2><p class="muted">Enquire on WhatsApp to confirm availability and lead time. Full payment confirms a pre-order. Prices subject to confirmation.</p></div>
     <div class="grid">${pre.map(productCard)}</div>
   </section>` : ''}
 </div>`;
@@ -306,6 +306,7 @@ function product(s, { p, base, preselect }) {
     ${p.is_sample ? html`<p class="sample-flag">Sample listing – details will be replaced with real stock</p>` : ''}
     <p class="price big"><span data-price>${priceLabel(p)}</span> ${bundleNote(p)}</p>
     <div class="kind-box"><strong>${p.cat.kind}.</strong> ${p.cat.kindLong}</div>
+    ${enquire ? html`<p class="pre-note">Pre-order price, subject to confirmation. Full payment confirms your order.</p>` : ''}
     ${p.short ? html`<p class="short">${p.short}</p>` : ''}
 
     <form class="buy-form" data-buy-form>
@@ -326,7 +327,7 @@ function product(s, { p, base, preselect }) {
     </form>
 
     <div class="ship-box">
-      <div><strong>Order preparation</strong><span>${enquire ? 'Confirmed on enquiry' : s.prep_time + ' after payment'}</span></div>
+      <div><strong>${enquire ? 'Pre-order lead time' : 'Order preparation'}</strong><span>${enquire ? (p.lead_time || s.preorder_time) : s.prep_time + ' after payment'}</span></div>
       <div><strong>Courier delivery</strong><span>${s.courier_time} after dispatch</span></div>
       <div><strong>Delivery fee</strong><span>${money(parseInt(s.delivery_fee_cents, 10) || 0)} nationwide${parseInt(s.free_delivery_over_cents, 10) > 0 ? ` · free over ${money(s.free_delivery_over_cents)}` : ''}</span></div>
     </div>

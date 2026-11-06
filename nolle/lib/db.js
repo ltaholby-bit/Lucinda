@@ -1,7 +1,10 @@
 'use strict';
 const path = require('node:path');
 const fs = require('node:fs');
-const { DatabaseSync } = require('node:sqlite');
+let DatabaseSync;
+try { ({ DatabaseSync } = require('node:sqlite')); } catch (e) {
+  throw new Error(`This shop needs Node.js 22.13 or newer (built-in SQLite). This server runs Node ${process.version}. In cPanel → Setup Node.js App, choose Node.js 22 or newer.`);
+}
 const { randomRef, randomToken } = require('./util');
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');

@@ -93,6 +93,9 @@ Log in with the `ADMIN_PASSWORD` set on the server. The admin also has a **Help*
 
 ## Going live
 
+**On your cPanel hosting (nolleluxuryhair.co.za):** follow [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) step by step.
+
+
 Any host that runs Node.js with a **persistent disk** works. Examples are Render (the `render.yaml` at the repo root deploys this folder), Railway, Fly.io, or a small VPS. Static hosts such as Netlify-static or plain cPanel HTML hosting **cannot** run this shop, because it needs a server for stock, orders and admin.
 
 Environment variables:

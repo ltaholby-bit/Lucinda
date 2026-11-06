@@ -543,7 +543,7 @@ const server = http.createServer(async (req, res) => {
 
 setInterval(() => { try { const n = store.expireUnpaid(); if (n) console.log(`Expired ${n} unpaid order(s); stock released.`); } catch (e) { console.error(e); } }, 5 * 60e3).unref();
 
-if (require.main === module) {
-  server.listen(PORT, () => console.log(`Nolle’ Luxury Hair running on http://localhost:${PORT}  (admin: /admin)`));
-}
+/* Always listen: cPanel's Node.js (Passenger) loads this file through its own
+   launcher, so a "run directly" check would stop it from ever starting. */
+server.listen(PORT, () => console.log(`Nolle’ Luxury Hair running on port ${PORT}  (admin: /admin)`));
 module.exports = server;

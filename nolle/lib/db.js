@@ -82,7 +82,18 @@ if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'lea
   db.exec("ALTER TABLE products ADD COLUMN lead_time TEXT DEFAULT ''");
 }
 
+for (const [col, def] of [['delivery_method', "TEXT DEFAULT ''"], ['delivery_type', "TEXT DEFAULT 'address'"], ['delivery_time', "TEXT DEFAULT ''"], ['paxi_point', "TEXT DEFAULT ''"]]) {
+  if (!db.prepare('PRAGMA table_info(orders)').all().some((c) => c.name === col)) db.exec(`ALTER TABLE orders ADD COLUMN ${col} ${def}`);
+}
+
 /* ---------------- Settings ---------------- */
+/* Delivery options. A fee of '' means "not offered yet" (hidden from clients).
+   type 'address' asks for a street address; 'paxi' asks for a PEP store (PAXI point). */
+const DEFAULT_DELIVERY_METHODS = [
+  { id: 'courier', name: 'Courier to your door', fee: '12000', time: '2–4 business days', type: 'address' },
+  { id: 'paxi', name: 'PEP PAXI (collect at a PEP store)', fee: '', time: '', type: 'paxi' },
+  { id: 'local', name: 'Local delivery (Johannesburg)', fee: '', time: '', type: 'address' },
+];
 const DEFAULT_SETTINGS = {
   shop_name: 'Nolle’ Luxury Hair',
   slogan: 'YOUR HAIR. YOUR CROWN.',
@@ -94,10 +105,9 @@ const DEFAULT_SETTINGS = {
   instagram: 'https://www.instagram.com/noelleluxury',
   tiktok: 'https://www.tiktok.com/@n.luxury.hair',
   hero_image: '',
-  delivery_fee_cents: '12000',
+  delivery_methods: JSON.stringify(DEFAULT_DELIVERY_METHODS),
   free_delivery_over_cents: '0',
   prep_time: '1–2 business days',
-  courier_time: '2–4 business days',
   courier_name: 'Courier',
   preorder_time: 'Confirmed when you order',
   payment_hours: '24',
@@ -109,11 +119,13 @@ const DEFAULT_SETTINGS = {
 - Sleep with a satin bonnet or on a satin pillowcase.
 - Store wigs on a wig stand or in the satin bag provided.`,
   policy_delivery: `## Delivery across South Africa
-We deliver nationwide by courier. The delivery fee is shown in your cart and at checkout before you pay.
+We deliver nationwide. Choose the option that suits you at checkout; the fee is shown before you pay.
+
+{delivery_options}
 
 ## How long it takes
 - Preparing your order: {prep_time} after payment is confirmed.
-- Courier delivery: {courier_time} after dispatch (main centres are usually quicker; outlying areas may take longer).
+- Delivery: the time shown for your delivery option, after dispatch (main centres are usually quicker; outlying areas may take longer).
 
 ## Tracking
 Once your order is dispatched we will send you the courier name and tracking number. You can also check your order at any time on our Track Order page.
@@ -121,8 +133,8 @@ Once your order is dispatched we will send you the courier name and tracking num
 ## Pre-orders
 Full payment is required to confirm a pre-order. Pre-order lead times are shown on each product (for example 7–10 working days for our Premium Virgin collection), plus delivery time. Wig making requires additional preparation time; your completion date will be confirmed when you order.
 
-## Delivery options
-Local delivery, PEP PAXI or courier shipping are available. Transit time depends on the service chosen.
+## PEP PAXI
+Choose PEP PAXI to have your parcel sent to the PEP store (PAXI point) of your choice. You collect it there once you receive the PAXI SMS.
 
 ## Collection
 Delivery only – we do not offer collection.`,
@@ -157,9 +169,19 @@ Good care keeps your hair soft and full for longer.
 
 const getSettingStmt = db.prepare('SELECT key, value FROM settings');
 const setSettingStmt = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
+const hadMethods = !!db.prepare("SELECT 1 FROM settings WHERE key = 'delivery_methods'").get();
 for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) {
   db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)').run(k, v);
 }
+/* Databases from before delivery options: keep the old single fee and time as the courier option. */
+if (!hadMethods) {
+  const old = (k) => (db.prepare('SELECT value FROM settings WHERE key = ?').get(k) || {}).value;
+  if (old('delivery_fee_cents') != null) {
+    setSettingStmt.run('delivery_methods', JSON.stringify(DEFAULT_DELIVERY_METHODS.map((m) => (m.id === 'courier'
+      ? { ...m, fee: String(old('delivery_fee_cents')), time: old('courier_time') || m.time } : m))));
+  }
+}
+
 /* Upgrade databases created before the real contact details were known:
    replace a value only if it is still the old placeholder. */
 const OLD_PLACEHOLDERS = { whatsapp: '27000000000', email: 'hello@example.co.za', phone_display: '', location: 'South Africa', instagram: '', tiktok: '' };
@@ -243,10 +265,23 @@ function returnStock(orderId) {
   db.prepare('UPDATE orders SET stock_held = 0 WHERE id = ?').run(orderId);
 }
 
-function deliveryFor(subtotal, settings) {
-  const fee = parseInt(settings.delivery_fee_cents, 10) || 0;
+/* Delivery options clients can choose (only those with a fee, unless all = true). */
+function deliveryMethods(settings, { all = false } = {}) {
+  let list = safeJSON(settings.delivery_methods, null);
+  if (!Array.isArray(list)) list = DEFAULT_DELIVERY_METHODS;
+  return list.map((m) => {
+    const fee = m.fee === '' || m.fee == null ? NaN : parseInt(m.fee, 10);
+    return {
+      id: String(m.id || ''), name: String(m.name || ''), type: m.type === 'paxi' ? 'paxi' : 'address',
+      time: String(m.time || ''), fee: Number.isFinite(fee) && fee >= 0 ? fee : null,
+    };
+  }).filter((m) => m.id && m.name && (all || m.fee != null));
+}
+function deliveryFor(subtotal, settings, methodId) {
+  const method = deliveryMethods(settings).find((m) => m.id === methodId) || null;
+  if (!method) return { method: null, fee: 0 };
   const freeOver = parseInt(settings.free_delivery_over_cents, 10) || 0;
-  return freeOver > 0 && subtotal >= freeOver ? 0 : fee;
+  return { method, fee: freeOver > 0 && subtotal >= freeOver ? 0 : method.fee };
 }
 
 /* Resolve cart lines [{variant_id, qty}] against the database. */
@@ -279,17 +314,20 @@ function createOrder(input, settings) {
     if (!items.length) throw new ShopError('Your cart is empty.');
     const bad = items.find((i) => !i.purchasable);
     if (bad) throw new ShopError(`“${bad.product_name}” is not available to buy online. Please enquire on WhatsApp.`);
+    const d = deliveryFor(subtotal, settings, input.delivery_method_id);
+    if (!d.method) throw new ShopError('Please choose a delivery option.');
+    const delivery = d.fee;
     takeStock(items);
-    const delivery = deliveryFor(subtotal, settings);
     const hours = parseInt(settings.payment_hours, 10) || 24;
     const deadline = new Date(Date.now() + hours * 3600e3).toISOString();
     let ref;
     do { ref = randomRef(); } while (db.prepare('SELECT 1 FROM orders WHERE ref = ?').get(ref));
-    const r = db.prepare(`INSERT INTO orders (ref, token, status, payment_method, name, phone, email, address1, address2, suburb, city, province, postal_code, notes, subtotal_cents, delivery_cents, total_cents, payment_deadline, source)
-      VALUES (?, ?, 'awaiting_payment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    const r = db.prepare(`INSERT INTO orders (ref, token, status, payment_method, name, phone, email, address1, address2, suburb, city, province, postal_code, notes, subtotal_cents, delivery_cents, total_cents, payment_deadline, source, delivery_method, delivery_type, delivery_time, paxi_point)
+      VALUES (?, ?, 'awaiting_payment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       ref, randomToken(), input.payment_method, input.name, input.phone, input.email,
       input.address1, input.address2, input.suburb, input.city, input.province, input.postal_code,
-      input.notes || '', subtotal, delivery, subtotal + delivery, deadline, input.source || '');
+      input.notes || '', subtotal, delivery, subtotal + delivery, deadline, input.source || '',
+      d.method.name, d.method.type, d.method.time, input.paxi_point || '');
     const orderId = Number(r.lastInsertRowid);
     const ins = db.prepare('INSERT INTO order_items (order_id, product_id, variant_id, product_name, variant_label, kind_label, unit_cents, qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
     for (const i of items) ins.run(orderId, i.product_id, i.variant_id, i.product_name, i.variant_label, i.kind_label, i.unit_cents, i.qty);
@@ -421,6 +459,6 @@ module.exports = {
   db, DATA_DIR, CATEGORIES, ShopError, tx, safeJSON,
   getSettings, setSetting, DEFAULT_SETTINGS,
   listProducts, usedCategories, kindFor, getProduct, getProductBySlug, hydrateProduct, variantLabel,
-  priceCart, deliveryFor, createOrder, getOrder, getOrderByRef,
+  priceCart, deliveryFor, deliveryMethods, createOrder, getOrder, getOrderByRef,
   markPaid, markDispatched, markDelivered, cancelOrder, extendDeadline, expireUnpaid,
 };

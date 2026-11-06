@@ -26,8 +26,8 @@ ADMIN_PASSWORD='choose-a-strong-password' npm start
 | `/shop` | **Ready to Ship** and **Pre-order** in separate sections. Category filters show only categories that have products. Bundle prices say *“for a set of 3 bundles”* |
 | `/product/<name>` | Photos and video, price in rands that changes with the option chosen, live stock, texture/length/colour/lace/density/what's included, hair care. A box says plainly whether it's a **complete wig**, a **set of 3 bundles** or a **closure/frontal only**. A WhatsApp button pre-fills the product name, chosen option, price and link |
 | `/p/<name>` | Short link for TikTok/Instagram. Opens the exact product |
-| `/cart` → `/checkout` | Guest checkout: name, phone, email, delivery address. Delivery fee and total are shown **before** paying |
-| `/order/<ref>` | Confirmation page: what was bought, payment status, payment deadline, bank details and reference, expected dispatch time vs courier time, then tracking once dispatched |
+| `/cart` → `/checkout` | Guest checkout: name, phone, email, then a delivery option (courier, PEP PAXI, local delivery…) with its own fee. Courier/local asks for a street address; PEP PAXI asks for the PEP store. Delivery fee and total are shown **before** paying |
+| `/order/<ref>` | Confirmation page: what was bought, payment status, payment deadline, bank details and reference, expected dispatch time vs delivery time for the chosen option, then tracking once dispatched. If bank details aren't on the site, a button asks for them on WhatsApp |
 | `/track` | Clients find their order with reference + phone number |
 | `/hair-care`, `/delivery`, `/returns`, `/privacy`, `/contact` | Information pages, editable in admin. Marked “draft” until you confirm them. Only your city/area is shown, never your home address |
 
@@ -39,7 +39,8 @@ Choose product → select options → add to cart → enter delivery details →
 - **EFT orders stay “Awaiting payment”** until you confirm the money is in your account. Each order gets a unique reference like `NLH-7KQ2XA` and a payment deadline (24 hours by default).
 - If an order isn't paid by the deadline it **expires automatically and its stock is released**. You can give a client 24 more hours from the order page. If money arrives after the order expired, you can still mark it paid, and the stock is taken again if it's still available.
 - **Pre-order items** show “Enquire on WhatsApp” instead of “Add to cart”. Paid pre-orders can be added later.
-- **Collection** is not offered yet (as requested). It can be added once you confirm the arrangements.
+- **Delivery only, no collection.** Delivery options (courier, PEP PAXI, local delivery) each have their own fee and are set in *Settings*. An option with no fee is hidden from clients.
+- **WhatsApp orders:** pre-order product pages let the client choose a delivery option too, so the WhatsApp message includes the product, options, price, delivery and total with delivery.
 
 ### The catalogue
 
@@ -82,7 +83,7 @@ Log in with the `ADMIN_PASSWORD` set on the server. The admin also has a **Help*
 **Settings** covers:
 - WhatsApp number, email, Instagram/TikTok links and the area shown publicly
 - Homepage photo, slogan and intro
-- Delivery fee, free-delivery threshold, preparation time and courier time
+- Delivery options: name, fee, delivery time and whether the client gives a street address or a PEP store (PAXI point); free-delivery threshold; preparation and pre-order lead times
 - Bank details and the payment window in hours
 - Hair-care text and all policy pages
 
@@ -115,7 +116,8 @@ Environment variables:
 - [ ] Switch any hair you physically have to **Ready to ship** and enter its stock, so clients can buy it online
 - [ ] Add close-up photos of each product (lace, wefts, hair on a stand) if you have them
 - [ ] Settings: WhatsApp number, email, area, Instagram/TikTok links
-- [ ] Settings: bank details and the delivery fee
+- [ ] Settings: confirm the courier fee (R120) and enter the PEP PAXI fee (and local delivery fee, if offered)
+- [ ] Bank details: either add them in Settings, or leave them out and send them to clients on WhatsApp (the order page has a “Get bank details on WhatsApp” button)
 - [ ] Upload the homepage photo
 - [ ] Review and confirm the delivery, returns and privacy policies, then tick “confirmed”
 - [ ] Set up email (SMTP) and, if wanted, PayFast. Run one PayFast sandbox payment
@@ -128,7 +130,7 @@ Environment variables:
 `npm run test:phone` runs a complete order on an emulated iPhone 13 using a temporary database and test stock (`SEED_FIXTURES=test`). It checks:
 - homepage, shop and product pages
 - price changes, sold-out blocking and the WhatsApp text
-- cart and delivery fee, guest checkout, and the confirmation page
+- cart and delivery fee, courier vs PEP PAXI at checkout, guest checkout, and the confirmation page
 - stock going down, Track Order
 - admin: bank details, mark paid, dispatch with tracking, stock/price edits, adding a product with a photo
 - unpaid-order expiry

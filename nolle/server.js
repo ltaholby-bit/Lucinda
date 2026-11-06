@@ -97,23 +97,29 @@ function serveFile(req, res, root, rel, maxAge) {
 }
 
 /* ---------- Emails ---------- */
+function addressText(o) {
+  return o.delivery_type === 'paxi'
+    ? `PEP PAXI point: ${o.paxi_point}, ${o.city}, ${o.province}`
+    : [o.address1, o.address2, o.suburb, o.city, `${o.province} ${o.postal_code}`].filter(Boolean).join(', ');
+}
 function orderEmail(o, s, base, kind) {
   const link = `${base}/order/${o.ref}?t=${o.token}`;
   const items = o.items.map((i) => `• ${i.product_name}${i.variant_label ? ' (' + i.variant_label + ')' : ''} – ${i.kind_label} × ${i.qty}: ${money(i.unit_cents * i.qty)}`).join('\n');
-  const totals = `Subtotal: ${money(o.subtotal_cents)}\nDelivery: ${money(o.delivery_cents)}\nTotal: ${money(o.total_cents)}`;
+  const totals = `Subtotal: ${money(o.subtotal_cents)}\nDelivery${o.delivery_method ? ' (' + o.delivery_method + ')' : ''}: ${money(o.delivery_cents)}\nTotal: ${money(o.total_cents)}\nDelivering to: ${addressText(o)}`;
   const bank = s.bank_account_number
     ? `Bank: ${s.bank_name}\nAccount name: ${s.bank_account_name}\nAccount number: ${s.bank_account_number}\nBranch code: ${s.bank_branch_code}\nReference: ${o.ref}`
     : `We will send our bank details on WhatsApp. Reference: ${o.ref}`;
   const first = String(o.name).split(' ')[0];
+  const dtime = o.delivery_time || 'the usual transit time for your delivery option';
   const T = {
     placed: [`Order ${o.ref} received – awaiting payment`,
       `Hi ${first},\n\nThank you for your order with ${s.shop_name}!\n\nOrder reference: ${o.ref}\nPayment status: Awaiting payment\n\n${items}\n\n${totals}\n\n` +
       (o.payment_method === 'eft' ? `Please pay by EFT before ${fmtDate(o.payment_deadline)}:\n${bank}\n\nUnpaid orders are cancelled after this time.\n\n` : '') +
-      `Once payment is confirmed we prepare your order within ${s.prep_time}; courier delivery then takes ${s.courier_time}.\n\nView your order: ${link}\n\n${s.shop_name}\n${s.slogan}`],
+      `Once payment is confirmed we prepare your order within ${s.prep_time}; delivery then takes ${dtime}.\n\nView your order: ${link}\n\n${s.shop_name}\n${s.slogan}`],
     paid: [`Payment received – order ${o.ref}`,
-      `Hi ${first},\n\nWe have received your payment for order ${o.ref}. Thank you!\n\n${items}\n\n${totals}\n\nExpected dispatch: within ${s.prep_time}. Courier delivery then takes ${s.courier_time}. We will send you tracking once it is dispatched.\n\nView your order: ${link}\n\n${s.shop_name}`],
+      `Hi ${first},\n\nWe have received your payment for order ${o.ref}. Thank you!\n\n${items}\n\n${totals}\n\nExpected dispatch: within ${s.prep_time}. Delivery then takes ${dtime}. We will send you tracking once it is dispatched.\n\nView your order: ${link}\n\n${s.shop_name}`],
     dispatched: [`Your order ${o.ref} has been dispatched`,
-      `Hi ${first},\n\nGood news – your order ${o.ref} is on its way!\n\nCourier: ${o.courier}\nTracking number: ${o.tracking_number}\n${o.tracking_url ? 'Track it: ' + o.tracking_url + '\n' : ''}\nDelivery usually takes ${s.courier_time}.\n\nView your order: ${link}\n\n${s.shop_name}`],
+      `Hi ${first},\n\nGood news – your order ${o.ref} is on its way!\n\nCourier: ${o.courier}\nTracking number: ${o.tracking_number}\n${o.tracking_url ? 'Track it: ' + o.tracking_url + '\n' : ''}\nDelivery usually takes ${dtime}.\n\nView your order: ${link}\n\n${s.shop_name}`],
   }[kind];
   return { subject: T[0], text: T[1] };
 }
@@ -123,21 +129,28 @@ function notify(o, kind, req) {
   const m = orderEmail(o, s, base, kind);
   sendMail({ to: o.email, subject: m.subject, text: m.text, replyTo: s.email });
   if (kind === 'placed' || kind === 'paid') {
-    sendMail({ to: process.env.SHOP_NOTIFY_EMAIL || s.email, subject: `[Shop] ${kind === 'placed' ? 'New order' : 'Paid'} ${o.ref} – ${money(o.total_cents)}`, text: `${o.name} · ${o.phone} · ${o.email}\n${o.address1}, ${o.suburb}, ${o.city}, ${o.province} ${o.postal_code}\n\n${m.text}\n\nAdmin: ${base}/admin/orders/${o.id}` });
+    sendMail({ to: process.env.SHOP_NOTIFY_EMAIL || s.email, subject: `[Shop] ${kind === 'placed' ? 'New order' : 'Paid'} ${o.ref} – ${money(o.total_cents)}`, text: `${o.name} · ${o.phone} · ${o.email}\n${addressText(o)}\n\n${m.text}\n\nAdmin: ${base}/admin/orders/${o.id}` });
   }
 }
 
 /* ---------- Validation ---------- */
-function validateCheckout(b) {
+function validateCheckout(b, s) {
   const out = {};
-  const req = ['name', 'phone', 'email', 'address1', 'suburb', 'city', 'province', 'postal_code'];
-  for (const k of [...req, 'address2', 'notes', 'source']) out[k] = String(b[k] ?? '').trim().slice(0, k === 'notes' ? 500 : 150);
-  for (const k of req) if (!out[k]) return { error: 'Please fill in all required fields.' };
+  for (const k of ['name', 'phone', 'email', 'address1', 'address2', 'suburb', 'city', 'province', 'postal_code', 'paxi_point', 'notes', 'source']) {
+    out[k] = String(b[k] ?? '').trim().slice(0, k === 'notes' ? 500 : 150);
+  }
+  const method = store.deliveryMethods(s).find((m) => m.id === b.delivery_method);
+  if (!method) return { error: 'Please choose a delivery option.' };
+  const paxi = method.type === 'paxi';
+  const req = ['name', 'phone', 'email', 'city', 'province', ...(paxi ? ['paxi_point'] : ['address1', 'suburb', 'postal_code'])];
+  for (const k of req) if (!out[k]) return { error: paxi && k === 'paxi_point' ? 'Please enter the PEP store (PAXI point) to send your parcel to.' : 'Please fill in all required fields.' };
+  if (paxi) { out.address1 = ''; out.address2 = ''; out.suburb = ''; out.postal_code = ''; } else out.paxi_point = '';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) return { error: 'Please enter a valid email address.' };
   const digits = out.phone.replace(/\D/g, '');
   if (digits.length < 9 || digits.length > 13) return { error: 'Please enter a valid phone number.' };
-  if (!/^\d{4}$/.test(out.postal_code)) return { error: 'Please enter a 4-digit postal code.' };
+  if (!paxi && !/^\d{4}$/.test(out.postal_code)) return { error: 'Please enter a 4-digit postal code.' };
   if (!views.PROVINCES.includes(out.province)) return { error: 'Please choose your province.' };
+  out.delivery_method_id = method.id;
   out.payment_method = b.payment_method === 'card' && payfast.enabled() ? 'card' : 'eft';
   out.lines = Array.isArray(b.lines) ? b.lines.slice(0, 30) : [];
   return { data: out };
@@ -188,13 +201,14 @@ async function handlePublic(req, res, url) {
   if (p === '/api/cart' && req.method === 'POST') {
     const body = JSON.parse((await readBody(req, 1e5)).toString() || '{}');
     const { items, subtotal } = store.priceCart(body.lines);
-    return json(res, { items, subtotal, delivery: store.deliveryFor(subtotal, s) });
+    const methods = store.deliveryMethods(s).map((m) => ({ id: m.id, name: m.name, type: m.type, fee: store.deliveryFor(subtotal, s, m.id).fee }));
+    return json(res, { items, subtotal, methods });
   }
   if (p === '/api/orders' && req.method === 'POST') {
     store.expireUnpaid();
     let body;
     try { body = JSON.parse((await readBody(req, 1e5)).toString()); } catch { return json(res, { error: 'Invalid request.' }, 400); }
-    const v = validateCheckout(body);
+    const v = validateCheckout(body, s);
     if (v.error) return json(res, { error: v.error }, 400);
     try {
       const o = store.createOrder(v.data, s);
@@ -316,7 +330,11 @@ async function handleAdmin(req, res, url) {
     const samples = store.db.prepare('SELECT COUNT(*) n FROM products WHERE is_sample = 1').get().n;
     const warnings = [];
     if (!/^27\d{9}$/.test(s.whatsapp) || s.whatsapp === '27000000000') warnings.push('Your WhatsApp number is not set. <a href="/admin/settings">Add it in Settings</a>.');
-    if (!s.bank_account_number) warnings.push('Your bank details for EFT are not set. <a href="/admin/settings">Add them in Settings</a>.');
+    if (!s.bank_account_number) warnings.push('Bank details are not shown on the site, so clients are asked to get them from you on WhatsApp after ordering. (Optional: add them in <a href="/admin/settings">Settings</a> to show them automatically.)');
+    const allMethods = store.deliveryMethods(s, { all: true });
+    if (!allMethods.some((m) => m.fee != null)) warnings.push('No delivery option has a fee yet, so online checkout cannot be used. <a href="/admin/settings">Add delivery fees in Settings</a>.');
+    const notOffered = allMethods.filter((m) => m.fee == null);
+    if (notOffered.length) warnings.push(`Not shown to clients until you add a fee: ${notOffered.map((m) => esc(m.name)).join(', ')}. <a href="/admin/settings">Add fees in Settings</a>.`);
     if (s.policies_confirmed !== '1') warnings.push('Your delivery, returns and privacy policies are still marked as drafts. <a href="/admin/settings">Review them</a>.');
     if (!mailConfigured()) warnings.push('Order emails are not switched on yet (see Help / README). Clients still see their confirmation page.');
     return page(res, admin.dashboard(s, { counts, recent, lowStock, samples, base, warnings }));
@@ -423,17 +441,29 @@ async function handleAdmin(req, res, url) {
   if (p === '/admin/settings') {
     if (req.method === 'POST') {
       const b = await formBody(req);
-      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'preorder_time', 'courier_time', 'courier_name', 'payment_hours',
+      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'preorder_time', 'courier_name', 'payment_hours',
         'bank_name', 'bank_account_name', 'bank_account_number', 'bank_branch_code', 'bank_account_type', 'care_default', 'policy_haircare', 'policy_delivery', 'policy_returns', 'policy_privacy'];
       for (const k of keys) if (k in b) store.setSetting(k, String(b[k]).trim());
       store.setSetting('whatsapp', String(b.whatsapp || '').replace(/\D/g, '').replace(/^0/, '27'));
-      store.setSetting('delivery_fee_cents', toCents(b.delivery_fee) ?? 0);
+      if ('dm_count' in b) {
+        const methods = [];
+        for (let i = 0; i < Math.min(20, parseInt(b.dm_count, 10) || 0); i++) {
+          const name = String(b[`dm_name_${i}`] || '').trim().slice(0, 60);
+          if (!name) continue;
+          const feeRaw = String(b[`dm_fee_${i}`] || '').trim();
+          const cents = feeRaw === '' ? null : toCents(feeRaw);
+          let id = String(b[`dm_id_${i}`] || '').trim() || slugify(name);
+          while (methods.some((m) => m.id === id)) id += '-2';
+          methods.push({ id, name, fee: cents == null ? '' : String(cents), time: String(b[`dm_time_${i}`] || '').trim().slice(0, 60), type: b[`dm_type_${i}`] === 'paxi' ? 'paxi' : 'address' });
+        }
+        store.setSetting('delivery_methods', JSON.stringify(methods));
+      }
       store.setSetting('free_delivery_over_cents', toCents(b.free_delivery_over) ?? 0);
       store.setSetting('payment_hours', Math.max(1, parseInt(b.payment_hours, 10) || 24));
       store.setSetting('policies_confirmed', b.policies_confirmed === '1' ? '1' : '0');
       return back('/admin/settings', 'Settings saved.');
     }
-    return page(res, admin.settings(s, { flash, cardEnabled: payfast.enabled(), mailOn: mailConfigured() }));
+    return page(res, admin.settings(s, { flash, cardEnabled: payfast.enabled(), mailOn: mailConfigured(), methods: store.deliveryMethods(s, { all: true }) }));
   }
   if (p === '/admin/help') return page(res, admin.help(s, { base }));
   return send(res, 404, 'Not found', 'text/plain');

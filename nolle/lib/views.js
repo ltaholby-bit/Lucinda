@@ -1,6 +1,16 @@
 'use strict';
 const { html, raw, esc, money, fmtDate, waLink, richText } = require('./util');
-const { CATEGORIES, usedCategories } = require('./db');
+const { CATEGORIES, usedCategories, deliveryMethods } = require('./db');
+
+const feeText = (c) => (c ? money(c) : 'Free');
+const timeText = (m) => (m.time ? `${m.time} after dispatch` : 'Transit time depends on the service chosen');
+function deliveryOptionsText(s) {
+  const list = deliveryMethods(s);
+  if (!list.length) return 'Delivery fees are confirmed with you on WhatsApp.';
+  const free = parseInt(s.free_delivery_over_cents, 10) || 0;
+  return list.map((m) => `- ${m.name}: ${feeText(m.fee)} – ${timeText(m)}`).join('\n')
+    + (free > 0 ? `\n- Free delivery on orders over ${money(free)}` : '');
+}
 
 const STATUS = {
   awaiting_payment: { label: 'Awaiting payment', tone: 'warn' },
@@ -162,7 +172,8 @@ function draftNotice(s) {
 }
 
 function fillPolicy(text, s) {
-  return String(text || '').replace(/\{(\w+)\}/g, (m, k) => (s[k] != null ? s[k] : m));
+  const vars = { ...s, delivery_options: deliveryOptionsText(s), courier_time: (deliveryMethods(s)[0] || {}).time || 'a few business days' };
+  return String(text || '').replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : m));
 }
 
 /* ------------------------------ Pages ------------------------------ */
@@ -277,6 +288,8 @@ function product(s, { p, base, preselect }) {
     optionNames: p.option_names, url: `${base}/product/${p.slug}`,
     variants: p.variants.map((v) => ({ id: v.id, options: v.options, price: v.price_cents, stock: Math.max(0, v.stock) })),
     preselect: preselect || null, image: images[0],
+    delivery: deliveryMethods(s).map((m) => ({ id: m.id, name: m.name, fee: m.fee })),
+    freeOver: parseInt(s.free_delivery_over_cents, 10) || 0,
   };
   const details = [
     ['What you’re buying', p.cat.kind],
@@ -318,6 +331,11 @@ function product(s, { p, base, preselect }) {
         </fieldset>`;
       })}
       <p class="stock" data-stock aria-live="polite"></p>
+      ${enquire && deliveryMethods(s).length ? html`<fieldset class="opt" data-delivery-opt>
+        <legend>Delivery: <span data-delivery-value></span></legend>
+        <div class="opt-values">${deliveryMethods(s).map((m) => html`<button type="button" class="opt-btn" data-delivery="${m.id}">${m.name} · ${feeText(m.fee)}</button>`)}</div>
+      </fieldset>
+      <p class="wa-total" data-wa-total aria-live="polite"></p>` : ''}
       ${enquire ? '' : html`<div class="qty-row">
         <label class="qty"><span>Qty</span><input type="number" name="qty" min="1" max="1" value="1" inputmode="numeric" data-qty></label>
         <button class="btn btn-gold btn-block" type="submit" data-add>Add to cart</button>
@@ -328,15 +346,16 @@ function product(s, { p, base, preselect }) {
 
     <div class="ship-box">
       <div><strong>${enquire ? 'Pre-order lead time' : 'Order preparation'}</strong><span>${enquire ? (p.lead_time || s.preorder_time) : s.prep_time + ' after payment'}</span></div>
-      <div><strong>Courier delivery</strong><span>${s.courier_time} after dispatch</span></div>
-      <div><strong>Delivery fee</strong><span>${money(parseInt(s.delivery_fee_cents, 10) || 0)} nationwide${parseInt(s.free_delivery_over_cents, 10) > 0 ? ` · free over ${money(s.free_delivery_over_cents)}` : ''}</span></div>
+      ${deliveryMethods(s).length ? deliveryMethods(s).map((m) => html`<div><strong>${m.name}</strong><span>${feeText(m.fee)} · ${timeText(m)}</span></div>`)
+        : html`<div><strong>Delivery</strong><span>Fee confirmed on WhatsApp</span></div>`}
+      ${parseInt(s.free_delivery_over_cents, 10) > 0 ? html`<div><strong>Free delivery</strong><span>on orders over ${money(s.free_delivery_over_cents)}</span></div>` : ''}
     </div>
 
     <dl class="details">${details.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
 
     ${p.description ? html`<details class="acc" open><summary>Description</summary><div>${richText(p.description)}</div></details>` : ''}
     <details class="acc"><summary>Hair care</summary><div>${richText(care)}<p><a href="/hair-care">Full hair-care guide →</a></p></div></details>
-    <details class="acc"><summary>Delivery &amp; returns</summary><div><p>Delivered nationwide by courier. We prepare your order within ${s.prep_time} of payment; the courier then takes ${s.courier_time}. <a href="/delivery">Delivery info</a> · <a href="/returns">Returns</a></p></div></details>
+    <details class="acc"><summary>Delivery &amp; returns</summary><div><p>Delivery only (no collection)${deliveryMethods(s).length ? ': ' + deliveryMethods(s).map((m) => `${m.name} ${feeText(m.fee)}`).join(' · ') : ''}. ${enquire ? `Pre-order lead time: ${p.lead_time || s.preorder_time}, then delivery.` : `We prepare your order within ${s.prep_time} of payment, then it is delivered.`} <a href="/delivery">Delivery info</a> · <a href="/returns">Returns</a></p></div></details>
   </div>
 </section>
 <section class="help-band slim"><div class="wrap help"><h2>Need help choosing?</h2><a class="btn btn-outline" href="${waLink(s.whatsapp, `Hi, I need help choosing. I’m looking at ${p.name}.`)}" target="_blank" rel="noopener">${ICON.wa} Chat to us on WhatsApp</a></div></section>
@@ -356,14 +375,14 @@ function product(s, { p, base, preselect }) {
 function cart(s, { base }) {
   const body = html`
 <section class="page-head"><p class="eyebrow">Your cart</p><h1>Cart</h1></section>
-<div class="wrap cart-wrap" data-cart-page data-fee="${s.delivery_fee_cents}" data-free-over="${s.free_delivery_over_cents}">
+<div class="wrap cart-wrap" data-cart-page>
   <div class="cart-items" data-cart-items><p class="muted">Loading…</p></div>
   <aside class="summary" data-cart-summary hidden>
     <h2>Summary</h2>
     <div class="sum-row"><span>Subtotal</span><span data-subtotal></span></div>
-    <div class="sum-row"><span>Delivery (nationwide)</span><span data-delivery></span></div>
+    <div class="sum-row"><span data-delivery-label>Delivery</span><span data-delivery></span></div>
     <div class="sum-row total"><span>Total</span><span data-total></span></div>
-    <p class="muted small">Prepared within ${s.prep_time} of payment, then ${s.courier_time} by courier.</p>
+    <p class="muted small">Choose your delivery at checkout: ${deliveryMethods(s).map((m) => `${m.name} (${feeText(m.fee)})`).join(' · ') || 'confirmed on WhatsApp'}.</p>
     <a class="btn btn-gold btn-block" href="/checkout">Checkout</a>
     <a class="link-gold" href="/shop">← Continue shopping</a>
   </aside>
@@ -376,7 +395,7 @@ const PROVINCES = ['Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal', 'Li
 function checkout(s, { base, cardEnabled }) {
   const body = html`
 <section class="page-head"><p class="eyebrow">Secure checkout</p><h1>Checkout</h1><p>No account needed. Your order is only confirmed once payment is received.</p></section>
-<div class="wrap checkout" data-checkout-page data-fee="${s.delivery_fee_cents}" data-free-over="${s.free_delivery_over_cents}">
+<div class="wrap checkout" data-checkout-page>
   <form class="co-form" data-checkout-form novalidate>
     <h2>1. Your details</h2>
     <label>Full name<input name="name" autocomplete="name" required maxlength="100"></label>
@@ -384,17 +403,25 @@ function checkout(s, { base, cardEnabled }) {
       <label>Phone (WhatsApp)<input name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 082 123 4567" maxlength="20"></label>
       <label>Email<input name="email" type="email" autocomplete="email" required maxlength="120"></label>
     </div>
-    <h2>2. Delivery address</h2>
-    <p class="muted small">Delivery nationwide by courier.</p>
-    <label>Street address<input name="address1" autocomplete="address-line1" required maxlength="150"></label>
-    <label>Complex / unit / building <span class="opt-l">(optional)</span><input name="address2" autocomplete="address-line2" maxlength="150"></label>
-    <div class="two">
-      <label>Suburb<input name="suburb" autocomplete="address-level3" required maxlength="80"></label>
-      <label>City / town<input name="city" autocomplete="address-level2" required maxlength="80"></label>
+    <h2>2. Delivery</h2>
+    ${deliveryMethods(s).length ? html`<div class="pay-opts">
+      ${deliveryMethods(s).map((m, i) => html`<label class="pay-opt"><input type="radio" name="delivery_method" value="${m.id}" data-type="${m.type}" data-name="${m.name}" data-time="${timeText(m)}" ${i === 0 ? raw('checked') : ''} required><span><strong>${m.name} – ${feeText(m.fee)}</strong><em>${m.type === 'paxi' ? 'Collect from the PEP store of your choice. ' : 'Delivered to your address. '}${timeText(m)}.</em></span></label>`)}
+    </div>` : html`<p class="warn-box">Online delivery is not set up yet – please <a href="${waLink(s.whatsapp, 'Hi, I would like to place an order.')}">order on WhatsApp</a>.</p>`}
+    <div class="addr" data-addr="address">
+      <label>Street address<input name="address1" autocomplete="address-line1" required maxlength="150"></label>
+      <label>Complex / unit / building <span class="opt-l">(optional)</span><input name="address2" autocomplete="address-line2" maxlength="150"></label>
+      <div class="two">
+        <label>Suburb<input name="suburb" autocomplete="address-level3" required maxlength="80"></label>
+        <label>Postal code<input name="postal_code" autocomplete="postal-code" inputmode="numeric" required pattern="\\d{4}" maxlength="4"></label>
+      </div>
+    </div>
+    <div class="addr" data-addr="paxi" hidden>
+      <label>PEP store (PAXI point)<input name="paxi_point" required maxlength="120" placeholder="e.g. PEP Rosebank Mall"></label>
+      <p class="muted small">We send your parcel to this PEP store. You collect it there once you receive the PAXI SMS.</p>
     </div>
     <div class="two">
+      <label>City / town<input name="city" autocomplete="address-level2" required maxlength="80"></label>
       <label>Province<select name="province" required><option value="">Choose…</option>${PROVINCES.map((p) => html`<option>${p}</option>`)}</select></label>
-      <label>Postal code<input name="postal_code" autocomplete="postal-code" inputmode="numeric" required pattern="\\d{4}" maxlength="4"></label>
     </div>
     <label>Delivery notes <span class="opt-l">(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="e.g. gate code, best time to deliver"></textarea></label>
 
@@ -411,11 +438,11 @@ function checkout(s, { base, cardEnabled }) {
     <h2>Your order</h2>
     <div data-co-items><p class="muted">Loading…</p></div>
     <div class="sum-row"><span>Subtotal</span><span data-subtotal></span></div>
-    <div class="sum-row"><span>Delivery (nationwide)</span><span data-delivery></span></div>
+    <div class="sum-row"><span data-delivery-label>Delivery</span><span data-delivery></span></div>
     <div class="sum-row total"><span>Total to pay</span><span data-total></span></div>
     <div class="ship-box small">
       <div><strong>Preparing your order</strong><span>${s.prep_time} after payment</span></div>
-      <div><strong>Courier delivery</strong><span>${s.courier_time} after dispatch</span></div>
+      <div><strong>Delivery time</strong><span data-delivery-time>Depends on the option you choose</span></div>
     </div>
   </aside>
 </div>`;
@@ -434,7 +461,8 @@ function bankBlock(s, o) {
     ${s.bank_account_type ? html`<div><dt>Account type</dt><dd>${s.bank_account_type}</dd></div>` : ''}
     <div><dt>Amount</dt><dd><strong>${money(o.total_cents)}</strong></dd></div>
     <div><dt>Reference</dt><dd><strong class="ref"><span data-copy>${o.ref}</span></strong></dd></div>
-  </dl>` : html`<p class="warn-box">Our bank details will be sent to you on WhatsApp. Please use reference <strong>${o.ref}</strong>.</p>`}
+  </dl>` : html`<p class="warn-box">Tap the button below and we’ll send you our bank details on WhatsApp. Please use <strong>${o.ref}</strong> as your payment reference.</p>
+  <p><a class="btn btn-gold" href="${waLink(s.whatsapp, `Hi Nolle’ Luxury Hair, I have placed order ${o.ref} for ${money(o.total_cents)}. Please send me your banking details.`)}" target="_blank" rel="noopener">${ICON.wa} Get bank details on WhatsApp</a></p>`}
   <p class="deadline">Please pay by <strong>${fmtDate(o.payment_deadline)}</strong>. Unpaid orders are cancelled automatically after this time and the stock is released.</p>
   <p class="muted small">Your order stays “Awaiting payment” until the money reflects in our account (instant EFTs usually reflect within a few hours; other banks can take 1–2 business days).</p>
   <a class="btn btn-outline" href="${waLink(s.whatsapp, `Hi, I have paid for order ${o.ref} (${money(o.total_cents)}). Here is my proof of payment:`)}" target="_blank" rel="noopener">${ICON.wa} Send proof of payment</a>
@@ -466,7 +494,7 @@ function orderPage(s, { o, base, cardEnabled, justPlaced, paidReturn }) {
 
     <div class="ship-box">
       <div><strong>Expected dispatch</strong><span>${o.dispatched_at ? 'Dispatched ' + fmtDate(o.dispatched_at, false) : `Within ${s.prep_time} after payment is confirmed`}</span></div>
-      <div><strong>Courier delivery time</strong><span>${s.courier_time} after dispatch</span></div>
+      <div><strong>${o.delivery_method || 'Delivery'}</strong><span>${o.delivery_time ? o.delivery_time + ' after dispatch' : 'Transit time depends on the service chosen'}</span></div>
     </div>
     ${o.tracking_number ? html`<div class="tracking"><h3>Tracking</h3><p>${o.courier || 'Courier'}: <strong>${o.tracking_number}</strong></p>${o.tracking_url ? html`<a class="btn btn-gold" href="${o.tracking_url}" target="_blank" rel="noopener">Track your parcel</a>` : ''}</div>`
       : html`<p class="muted small">Tracking details will appear here and be sent to you once your order is dispatched.</p>`}
@@ -476,10 +504,10 @@ function orderPage(s, { o, base, cardEnabled, justPlaced, paidReturn }) {
     <h2>What you bought</h2>
     ${o.items.map((i) => html`<div class="line"><div><strong>${i.product_name}</strong><span class="muted small">${[i.kind_label, i.variant_label].filter(Boolean).join(' · ')} × ${i.qty}</span></div><span>${money(i.unit_cents * i.qty)}</span></div>`)}
     <div class="sum-row"><span>Subtotal</span><span>${money(o.subtotal_cents)}</span></div>
-    <div class="sum-row"><span>Delivery</span><span>${o.delivery_cents ? money(o.delivery_cents) : 'Free'}</span></div>
+    <div class="sum-row"><span>Delivery${o.delivery_method ? ` – ${o.delivery_method}` : ''}</span><span>${o.delivery_cents ? money(o.delivery_cents) : 'Free'}</span></div>
     <div class="sum-row total"><span>Total</span><span>${money(o.total_cents)}</span></div>
     <h3>Delivering to</h3>
-    <p class="small">${o.name}<br>${o.address1}${o.address2 ? html`, ${o.address2}` : ''}<br>${o.suburb}, ${o.city}<br>${o.province}, ${o.postal_code}<br>${o.phone} · ${o.email}</p>
+    <p class="small">${o.name}<br>${o.delivery_type === 'paxi' ? html`PEP PAXI point: ${o.paxi_point}<br>${o.city}, ${o.province}` : html`${o.address1}${o.address2 ? html`, ${o.address2}` : ''}<br>${o.suburb}, ${o.city}<br>${o.province}, ${o.postal_code}`}<br>${o.phone} · ${o.email}</p>
     <a class="btn btn-outline btn-block" href="${waLink(s.whatsapp, `Hi, I have a question about my order ${o.ref}.`)}" target="_blank" rel="noopener">${ICON.wa} Questions? WhatsApp us</a>
   </aside>
 </div>

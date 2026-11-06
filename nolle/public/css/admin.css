@@ -64,3 +64,4 @@ code { background: var(--blush-100); padding: .1rem .35rem; border-radius: 4px; 
 .a-form, .a-form > *, .a-card, .a-cols > * { min-width: 0; }
 .tbl-wrap { max-width: 100%; }
 @media (max-width: 860px) { .a-head { position: static; } .a-main { padding-top: 1rem; } }
+.dm-tbl input, .dm-tbl select { min-width: 120px; }

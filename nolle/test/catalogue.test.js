@@ -50,6 +50,8 @@ const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
     await page.getByRole('button', { name: 'Wavy', exact: true }).click();
     const wa = decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
     assert.match(wa, /Raw Indian Hair Bundles – Straight & Wavy/); assert.match(wa, /Wavy · 20"/); assert.match(wa, /for 3 bundles/);
+    assert.match(wa, /Delivery: Courier to your door \(R120\)/); assert.match(wa, /Total with delivery: R8 457/);
+    assert.match(await page.locator('[data-wa-total]').innerText(), /Total with delivery: R8 457/);
     assert.match(await page.locator('.ship-box').innerText(), /Pre-order lead time/i);
     log(`Raw 20" set of 3 = ${R(2779 * 3)}; WhatsApp message has product, texture, length and “for 3 bundles”`);
 
@@ -81,6 +83,8 @@ const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
       const [sw, cw] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
       assert.ok(sw <= cw, `${u} scrolls sideways`);
     }
+    await page.goto(BASE + '/delivery');
+    assert.match(await page.locator('.prose').innerText(), /Courier to your door: R120/);
     log('No sideways scrolling');
     assert.deepEqual(errors, []);
     log('No JavaScript errors');

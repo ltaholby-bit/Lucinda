@@ -52,6 +52,7 @@
   if (pdEl) (function () {
     var P = JSON.parse(pdEl.textContent);
     var sel = {};
+    var dSel = P.delivery && P.delivery.length ? P.delivery[0].id : null;
     var form = $('[data-buy-form]');
     var priceEl = $('[data-price]'), stockEl = $('[data-stock]'), addBtn = $('[data-add]'), qtyEl = $('[data-qty]');
     var waBtn = $('[data-wa-enquire]'), addedEl = $('[data-added]'), lenEl = $('[data-detail-length]');
@@ -118,11 +119,25 @@
           : 'This combination is not available - please choose another option, or ask us on WhatsApp.';
         if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Choose an option'; }
       }
+      // Delivery choice for WhatsApp orders: shows the total and adds it to the message
+      var dm = (P.delivery || []).find(function (d) { return d.id === dSel; });
+      $$('[data-delivery]').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-delivery') === dSel);
+        b.setAttribute('aria-pressed', b.getAttribute('data-delivery') === dSel);
+      });
+      var dv = $('[data-delivery-value]'); if (dv) dv.textContent = dm ? dm.name : 'please choose';
+      var wt = $('[data-wa-total]');
+      if (v && dm) {
+        var dfee = P.freeOver && v.price >= P.freeOver ? 0 : dm.fee;
+        var dtxt = dfee ? money(dfee) : 'free';
+        if (wt) wt.textContent = 'Total with delivery: ' + money(v.price + dfee) + ' (' + money(v.price) + ' + ' + dtxt + ' delivery)';
+        waText += '. Delivery: ' + dm.name + ' (' + dtxt + '). Total with delivery: ' + money(v.price + dfee);
+      } else if (wt) wt.textContent = '';
       waText += '. ' + P.url + (v ? '?v=' + v.id : '');
       if (waBtn) waBtn.href = waLink(waText);
     }
 
-    $$('.opt-btn').forEach(function (b) {
+    $$('[data-opt] .opt-btn').forEach(function (b) {
       b.addEventListener('click', function () {
         var name = b.closest('[data-opt]').getAttribute('data-opt');
         sel[name] = b.getAttribute('data-value');
@@ -144,6 +159,10 @@
       || P.variants[0];
     if (pre) P.optionNames.forEach(function (n) { sel[n] = pre.options[n]; });
     render();
+
+    $$('[data-delivery]').forEach(function (b) {
+      b.addEventListener('click', function () { dSel = b.getAttribute('data-delivery'); render(); });
+    });
 
     // thumbnails
     $$('[data-thumb]').forEach(function (t) {
@@ -172,10 +191,11 @@
     return fetch('/api/cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines: getCart() }) })
       .then(function (r) { return r.json(); });
   }
-  function fillTotals(root, data) {
-    $('[data-subtotal]', root).textContent = money(data.subtotal);
-    $('[data-delivery]', root).textContent = data.delivery ? money(data.delivery) : 'Free';
-    $('[data-total]', root).textContent = money(data.subtotal + data.delivery);
+  function fillTotals(root, subtotal, fee, from) {
+    var pre = from ? 'from ' : '';
+    $('[data-subtotal]', root).textContent = money(subtotal);
+    $('[data-delivery]', root).textContent = fee == null ? 'Confirmed on WhatsApp' : (fee ? pre + money(fee) : 'Free');
+    $('[data-total]', root).textContent = pre + money(subtotal + (fee || 0));
   }
   function lineMeta(i) { return [i.kind_label, i.variant_label].filter(Boolean).join(' · '); }
 
@@ -209,7 +229,9 @@
             '<div class="lt">' + money(i.unit_cents * i.qty) + '</div></div>';
         }).join('');
         sumEl.hidden = false;
-        fillTotals(sumEl, data);
+        var fees = (data.methods || []).map(function (m) { return m.fee; });
+        var minFee = fees.length ? Math.min.apply(null, fees) : null;
+        fillTotals(sumEl, data.subtotal, minFee, fees.length > 1 && minFee !== Math.max.apply(null, fees));
         var co = $('a[href="/checkout"]', sumEl);
         co.classList.toggle('disabled', blocked);
         co.setAttribute('aria-disabled', blocked);
@@ -233,12 +255,31 @@
     var coForm = $('[data-checkout-form]'), errEl = $('[data-form-error]'), btn = $('[data-place-order]');
     var coItems = $('[data-co-items]');
     if (!getCart().length) { location.href = '/cart'; return; }
+    var cartData = null, methodFee = {};
+    var applyMethod = function () {
+      var r = coForm.querySelector('input[name=delivery_method]:checked');
+      var type = r ? r.getAttribute('data-type') : 'address';
+      $$('[data-addr]', coForm).forEach(function (block) {
+        var on = block.getAttribute('data-addr') === type;
+        block.hidden = !on;
+        $$('input, select, textarea', block).forEach(function (f) { f.disabled = !on; });
+      });
+      var tEl = $('[data-delivery-time]'); if (tEl && r) tEl.textContent = r.getAttribute('data-time');
+      var lEl = $('[data-co-summary] [data-delivery-label]'); if (lEl) lEl.textContent = r ? 'Delivery – ' + r.getAttribute('data-name') : 'Delivery';
+      if (!cartData) return;
+      var fee = r && methodFee[r.value] != null ? methodFee[r.value] : null;
+      fillTotals($('[data-co-summary]'), cartData.subtotal, fee, false);
+      btn.textContent = 'Place order – ' + money(cartData.subtotal + (fee || 0));
+    };
+    coForm.addEventListener('change', function (e) { if (e.target.name === 'delivery_method') applyMethod(); });
+    applyMethod();
     fetchCart().then(function (data) {
+      cartData = data;
+      (data.methods || []).forEach(function (m) { methodFee[m.id] = m.fee; });
       coItems.innerHTML = data.items.map(function (i) {
         return '<div class="line"><div><strong>' + esc(i.product_name) + '</strong><span class="muted small">' + esc(lineMeta(i)) + ' × ' + i.qty + '</span></div><span>' + money(i.unit_cents * i.qty) + '</span></div>';
       }).join('');
-      fillTotals($('[data-co-summary]'), data);
-      btn.textContent = 'Place order – ' + money(data.subtotal + data.delivery);
+      applyMethod();
     });
     // restore half-filled details
     try {
@@ -246,7 +287,7 @@
       Object.keys(saved).forEach(function (k) { var f = coForm.elements[k]; if (f && f.type !== 'checkbox' && f.type !== 'radio' && !f.value) f.value = saved[k]; });
     } catch (e) {}
     coForm.addEventListener('input', function () {
-      var d = {}; ['name', 'phone', 'email', 'address1', 'address2', 'suburb', 'city', 'province', 'postal_code'].forEach(function (k) { d[k] = coForm.elements[k].value; });
+      var d = {}; ['name', 'phone', 'email', 'address1', 'address2', 'suburb', 'city', 'province', 'postal_code', 'paxi_point'].forEach(function (k) { d[k] = coForm.elements[k].value; });
       try { localStorage.setItem('nolle_details', JSON.stringify(d)); } catch (e) {}
     });
     coForm.addEventListener('submit', function (e) {

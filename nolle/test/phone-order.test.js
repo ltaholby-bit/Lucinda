@@ -142,7 +142,7 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     // 6. Stock reduced: 20" is now sold out, cannot be bought again
     await page.goto(BASE + '/product/body-wave-13x4-frontal-wig?v=2');
     assert.match(await page.locator('[data-stock]').innerText(), /Sold out/);
-    const again = await fetch(BASE + '/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'X Y', phone: '0825551111', email: 'x@y.co', address1: 'a', suburb: 'b', city: 'c', province: 'Gauteng', postal_code: '2000', lines: [{ v: 2, q: 1 }] }) });
+    const again = await fetch(BASE + '/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'X Y', phone: '0825551111', email: 'x@y.co', address1: 'a', suburb: 'b', city: 'c', province: 'Gauteng', postal_code: '2000', delivery_method: 'courier', lines: [{ v: 2, q: 1 }] }) });
     assert.equal(again.status, 409);
     log('Stock reduced on order; sold-out item cannot be ordered again (409)');
 
@@ -171,7 +171,7 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     await page.fill('[name=bank_account_name]', 'Nolle Luxury Hair');
     await page.fill('[name=bank_account_number]', '62000000000');
     await page.fill('[name=bank_branch_code]', '250655');
-    await page.fill('[name=delivery_fee]', '150');
+    await page.fill('[name=dm_fee_1]', '65'); // PEP PAXI
     await page.getByRole('button', { name: 'Save settings' }).click();
     assert.match(await page.locator('.flash').innerText(), /Settings saved/);
     await page.goto(orderUrl.replace('&new=1', ''));
@@ -181,6 +181,19 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     assert.equal(await page.locator('body').getAttribute('data-wa'), '27821234567');
     await shot(page, 'order-eft-details');
     log('Admin settings: bank details appear on the order page; WhatsApp number normalised to 27…');
+
+    // PEP PAXI has its own fee; choosing it swaps the street address for a PAXI point
+    await page.goto(BASE + '/product/straight-bundle-set?v=5');
+    await page.locator('[data-add]').click();
+    await page.goto(BASE + '/checkout');
+    await page.locator('[data-co-items] .line').first().waitFor();
+    assert.equal(await page.locator('[data-co-summary] [data-total]').innerText(), 'R3 020');
+    await page.locator('input[name=delivery_method][value=paxi]').check();
+    assert.equal(await page.locator('[data-co-summary] [data-total]').innerText(), 'R2 965');
+    assert.ok(await page.locator('[name=paxi_point]').isVisible());
+    assert.ok(await page.locator('[name=address1]').isHidden());
+    await page.evaluate(() => localStorage.removeItem('nolle_cart'));
+    log('Checkout: PEP PAXI (R65) vs courier (R120) changes the total and asks for a PEP store instead of an address');
 
     // Mark paid
     await page.goto(BASE + '/admin/orders?status=awaiting_payment');
@@ -232,18 +245,20 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     log('Admin adds a product with photo; it is live at its social link');
 
     // 11. Unpaid EFT order expires after deadline and stock is released
-    const r = await fetch(BASE + '/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Lerato K', phone: '0821112222', email: 'l@k.co', address1: '1 A St', suburb: 'B', city: 'Durban', province: 'KwaZulu-Natal', postal_code: '4001', lines: [{ v: 5, q: 1 }] }) });
+    const r = await fetch(BASE + '/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Lerato K', phone: '0821112222', email: 'l@k.co', delivery_method: 'paxi', paxi_point: 'PEP Durban Station', city: 'Durban', province: 'KwaZulu-Natal', lines: [{ v: 5, q: 1 }] }) });
     const placed = await r.json();
     assert.ok(placed.ref);
     const { DatabaseSync } = require('node:sqlite');
     const db = new DatabaseSync(path.join(DATA, 'shop.db'));
     assert.equal(db.prepare('SELECT stock FROM variants WHERE id = 5').get().stock, 0);
+    assert.deepEqual({ ...db.prepare('SELECT delivery_cents, delivery_type, paxi_point FROM orders WHERE ref = ?').get(placed.ref) },
+      { delivery_cents: 6500, delivery_type: 'paxi', paxi_point: 'PEP Durban Station' });
     db.prepare("UPDATE orders SET payment_deadline = '2000-01-01T00:00:00Z' WHERE ref = ?").run(placed.ref);
     await page.goto(BASE + '/admin/orders');
     assert.equal(db.prepare('SELECT status FROM orders WHERE ref = ?').get(placed.ref).status, 'expired');
     assert.equal(db.prepare('SELECT stock FROM variants WHERE id = 5').get().stock, 1);
     db.close();
-    log('Unpaid order past its deadline expires and its stock is released');
+    log('PEP PAXI order charged R65 with its PAXI point; unpaid order past its deadline expires and its stock is released');
 
     assert.deepEqual(errors, [], 'no JavaScript errors');
     log('No JavaScript errors');

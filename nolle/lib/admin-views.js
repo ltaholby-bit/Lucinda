@@ -99,7 +99,7 @@ function orders(s, { list, status, q }) {
 function order(s, { o, flash, base }) {
   const link = `${base}/order/${o.ref}?t=${o.token}`;
   const msgPaid = `Hi ${o.name.split(' ')[0]}, thank you! We have received your payment for order ${o.ref}. We’ll prepare your hair within ${s.prep_time} and send tracking once it’s dispatched. ${link}`;
-  const msgDisp = `Hi ${o.name.split(' ')[0]}, your Nolle’ order ${o.ref} has been dispatched with ${o.courier || 'the courier'}. Tracking number: ${o.tracking_number}${o.tracking_url ? ' – ' + o.tracking_url : ''}. Delivery usually takes ${s.courier_time}.`;
+  const msgDisp = `Hi ${o.name.split(' ')[0]}, your Nolle’ order ${o.ref} has been dispatched with ${o.courier || 'the courier'}. Tracking number: ${o.tracking_number}${o.tracking_url ? ' – ' + o.tracking_url : ''}. ${o.delivery_time ? ' Delivery usually takes ' + o.delivery_time + '.' : ''}`;
   const msgRemind = `Hi ${o.name.split(' ')[0]}, this is Nolle’ Luxury Hair. Your order ${o.ref} (${money(o.total_cents)}) is awaiting payment. Please pay by ${fmtDate(o.payment_deadline)} using reference ${o.ref}. ${link}`;
   const intl = o.phone.replace(/\D/g, '').replace(/^0/, '27');
   return alayout(s, {
@@ -117,7 +117,9 @@ function order(s, { o, flash, base }) {
     </tbody></table>
     <h2>Client</h2>
     <p>${o.name}<br><a href="tel:${o.phone}">${o.phone}</a> · <a href="mailto:${o.email}">${o.email}</a></p>
-    <p>${o.address1}${o.address2 ? ', ' + o.address2 : ''}<br>${o.suburb}, ${o.city}<br>${o.province}, ${o.postal_code}</p>
+    <p><strong>Delivery:</strong> ${o.delivery_method || 'Courier'} (${money(o.delivery_cents)})</p>
+    ${o.delivery_type === 'paxi' ? html`<p>PEP PAXI point: <strong>${o.paxi_point}</strong><br>${o.city}, ${o.province}</p>`
+      : html`<p>${o.address1}${o.address2 ? ', ' + o.address2 : ''}<br>${o.suburb}, ${o.city}<br>${o.province}, ${o.postal_code}</p>`}
     ${o.notes ? html`<p><strong>Notes:</strong> ${o.notes}</p>` : ''}
     <p class="muted small">Placed ${fmtDate(o.created_at)} · Payment: ${o.payment_method === 'eft' ? 'EFT' : 'Card (PayFast)'}${o.source ? ' · Came from: ' + o.source : ''}</p>
     <p class="muted small">Client’s order page: <a href="${link}" target="_blank">${link}</a></p>
@@ -134,7 +136,7 @@ function order(s, { o, flash, base }) {
 
     <h2>Dispatch</h2>
     ${o.status === 'paid' || o.status === 'dispatched' ? html`<form method="post" action="/admin/orders/${o.id}/dispatch" class="a-form">
-      <label>Courier<input name="courier" value="${o.courier || s.courier_name}"></label>
+      <label>Courier<input name="courier" value="${o.courier || (o.delivery_type === 'paxi' ? 'PEP PAXI' : s.courier_name)}"></label>
       <label>Tracking number<input name="tracking_number" value="${o.tracking_number}" required></label>
       <label>Tracking link (optional)<input name="tracking_url" type="url" value="${o.tracking_url}" placeholder="https://"></label>
       <button class="btn btn-gold">${o.status === 'dispatched' ? 'Update tracking' : 'Mark as dispatched'}</button>
@@ -266,7 +268,7 @@ function reviews(s, { list, products, flash }) {
   });
 }
 
-function settings(s, { flash, cardEnabled, mailOn }) {
+function settings(s, { flash, cardEnabled, mailOn, methods = [] }) {
   const t = (k, label, help = '', type = 'text') => html`<label>${label}${help ? html`<small>${help}</small>` : ''}<input type="${type}" name="${k}" value="${s[k]}"></label>`;
   const ta = (k, label, help = '', rows = 8) => html`<label>${label}${help ? html`<small>${help}</small>` : ''}<textarea name="${k}" rows="${rows}">${s[k]}</textarea></label>`;
   const rands = (k) => ((parseInt(s[k], 10) || 0) / 100).toFixed(2).replace(/\.00$/, '');
@@ -290,12 +292,21 @@ function settings(s, { flash, cardEnabled, mailOn }) {
   <label class="btn btn-outline btn-sm file-btn">Upload homepage photo<input type="file" accept="image/jpeg,image/png,image/webp" data-upload-hero hidden></label>
   <p class="upload-status" data-upload-status></p>
 </section>
-<section class="a-card"><h2>Delivery</h2>
-  <div class="two"><label>Delivery fee (R)<small>Nationwide flat rate, shown before payment</small><input name="delivery_fee" value="${rands('delivery_fee_cents')}" inputmode="decimal"></label>
-  <label>Free delivery over (R)<small>0 = never free</small><input name="free_delivery_over" value="${rands('free_delivery_over_cents')}" inputmode="decimal"></label></div>
-  <div class="two">${t('prep_time', 'Time to prepare an order', 'Your time, after payment. e.g. 1–2 business days')}${t('courier_time', 'Courier delivery time', 'After dispatch. e.g. 2–4 business days')}</div>
+<section class="a-card"><h2>Delivery options</h2>
+  <p class="muted small">Clients choose one of these at checkout and see its fee before they pay. They also appear on pre-order product pages, so WhatsApp enquiries include the delivery and total. <strong>Leave the fee empty to hide an option</strong> (e.g. until you have confirmed its price). Clear the name to remove an option; use the empty row to add one.</p>
+  <div class="tbl-wrap"><table class="tbl dm-tbl"><thead><tr><th>Option name</th><th>Fee (R)</th><th>Delivery time after dispatch</th><th>Client gives</th></tr></thead><tbody>
+  ${[...methods, { id: '', name: '', fee: null, time: '', type: 'address' }].map((m, i) => html`<tr>
+    <td><input type="hidden" name="dm_id_${i}" value="${m.id}"><input name="dm_name_${i}" value="${m.name}" placeholder="Add an option"></td>
+    <td><input class="num" name="dm_fee_${i}" value="${m.fee == null ? '' : (m.fee / 100).toFixed(2).replace(/\.00$/, '')}" inputmode="decimal" placeholder="not offered"></td>
+    <td><input name="dm_time_${i}" value="${m.time}" placeholder="e.g. 2–4 business days"></td>
+    <td><select name="dm_type_${i}"><option value="address" ${m.type !== 'paxi' ? raw('selected') : ''}>Street address</option><option value="paxi" ${m.type === 'paxi' ? raw('selected') : ''}>PEP store (PAXI point)</option></select></td>
+  </tr>`)}
+  </tbody></table></div>
+  <input type="hidden" name="dm_count" value="${methods.length + 1}">
+  <div class="two"><label>Free delivery over (R)<small>0 = never free</small><input name="free_delivery_over" value="${rands('free_delivery_over_cents')}" inputmode="decimal"></label>
+  ${t('prep_time', 'Time to prepare a ready-to-ship order', 'Your time, after payment. e.g. 1–2 business days')}</div>
   ${t('preorder_time', 'Default pre-order lead time', 'Used when a pre-order product has no lead time of its own')}
-  ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch, e.g. Courier Guy or PEP PAXI')}
+  ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch a courier order, e.g. The Courier Guy')}
 </section>
 <section class="a-card"><h2>EFT payment</h2>
   ${t('payment_hours', 'Hours a client has to pay', 'Unpaid orders are cancelled after this and stock is released', 'number')}
@@ -305,7 +316,7 @@ function settings(s, { flash, cardEnabled, mailOn }) {
   <p class="muted small">Card payments (PayFast): <strong>${cardEnabled ? 'switched on' : 'not set up'}</strong>. Order emails: <strong>${mailOn ? 'switched on' : 'not set up'}</strong>. These are set up on the server; see Help.</p>
 </section>
 <section class="a-card"><h2>Policies &amp; hair care</h2>
-  <p class="muted small">Blank line = new paragraph. Start a line with “## ” for a heading and “- ” for a bullet. {prep_time}, {courier_time} and {care_default} are filled in automatically.</p>
+  <p class="muted small">Blank line = new paragraph. Start a line with “## ” for a heading and “- ” for a bullet. {prep_time}, {delivery_options} (your delivery options and fees) and {care_default} are filled in automatically.</p>
   ${ta('care_default', 'Standard hair-care text (used on product pages)', '', 6)}
   ${ta('policy_haircare', 'Hair care page')}
   ${ta('policy_delivery', 'Delivery page')}

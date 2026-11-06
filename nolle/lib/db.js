@@ -83,12 +83,12 @@ const DEFAULT_SETTINGS = {
   shop_name: 'Nolle’ Luxury Hair',
   slogan: 'YOUR HAIR. YOUR CROWN.',
   intro: 'Nolle’ Luxury Hair offers premium wigs, bundle sets and closures, carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.',
-  whatsapp: '27000000000',
-  email: 'hello@example.co.za',
-  phone_display: '',
-  location: 'South Africa',
-  instagram: '',
-  tiktok: '',
+  whatsapp: '27616029381',
+  email: 'info@graceandcompanies.co.za',
+  phone_display: '+27 61 602 9381',
+  location: 'Melrose / Sandton, Johannesburg',
+  instagram: 'https://www.instagram.com/noelleluxury',
+  tiktok: 'https://www.tiktok.com/@n.luxury.hair',
   hero_image: '',
   delivery_fee_cents: '12000',
   free_delivery_over_cents: '0',
@@ -148,6 +148,12 @@ const getSettingStmt = db.prepare('SELECT key, value FROM settings');
 const setSettingStmt = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
 for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) {
   db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)').run(k, v);
+}
+/* Upgrade databases created before the real contact details were known:
+   replace a value only if it is still the old placeholder. */
+const OLD_PLACEHOLDERS = { whatsapp: '27000000000', email: 'hello@example.co.za', phone_display: '', location: 'South Africa', instagram: '', tiktok: '' };
+for (const [k, old] of Object.entries(OLD_PLACEHOLDERS)) {
+  db.prepare('UPDATE settings SET value = ? WHERE key = ? AND value = ?').run(DEFAULT_SETTINGS[k], k, old);
 }
 function getSettings() {
   const s = { ...DEFAULT_SETTINGS };

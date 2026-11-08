@@ -27,7 +27,7 @@ const zip = (lengths, prices) => Object.fromEntries(lengths.map((l, i) => [l, pr
 const times3 = (table) => Object.fromEntries(Object.entries(table).map(([l, p]) => [l, p * 3]));
 const plus = (table, add) => Object.fromEntries(Object.entries(table).map(([l, p]) => [l, p == null ? null : p + add]));
 const money = (r) => 'R' + r.toLocaleString('en-ZA').replace(/,/g, ' ');
-const perBundleList = (table, label = 'Single-bundle price') =>
+const perBundleList = (table, label = 'Single-bundle prices') =>
   `## ${label}\n` + Object.entries(table).map(([l, p]) => `- ${l}": ${money(p)} per bundle`).join('\n');
 
 const MIXED = 'Need mixed lengths (e.g. 16" / 18" / 20") or a different number of bundles? Ask us on WhatsApp for a quote.';
@@ -71,28 +71,30 @@ const pick = (obj, keys) => Object.fromEntries(keys.map((k) => [k, obj[k]]));
 /* ---------------- Products ---------------- */
 const base = { category: 'bundles', availability: 'enquire', colour: 'Natural colour', includes: '3 bundles of the length you choose' };
 
-const CATALOGUE = [
+const BASE_PRODUCTS = [
   /* ---- Raw Indian Hair ---- */
   {
     ...base, slug: 'raw-indian-straight-wavy-bundles', name: 'Raw Indian Hair Bundles – Straight & Wavy', featured: 1,
-    texture: 'Straight or wavy', lead_time: 'Confirmed when you order',
+    texture: 'Straight or wavy', lead_time: '',
     short: 'Raw Indian hair in straight or wavy. Price shown is for a set of 3 bundles of the same length.',
-    description: `Our Raw Indian Hair range in straight or wavy, sold as a set of three bundles.\n\n${MIXED}\n\n${perBundleList(RAW_SW)}\n\n${PREORDER}`,
+    description: `Our Raw Indian Hair range in straight or wavy, sold as a set of three bundles.\n\n${MIXED}\n\n${PREORDER}`,
+    extra_prices: perBundleList(RAW_SW),
     images: IMG('straight-black-styling', 'wavy-black-portrait', 'backs-five-textures'),
     ...grid(['Texture'], [[{ Texture: 'Straight' }, times3(RAW_SW)], [{ Texture: 'Wavy' }, times3(RAW_SW)]]),
   },
   {
     ...base, slug: 'raw-indian-curly-bundles', name: 'Raw Indian Hair Bundles – Curly', featured: 0,
-    texture: 'Curly', lead_time: 'Confirmed when you order',
+    texture: 'Curly', lead_time: '',
     short: 'Raw Indian curly hair. Price shown is for a set of 3 bundles of the same length.',
-    description: `Our Raw Indian Hair range in curly, sold as a set of three bundles.\n\n${MIXED}\n\n${perBundleList(RAW_CURLY)}\n\n${PREORDER}`,
+    description: `Our Raw Indian Hair range in curly, sold as a set of three bundles.\n\n${MIXED}\n\n${PREORDER}`,
+    extra_prices: perBundleList(RAW_CURLY),
     images: IMG('backs-curly-and-wavy', 'duo-curly-and-wavy', 'backs-five-textures'),
     ...grid([], [[{}, times3(RAW_CURLY)]]),
   },
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'raw-indian-hd-closure', name: 'Raw Indian HD Lace Closure', texture: 'Straight / wavy or curly',
-    lace: 'HD lace closure – 5x5 or 6x6', includes: '1 closure only (bundles not included)', lead_time: 'Confirmed when you order',
+    lace: 'HD lace closure – 5x5 or 6x6', includes: '1 closure only (bundles not included)', lead_time: '',
     short: 'Raw Indian hair on an HD lace closure, 5x5 or 6x6. Sold on its own.',
     description: `Raw Indian hair on HD lace for a natural-looking parting. Curly closures are R${RAW_CURLY_ADD} more per piece.\n\n${PREORDER}`,
     images: IMG('straight-black-portrait', 'trio-straight'),
@@ -104,7 +106,7 @@ const CATALOGUE = [
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 1,
     slug: 'raw-indian-hd-frontal', name: 'Raw Indian HD Lace Frontal', texture: 'Straight / wavy or curly',
-    lace: 'HD lace frontal – 13x4 or 13x6', includes: '1 frontal only (bundles not included)', lead_time: 'Confirmed when you order',
+    lace: 'HD lace frontal – 13x4 or 13x6', includes: '1 frontal only (bundles not included)', lead_time: '',
     short: 'Raw Indian hair on an HD lace frontal, 13x4 or 13x6. Sold on its own.',
     description: `Ear-to-ear HD lace frontal in Raw Indian hair for a seamless hairline. Curly frontals are R${RAW_CURLY_ADD} more per piece.\n\n${PREORDER}`,
     images: IMG('trio-profiles', 'straight-black-portrait'),
@@ -117,24 +119,26 @@ const CATALOGUE = [
   /* ---- Premium Virgin Hair Collection ---- */
   {
     ...base, slug: 'virgin-straight-bundles', name: 'Premium Virgin Hair Bundles – Straight', featured: 0,
-    texture: 'Straight', lead_time: '7–10 working days, plus delivery',
+    texture: 'Straight', lead_time: '7–10 working days',
     short: 'Premium virgin straight hair. Price shown is for a set of 3 bundles of the same length.',
-    description: `From our Premium Virgin Hair Collection, sold as a set of three bundles.\n\n${MIXED}\n\n${perBundleList(V_STRAIGHT_1)}\n\n${PREORDER}`,
+    description: `From our Premium Virgin Hair Collection, sold as a set of three bundles.\n\n${MIXED}\n\n${PREORDER}`,
+    extra_prices: perBundleList(V_STRAIGHT_1),
     images: IMG('straight-black-portrait', 'backs-five-textures', 'trio-straight'),
     ...grid([], [[{}, times3(V_STRAIGHT_1)]]),
   },
   {
     ...base, slug: 'virgin-curly-bundles', name: 'Premium Virgin Hair Bundles – Curly', featured: 1,
-    texture: 'Curly', lead_time: '7–10 working days, plus delivery',
+    texture: 'Curly', lead_time: '7–10 working days',
     short: 'Premium virgin curly hair. Price shown is for a set of 3 bundles of the same length.',
-    description: `From our Premium Virgin Hair Collection, sold as a set of three bundles.\n\n${MIXED}\n\n${perBundleList(V_CURLY_1)}\n\n${PREORDER}`,
+    description: `From our Premium Virgin Hair Collection, sold as a set of three bundles.\n\n${MIXED}\n\n${PREORDER}`,
+    extra_prices: perBundleList(V_CURLY_1),
     images: IMG('duo-curly-and-wavy', 'backs-curly-and-wavy'),
     ...grid([], [[{}, times3(V_CURLY_1)]]),
   },
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'virgin-4x4-closure', name: 'Premium Virgin 4x4 Lace Closure', texture: 'Straight / body wave or curly',
-    lace: '4x4 lace closure', includes: '1 closure only (bundles not included)', lead_time: '7–10 working days, plus delivery',
+    lace: '4x4 lace closure', includes: '1 closure only (bundles not included)', lead_time: '7–10 working days',
     short: 'Premium virgin hair on a 4x4 lace closure. Sold on its own.',
     description: `A 4x4 lace closure from our Premium Virgin Hair Collection.\n\n${PREORDER}`,
     images: IMG('wavy-black-portrait', 'straight-black-portrait'),
@@ -143,7 +147,7 @@ const CATALOGUE = [
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'virgin-13x4-frontal', name: 'Premium Virgin 13x4 Lace Frontal', texture: 'Straight / body wave or curly',
-    lace: '13x4 lace frontal', includes: '1 frontal only (bundles not included)', lead_time: '7–10 working days, plus delivery',
+    lace: '13x4 lace frontal', includes: '1 frontal only (bundles not included)', lead_time: '7–10 working days',
     short: 'Premium virgin hair on a 13x4 lace frontal. Sold on its own.',
     description: `A 13x4 ear-to-ear lace frontal from our Premium Virgin Hair Collection.\n\n${PREORDER}`,
     images: IMG('trio-straight', 'trio-profiles'),
@@ -152,7 +156,7 @@ const CATALOGUE = [
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'virgin-5x5-hd-closures', name: 'Premium Virgin 5x5 & HD Closures', texture: 'Straight',
-    lace: '5x5 lace, 4x4 HD lace or 5x5 HD lace closure', includes: '1 closure only (bundles not included)', lead_time: '7–10 working days, plus delivery',
+    lace: '5x5 lace, 4x4 HD lace or 5x5 HD lace closure', includes: '1 closure only (bundles not included)', lead_time: '7–10 working days',
     short: 'Premium virgin closures in 5x5, 4x4 HD or 5x5 HD lace. Sold on their own.',
     description: `Choose standard 5x5 lace, or HD lace for an even more invisible finish.\n\n${PREORDER}`,
     images: IMG('straight-black-styling', 'trio-smiling'),
@@ -162,9 +166,10 @@ const CATALOGUE = [
   /* ---- SDD Indian Hair ---- */
   {
     ...base, slug: 'sdd-indian-bundles', name: 'SDD Indian Hair Bundles', featured: 1,
-    texture: 'Straight, bouncy curl or Caribbean curl', lead_time: 'Confirmed when you order',
+    texture: 'Straight, bouncy curl or Caribbean curl', lead_time: '',
     short: 'SDD Indian hair in straight, bouncy curl or Caribbean curl. Price shown is for a set of 3 bundles of the same length.',
-    description: `SDD Indian Hair, sold as a set of three bundles. Caribbean Curl is R${SDD_CARIB_ADD} more per bundle.\n\n${MIXED}\n\n${perBundleList(SDD_1, 'Single-bundle price (straight & bouncy curl)')}\n\n${PREORDER}`,
+    description: `SDD Indian Hair, sold as a set of three bundles. Caribbean Curl is R${SDD_CARIB_ADD} more per bundle.\n\n${MIXED}\n\n${PREORDER}`,
+    extra_prices: perBundleList(SDD_1, 'Single-bundle prices (straight & bouncy curl)'),
     images: IMG('group-lineup', 'straight-black-styling', 'wavy-black-portrait'),
     ...grid(['Texture'], [
       [{ Texture: 'Straight' }, times3(SDD_1)],
@@ -175,7 +180,7 @@ const CATALOGUE = [
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'sdd-indian-hd-closure', name: 'SDD Indian HD Lace Closure', texture: 'Straight or bouncy curl',
-    lace: 'HD lace closure – 5x5 or 6x6', includes: '1 closure only (bundles not included)', lead_time: 'Confirmed when you order',
+    lace: 'HD lace closure – 5x5 or 6x6', includes: '1 closure only (bundles not included)', lead_time: '',
     short: 'SDD Indian hair on an HD lace closure, 5x5 or 6x6. Sold on its own.',
     description: `HD lace closure to match our SDD Indian bundles.\n\n${PREORDER}`,
     images: IMG('trio-laughing', 'straight-black-portrait'),
@@ -184,7 +189,7 @@ const CATALOGUE = [
   {
     category: 'closures', availability: 'enquire', colour: 'Natural colour', featured: 0,
     slug: 'sdd-indian-hd-frontal', name: 'SDD Indian HD Lace Frontal', texture: 'Straight or bouncy curl',
-    lace: 'HD lace frontal – 13x4 or 13x6', includes: '1 frontal only (bundles not included)', lead_time: 'Confirmed when you order',
+    lace: 'HD lace frontal – 13x4 or 13x6', includes: '1 frontal only (bundles not included)', lead_time: '',
     short: 'SDD Indian hair on an HD lace frontal, 13x4 or 13x6. Sold on its own.',
     description: `HD lace frontal to match our SDD Indian bundles.\n\n${PREORDER}`,
     images: IMG('trio-smiling', 'trio-profiles'),
@@ -192,4 +197,60 @@ const CATALOGUE = [
   },
 ];
 
-module.exports = { CATALOGUE };
+/* ---------------- 3 bundles + matching closure (one price for the full set) ----------------
+   Bundles and closure in the same length. Price = 3 x single-bundle price + closure price. */
+const sameLengths = (bundle1, closure) => Object.keys(bundle1).filter((l) => bundle1[l] != null && closure[l] != null);
+function setGrid(rows) {
+  const variants = [];
+  for (const [texture, bundle1, closure] of rows) {
+    for (const len of sameLengths(bundle1, closure)) {
+      variants.push({ options: { Texture: texture, Length: L(len) }, price: Math.round((bundle1[len] * 3 + closure[len]) * 100) });
+    }
+  }
+  return { option_names: ['Texture', 'Length'], variants };
+}
+const breakdown = (rows, closureName) => '## Price breakdown (3 bundles + closure)\n' + rows.flatMap(([texture, b1, cl]) =>
+  sameLengths(b1, cl).map((len) => `- ${texture} ${len}": 3 bundles ${money(b1[len] * 3)} + ${closureName} ${money(cl[len])} = ${money(b1[len] * 3 + cl[len])}`)).join('\n');
+const SET_NOTE = 'The three bundles and the closure all come in the length you choose. Want different lengths (e.g. 18" / 20" / 22" bundles with a 16" closure)? Ask us on WhatsApp for a quote.';
+const SET_BASE = { category: 'sets', availability: 'enquire', colour: 'Natural colour', featured: 1 };
+
+const RAW_SET = [['Straight', RAW_SW, RAW_HD['5x5 HD closure']], ['Wavy', RAW_SW, RAW_HD['5x5 HD closure']], ['Curly', RAW_CURLY, plus(RAW_HD['5x5 HD closure'], RAW_CURLY_ADD)]];
+const VIRGIN_SET = [['Straight', V_STRAIGHT_1, V_4X4['Straight / Body wave']], ['Curly', V_CURLY_1, V_4X4.Curly]];
+const SDD_SET = [['Straight', SDD_1, SDD_HD['5x5 HD closure']], ['Bouncy curl', SDD_1, SDD_HD['5x5 HD closure']]];
+
+const SETS = [
+  {
+    ...SET_BASE, sort: -3, slug: 'raw-indian-bundles-closure-set', name: 'Raw Indian 3 Bundles + 5x5 HD Closure',
+    texture: 'Straight, wavy or curly', lace: '5x5 HD lace closure', lead_time: '',
+    includes: '3 bundles + 1 matching 5x5 HD lace closure, all in the same length',
+    short: 'Three Raw Indian bundles with a matching 5x5 HD lace closure, in the length you choose. One price for the full set.',
+    description: `Everything for a full install: three Raw Indian bundles and a matching 5x5 HD lace closure. Curly sets include the curly closure.\n\n${SET_NOTE}\n\n${PREORDER}`,
+    extra_prices: breakdown(RAW_SET, '5x5 HD closure'),
+    images: IMG('backs-five-textures', 'straight-black-portrait', 'wavy-black-portrait'),
+    ...setGrid(RAW_SET),
+  },
+  {
+    ...SET_BASE, sort: -2, slug: 'virgin-bundles-closure-set', name: 'Premium Virgin 3 Bundles + 4x4 Closure',
+    texture: 'Straight or curly', lace: '4x4 lace closure', lead_time: '7–10 working days',
+    includes: '3 bundles + 1 matching 4x4 lace closure, all in the same length',
+    short: 'Three Premium Virgin bundles with a matching 4x4 lace closure, in the length you choose. One price for the full set.',
+    description: `Everything for a full install from our Premium Virgin Hair Collection: three bundles and a matching 4x4 lace closure.\n\n${SET_NOTE}\n\n${PREORDER}`,
+    extra_prices: breakdown(VIRGIN_SET, '4x4 closure'),
+    images: IMG('trio-straight', 'duo-curly-and-wavy', 'straight-black-portrait'),
+    ...setGrid(VIRGIN_SET),
+  },
+  {
+    ...SET_BASE, sort: -1, slug: 'sdd-indian-bundles-closure-set', name: 'SDD Indian 3 Bundles + 5x5 HD Closure',
+    texture: 'Straight or bouncy curl', lace: '5x5 HD lace closure', lead_time: '',
+    includes: '3 bundles + 1 matching 5x5 HD lace closure, all in the same length',
+    short: 'Three SDD Indian bundles with a matching 5x5 HD lace closure, in the length you choose. One price for the full set.',
+    description: `Everything for a full install: three SDD Indian bundles and a matching 5x5 HD lace closure. Caribbean curl sets are available on request.\n\n${SET_NOTE}\n\n${PREORDER}`,
+    extra_prices: breakdown(SDD_SET, '5x5 HD closure'),
+    images: IMG('trio-smiling', 'group-lineup', 'straight-black-styling'),
+    ...setGrid(SDD_SET),
+  },
+];
+
+const CATALOGUE = [...SETS, ...BASE_PRODUCTS];
+
+module.exports = { CATALOGUE, SETS };

@@ -177,11 +177,10 @@ async function handlePublic(req, res, url) {
   if (p === '/' && req.method === 'GET') {
     const products = store.listProducts();
     const pickFour = (list) => list.filter((x) => x.featured).concat(list.filter((x) => !x.featured)).slice(0, 4);
-    const ready = products.filter((x) => x.availability === 'ready' && !x.sold_out);
-    const mode = ready.length ? 'ready' : 'pre';
-    const featured = pickFour(ready.length ? ready : products.filter((x) => x.availability !== 'ready'));
+    const ready = pickFour(products.filter((x) => x.availability === 'ready' && !x.sold_out));
+    const pre = pickFour(products.filter((x) => x.availability !== 'ready'));
     const reviews = store.db.prepare('SELECT * FROM reviews WHERE visible = 1 ORDER BY id DESC LIMIT 6').all();
-    return page(res, views.home(s, { featured, reviews, base, mode }));
+    return page(res, views.home(s, { ready, pre, reviews, base }));
   }
   if (p === '/shop') return page(res, views.shop(s, { products: store.listProducts(), cat: url.searchParams.get('cat'), base }));
 
@@ -261,12 +260,12 @@ async function handlePublic(req, res, url) {
 
   /* Info pages */
   const info = {
-    '/hair-care': ['Hair care', 'Keep it beautiful', 'policy_haircare', false],
-    '/delivery': ['Delivery', 'Nationwide', 'policy_delivery', true],
-    '/returns': ['Returns & refunds', 'Policies', 'policy_returns', true],
-    '/privacy': ['Privacy', 'Policies', 'policy_privacy', true],
+    '/hair-care': ['Hair care', 'Keep it beautiful', 'policy_haircare', null],
+    '/delivery': ['Delivery', 'Nationwide', 'policy_delivery', 'policy_delivery_confirmed'],
+    '/returns': ['Returns & refunds', 'Policies', 'policy_returns', 'policy_returns_confirmed'],
+    '/privacy': ['Privacy', 'Policies', 'policy_privacy', 'policy_privacy_confirmed'],
   }[p];
-  if (info) return page(res, views.infoPage(s, { title: info[0], eyebrow: info[1], text: s[info[2]], base, path: p, draft: info[3] }));
+  if (info) return page(res, views.infoPage(s, { title: info[0], eyebrow: info[1], text: s[info[2]], base, path: p, confirmKey: info[3] }));
   if (p === '/contact') return page(res, views.contact(s, { base }));
 
   if (p === '/robots.txt') return send(res, 200, `User-agent: *\nDisallow: /admin\nDisallow: /order/\nDisallow: /cart\nDisallow: /checkout\nSitemap: ${base}/sitemap.xml\n`, 'text/plain');
@@ -335,7 +334,9 @@ async function handleAdmin(req, res, url) {
     if (!allMethods.some((m) => m.fee != null)) warnings.push('No delivery option has a fee yet, so online checkout cannot be used. <a href="/admin/settings">Add delivery fees in Settings</a>.');
     const notOffered = allMethods.filter((m) => m.fee == null);
     if (notOffered.length) warnings.push(`Not shown to clients until you add a fee: ${notOffered.map((m) => esc(m.name)).join(', ')}. <a href="/admin/settings">Add fees in Settings</a>.`);
-    if (s.policies_confirmed !== '1') warnings.push('Your delivery, returns and privacy policies are still marked as drafts. <a href="/admin/settings">Review them</a>.');
+    const drafts = [['policy_delivery_confirmed', 'delivery'], ['policy_returns_confirmed', 'returns'], ['policy_privacy_confirmed', 'privacy']].filter(([k]) => s[k] !== '1' && s.policies_confirmed !== '1').map(([, n]) => n);
+    if (drafts.length) warnings.push(`Still marked as drafts on the site: ${drafts.join(', ')} policy. <a href="/admin/settings">Review and confirm them in Settings</a>.`);
+    if (s.email_public !== '1') warnings.push('No email address is shown on the site yet. Create a Nolle’ email in cPanel (e.g. info@nolleluxuryhair.co.za), send yourself a test, then enter it in <a href="/admin/settings">Settings</a> and tick “Show on website”.');
     if (!mailConfigured()) warnings.push('Order emails are not switched on yet (see Help / README). Clients still see their confirmation page.');
     return page(res, admin.dashboard(s, { counts, recent, lowStock, samples, base, warnings }));
   }
@@ -460,7 +461,8 @@ async function handleAdmin(req, res, url) {
       }
       store.setSetting('free_delivery_over_cents', toCents(b.free_delivery_over) ?? 0);
       store.setSetting('payment_hours', Math.max(1, parseInt(b.payment_hours, 10) || 24));
-      store.setSetting('policies_confirmed', b.policies_confirmed === '1' ? '1' : '0');
+      for (const k of ['policy_delivery_confirmed', 'policy_returns_confirmed', 'policy_privacy_confirmed', 'email_public']) store.setSetting(k, b[k] === '1' ? '1' : '0');
+      store.setSetting('policies_confirmed', '0'); // replaced by the per-policy settings above
       return back('/admin/settings', 'Settings saved.');
     }
     return page(res, admin.settings(s, { flash, cardEnabled: payfast.enabled(), mailOn: mailConfigured(), methods: store.deliveryMethods(s, { all: true }) }));
@@ -476,6 +478,7 @@ function saveProduct(id, b) {
     short: b.short || '', description: b.description || '', texture: b.texture || '', colour: b.colour || '', length: b.length || '',
     lace: b.lace || '', density: b.density || '', includes: b.includes || '', care: b.care || '', video: b.video || '',
     lead_time: String(b.lead_time || '').slice(0, 80),
+    extra_prices: String(b.extra_prices || '').slice(0, 6000),
     option_names: String(b.option_names || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3),
     images: store.safeJSON(b.images, []).filter((x) => typeof x === 'string' && /^\/(uploads|static)\//.test(x)).slice(0, 12),
     active: b.active === '1' ? 1 : 0, featured: b.featured === '1' ? 1 : 0, sort: parseInt(b.sort, 10) || 0,
@@ -502,7 +505,7 @@ function saveProduct(id, b) {
   if (clash) draft.slug = `${draft.slug}-${Date.now().toString(36).slice(-4)}`;
 
   return store.tx(() => {
-    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'active', 'featured', 'sort'];
+    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'extra_prices', 'active', 'featured', 'sort'];
     const vals = cols.map((c) => draft[c]);
     if (id) {
       store.db.prepare(`UPDATE products SET ${cols.map((c) => c + ' = ?').join(', ')}, option_names = ?, images = ?, is_sample = 0 WHERE id = ?`)

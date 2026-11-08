@@ -3,7 +3,22 @@ const { html, raw, esc, money, fmtDate, waLink, richText } = require('./util');
 const { CATEGORIES, usedCategories, deliveryMethods } = require('./db');
 
 const feeText = (c) => (c ? money(c) : 'Free');
-const timeText = (m) => (m.time ? `${m.time} after dispatch` : 'Transit time depends on the service chosen');
+const timeText = (m) => (m.type === 'paxi'
+  ? (m.time ? `${m.time} after dispatch, collected at your chosen PEP point` : 'Collected at your chosen PEP point')
+  : (m.time ? `${m.time} after dispatch` : 'Transit time confirmed when you order'));
+/* "After dispatch" line for one delivery option. */
+const afterText = (m) => (m.type === 'paxi'
+  ? `PEP PAXI – collected at your chosen PEP point${m.time ? ` (${m.time})` : ''}`
+  : `${m.name} – ${m.time || 'transit time confirmed when you order'}`);
+/* "Before dispatch" for a pre-order product. */
+const leadText = (p, s) => (p.lead_time ? `${p.lead_time} after payment` : s.preorder_time);
+/* WhatsApp number written out, e.g. +27 61 602 9381 */
+function waNumber(s) {
+  if (s.phone_display) return s.phone_display;
+  const d = String(s.whatsapp || '').replace(/\D/g, '');
+  return d.length === 11 ? `+${d.slice(0, 2)} ${d.slice(2, 4)} ${d.slice(4, 7)} ${d.slice(7)}` : `+${d}`;
+}
+const emailPublic = (s) => s.email_public === '1' && s.email;
 function deliveryOptionsText(s) {
   const list = deliveryMethods(s);
   if (!list.length) return 'Delivery fees are confirmed with you on WhatsApp.';
@@ -47,7 +62,9 @@ function priceLabel(p) {
   return from + money(p.min_price);
 }
 function bundleNote(p) {
-  return p.category === 'bundles' ? html`<span class="price-note">for a set of 3 bundles</span>` : '';
+  if (p.category === 'bundles') return html`<span class="price-note">for a set of 3 bundles</span>`;
+  if (p.category === 'sets') return html`<span class="price-note">for 3 bundles + closure</span>`;
+  return '';
 }
 
 /* ------------------------------ Layout ------------------------------ */
@@ -75,7 +92,7 @@ ${image ? html`<meta property="og:image" content="${image}"><meta name="twitter:
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=1">
+<link rel="stylesheet" href="/static/css/style.css?v=2">
 ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>`) : ''}
 </head>
 <body class="${bodyClass}" data-wa="${String(s.whatsapp).replace(/\D/g, '')}">
@@ -127,15 +144,15 @@ ${body}
     </div>
     <div>
       <h4>Contact</h4>
-      <a href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair')}" target="_blank" rel="noopener">WhatsApp</a>
-      <a href="mailto:${s.email}">${s.email}</a>
-      ${s.phone_display ? html`<a href="tel:${s.phone_display.replace(/[^\d+]/g, '')}">${s.phone_display}</a>` : ''}
+      <a href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair')}" target="_blank" rel="noopener">WhatsApp: ${waNumber(s)}</a>
+      ${emailPublic(s) ? html`<a href="mailto:${s.email}">${s.email}</a>` : ''}
+      <a href="/contact">All contact details</a>
     </div>
   </div>
   <div class="wrap footer-base">© ${year} ${s.shop_name}. All rights reserved.</div>
 </footer>
 <a class="wa-float" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I would like some assistance please.')}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" data-wa-float>${ICON.wa}<span>Chat with us</span></a>
-<script src="/static/js/shop.js?v=1" defer></script>
+<script src="/static/js/shop.js?v=2" defer></script>
 </body>
 </html>`;
 }
@@ -143,7 +160,7 @@ ${body}
 /* ------------------------------ Pieces ------------------------------ */
 function productCard(p) {
   const badge = p.availability === 'enquire'
-    ? html`<span class="badge badge-pre">Pre-order · Enquire</span>`
+    ? html`<span class="badge badge-pre">Pre-order</span>`
     : p.sold_out ? html`<span class="badge badge-out">Sold out</span>` : html`<span class="badge badge-ready">Ready to ship</span>`;
   return html`<article class="card">
   <a href="/product/${p.slug}" class="card-link">
@@ -158,17 +175,31 @@ function productCard(p) {
 </article>`;
 }
 
-function steps() {
-  return html`<ol class="steps">
-  <li><span>1</span><strong>Choose your hair</strong><em>Pick your length and options.</em></li>
-  <li><span>2</span><strong>Checkout as a guest</strong><em>Add your delivery details – no account needed.</em></li>
-  <li><span>3</span><strong>Pay securely</strong><em>EFT with your unique order reference.</em></li>
-  <li><span>4</span><strong>We dispatch</strong><em>You get a confirmation, then tracking once it ships.</em></li>
-</ol>`;
+const STEPS = {
+  pre: [
+    ['Choose your hair and delivery', 'Pick the texture, length and delivery option – the total shows on the page.'],
+    ['Send your selection on WhatsApp', 'Tap “Confirm my pre-order on WhatsApp” – your selection is filled in for you.'],
+    ['We confirm the details', 'Availability, your final total and your estimated dispatch date.'],
+    ['Pay to confirm', 'Full payment confirms your pre-order. We send tracking once it is dispatched.'],
+  ],
+  ready: [
+    ['Choose your hair', 'Pick your length and options.'],
+    ['Checkout as a guest', 'Add your delivery details – no account needed.'],
+    ['Pay securely', 'EFT with your unique order reference.'],
+    ['We dispatch', 'You get a confirmation, then tracking once it ships.'],
+  ],
+};
+function stepList(list) {
+  return html`<ol class="steps">${list.map(([t, d], i) => html`<li><span>${i + 1}</span><strong>${t}</strong><em>${d}</em></li>`)}</ol>`;
+}
+/* mode: 'pre' (pre-order only), 'ready' (ready-to-ship only) or 'mixed' */
+function steps(mode) {
+  if (mode !== 'mixed') return stepList(STEPS[mode] || STEPS.pre);
+  return html`<h3 class="steps-title">Ready-to-ship hair</h3>${stepList(STEPS.ready)}<h3 class="steps-title">Pre-orders</h3>${stepList(STEPS.pre)}`;
 }
 
-function draftNotice(s) {
-  return s.policies_confirmed === '1' ? '' : html`<p class="draft-note">This policy is a draft and is still being confirmed.</p>`;
+function draftNotice(s, key) {
+  return s[key] === '1' || s.policies_confirmed === '1' ? '' : html`<p class="draft-note">This policy is a draft and is still being confirmed.</p>`;
 }
 
 function fillPolicy(text, s) {
@@ -177,7 +208,14 @@ function fillPolicy(text, s) {
 }
 
 /* ------------------------------ Pages ------------------------------ */
-function home(s, { featured, reviews, base, mode = 'ready' }) {
+function home(s, { ready = [], pre = [], reviews, base }) {
+  const mode = ready.length ? (pre.length ? 'mixed' : 'ready') : 'pre';
+  const lead = { pre: 'Luxury bundles, closures and complete sets – pre-order on WhatsApp, delivered nationwide.',
+    ready: 'Luxury hair, ready to ship and delivered nationwide.',
+    mixed: 'Ready-to-ship hair and pre-orders – delivered nationwide.' }[mode];
+  const trust = mode === 'pre'
+    ? [['Nationwide delivery', 'Courier to your door or PEP PAXI'], ['Confirmed before you pay', 'Availability, final total and dispatch date on WhatsApp'], ['Complete sets', '3 bundles + matching closure, one price']]
+    : [['Nationwide delivery', 'Courier to your door or PEP PAXI'], ['Guest checkout', 'No account needed'], ['Real stock', 'Ready-to-ship items are in hand']];
   const hero = s.hero_image || '/static/img/brand/group-holding-box.jpg';
   const body = html`
 <section class="hero">
@@ -185,36 +223,41 @@ function home(s, { featured, reviews, base, mode = 'ready' }) {
   <div class="hero-copy">
     <p class="eyebrow">Nolle’ Luxury Hair</p>
     <h1 class="slogan">${s.slogan.split('. ').map((part, i, a) => html`<span>${part}${i < a.length - 1 ? '.' : ''}</span>`)}</h1>
-    <p class="lead">Luxury wigs, bundles and closures – ready to ship, delivered nationwide.</p>
+    <p class="lead">${lead}</p>
     <div class="cta-row">
-      <a class="btn btn-gold" href="/shop">Shop Available Hair</a>
+      <a class="btn btn-gold" href="/shop">${mode === 'pre' ? 'Shop Pre-Orders' : 'Shop Available Hair'}</a>
       <a class="btn btn-outline" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I need help choosing hair.')}" target="_blank" rel="noopener">${ICON.wa} WhatsApp for assistance</a>
     </div>
     <p class="hero-note">${ICON.truck} We deliver nationwide across South Africa</p>
   </div>
 </section>
 
-<section class="section wrap">
+${ready.length ? html`<section class="section wrap" id="ready">
   <div class="section-head">
-    <p class="eyebrow">${mode === 'ready' ? 'Available now' : 'Order now'}</p>
-    <h2>${mode === 'ready' ? 'Ready to Ship' : 'Available to Pre-order'}</h2>
-    ${mode === 'ready' ? '' : html`<p class="muted">Prices in rands. Bundle prices are for a set of 3 bundles. Enquire on WhatsApp to confirm your order and lead time.</p>`}
-    <a class="link-gold" href="/shop">View all available hair →</a>
+    <p class="eyebrow">Available now</p>
+    <h2>Ready to Ship</h2>
+    <p class="muted">In stock now – add to cart and pay online. Dispatched within ${s.prep_time} of payment.</p>
+    <a class="link-gold" href="/shop#ready">View all ready-to-ship hair →</a>
   </div>
-  ${featured.length ? html`<div class="grid">${featured.map(productCard)}</div>`
-    : html`<p class="empty">New stock is on its way. <a href="${waLink(s.whatsapp, 'Hi, what hair do you have available?')}">Ask us on WhatsApp</a> what’s available.</p>`}
-</section>
+  <div class="grid">${ready.map(productCard)}</div>
+</section>` : ''}
+${pre.length ? html`<section class="section wrap" id="pre-order">
+  <div class="section-head">
+    <p class="eyebrow">Order now</p>
+    <h2>Available to Pre-order</h2>
+    <p class="muted">Prices in rands. Bundle prices are for a set of 3 bundles. Choose your hair and delivery, then confirm on WhatsApp – we confirm availability, your final total and your estimated dispatch date before you pay.</p>
+    <a class="link-gold" href="/shop#pre-order">View all pre-orders →</a>
+  </div>
+  <div class="grid">${pre.map(productCard)}</div>
+</section>` : ''}
+${!ready.length && !pre.length ? html`<section class="section wrap"><p class="empty">New stock is on its way. <a href="${waLink(s.whatsapp, 'Hi, what hair do you have available?')}">Ask us on WhatsApp</a> what’s available.</p></section>` : ''}
 
 <section class="intro-band">
   <div class="wrap intro">
     <div class="crown" aria-hidden="true">♛</div>
     <h2>Welcome to Nolle’</h2>
     <p>${s.intro}</p>
-    <div class="trust">
-      <div><strong>Nationwide delivery</strong><span>Courier to your door, anywhere in SA</span></div>
-      <div><strong>Guest checkout</strong><span>No account needed</span></div>
-      <div><strong>Real stock</strong><span>What you see is what we have</span></div>
-    </div>
+    <div class="trust">${trust.map(([t, d]) => html`<div><strong>${t}</strong><span>${d}</span></div>`)}</div>
   </div>
 </section>
 
@@ -228,7 +271,7 @@ function home(s, { featured, reviews, base, mode = 'ready' }) {
 
 <section class="section wrap">
   <div class="section-head center"><p class="eyebrow">Simple ordering</p><h2>How it works</h2></div>
-  ${steps()}
+  ${steps(mode)}
 </section>
 
 ${reviews.length ? html`<section class="section wrap">
@@ -254,12 +297,13 @@ function shop(s, { products, cat, base }) {
   const shown = cat && usedCats.includes(cat) ? products.filter((p) => p.category === cat) : products;
   const ready = shown.filter((p) => p.availability === 'ready');
   const pre = shown.filter((p) => p.availability !== 'ready');
-  const title = cat && CATEGORIES[cat] && usedCats.includes(cat) ? CATEGORIES[cat].label : 'Shop Available Hair';
+  const preOnly = !products.some((p) => p.availability === 'ready' && !p.sold_out);
+  const title = cat && CATEGORIES[cat] && usedCats.includes(cat) ? CATEGORIES[cat].label : (preOnly ? 'Shop Pre-Orders' : 'Shop Available Hair');
   const body = html`
 <section class="page-head">
   <p class="eyebrow">Shop</p>
   <h1>${title}</h1>
-  <p>Prices in rands, including the hair only. Delivery is added at checkout. <strong>Bundle prices are for a set of 3 bundles.</strong></p>
+  <p>${preOnly ? 'All our hair is currently available to pre-order. ' : ''}Prices in rands for the hair only; choose your delivery on the product page. <strong>Bundle prices are for a set of 3 bundles.</strong></p>
 </section>
 <div class="wrap">
   ${usedCats.length > 1 ? html`<nav class="chips" aria-label="Categories">
@@ -267,13 +311,14 @@ function shop(s, { products, cat, base }) {
     ${usedCats.map((k) => html`<a class="chip ${cat === k ? 'on' : ''}" href="/shop?cat=${k}">${CATEGORIES[k].label}</a>`)}
   </nav>` : ''}
 
-  <section class="section" id="ready">
-    <div class="section-head"><h2>Ready to Ship</h2><p class="muted">In stock now. Dispatched within ${s.prep_time} of payment.</p></div>
-    ${ready.length ? html`<div class="grid">${ready.map(productCard)}</div>` : html`<p class="empty">Ready-to-ship stock will be listed here as it arrives. ${pre.length ? 'Right now our hair is available to pre-order below.' : ''}</p>`}
-  </section>
+  ${ready.length ? html`<section class="section" id="ready">
+    <div class="section-head"><h2>Ready to Ship</h2><p class="muted">In stock now – add to cart and pay online. Dispatched within ${s.prep_time} of payment.</p></div>
+    <div class="grid">${ready.map(productCard)}</div>
+  </section>` : ''}
+  ${!ready.length && !pre.length ? html`<p class="empty">Nothing in this category right now. <a href="${waLink(s.whatsapp, 'Hi, what hair do you have available?')}">Ask us on WhatsApp</a>.</p>` : ''}
 
   ${pre.length ? html`<section class="section" id="pre-order">
-    <div class="section-head"><h2>Pre-order</h2><p class="muted">Enquire on WhatsApp to confirm availability and lead time. Full payment confirms a pre-order. Prices subject to confirmation.</p></div>
+    <div class="section-head"><h2>Pre-order</h2><p class="muted">Choose your hair and delivery, then send your selection on WhatsApp. We confirm availability, your final total and your estimated dispatch date before you pay. Full payment confirms a pre-order. Prices subject to confirmation.</p></div>
     <div class="grid">${pre.map(productCard)}</div>
   </section>` : ''}
 </div>`;
@@ -288,7 +333,7 @@ function product(s, { p, base, preselect }) {
     optionNames: p.option_names, url: `${base}/product/${p.slug}`,
     variants: p.variants.map((v) => ({ id: v.id, options: v.options, price: v.price_cents, stock: Math.max(0, v.stock) })),
     preselect: preselect || null, image: images[0],
-    delivery: deliveryMethods(s).map((m) => ({ id: m.id, name: m.name, fee: m.fee })),
+    delivery: deliveryMethods(s).map((m) => ({ id: m.id, name: m.name, fee: m.fee, after: afterText(m) })),
     freeOver: parseInt(s.free_delivery_over_cents, 10) || 0,
   };
   const details = [
@@ -301,7 +346,9 @@ function product(s, { p, base, preselect }) {
     ['Included', p.includes],
   ].filter(([, v]) => v);
   const care = p.care || s.care_default;
-  const waText = `Hi Nolle’ Luxury Hair, I’m interested in: ${p.name}. ${base}/product/${p.slug}`;
+  const waText = `Hi Nolle’ Luxury Hair, ${enquire ? 'I’d like to pre-order' : 'I’m interested in'}: ${p.name}. ${base}/product/${p.slug}`;
+  const methods = deliveryMethods(s);
+  const extra = p.extra_prices ? /^## (.+)\n?([\s\S]*)$/.exec(p.extra_prices.trim()) : null;
   const body = html`
 <nav class="crumbs wrap" aria-label="Breadcrumb"><a href="/shop">Shop</a> / <a href="/shop?cat=${p.category}">${p.cat.label}</a> / <span>${p.name}</span></nav>
 <section class="wrap product">
@@ -314,12 +361,12 @@ function product(s, { p, base, preselect }) {
   </div>
 
   <div class="buy">
-    ${enquire ? html`<span class="badge badge-pre inline">Pre-order · Enquire on WhatsApp</span>` : html`<span class="badge badge-ready inline">Ready to ship</span>`}
+    ${enquire ? html`<span class="badge badge-pre inline">Pre-order · Confirm on WhatsApp</span>` : html`<span class="badge badge-ready inline">Ready to ship</span>`}
     <h1>${p.name}</h1>
     ${p.is_sample ? html`<p class="sample-flag">Sample listing – details will be replaced with real stock</p>` : ''}
     <p class="price big"><span data-price>${priceLabel(p)}</span> ${bundleNote(p)}</p>
     <div class="kind-box"><strong>${p.cat.kind}.</strong> ${p.cat.kindLong}</div>
-    ${enquire ? html`<p class="pre-note">Pre-order price, subject to confirmation. Full payment confirms your order.</p>` : ''}
+    ${enquire ? html`<p class="pre-note">Pre-order price, subject to confirmation.</p>` : ''}
     ${p.short ? html`<p class="short">${p.short}</p>` : ''}
 
     <form class="buy-form" data-buy-form>
@@ -336,16 +383,20 @@ function product(s, { p, base, preselect }) {
         <div class="opt-values">${deliveryMethods(s).map((m) => html`<button type="button" class="opt-btn" data-delivery="${m.id}">${m.name} · ${feeText(m.fee)}</button>`)}</div>
       </fieldset>
       <p class="wa-total" data-wa-total aria-live="polite"></p>` : ''}
+      <div class="timing">
+        <div><strong>Before dispatch</strong><span>${enquire ? leadText(p, s) : `${s.prep_time} after payment`}</span></div>
+        ${methods.length ? html`<div><strong>After dispatch</strong><span data-after-dispatch>${enquire ? afterText(methods[0]) : methods.map(afterText).join(' · ')}</span></div>` : ''}
+      </div>
       ${enquire ? '' : html`<div class="qty-row">
         <label class="qty"><span>Qty</span><input type="number" name="qty" min="1" max="1" value="1" inputmode="numeric" data-qty></label>
         <button class="btn btn-gold btn-block" type="submit" data-add>Add to cart</button>
       </div>`}
-      <a class="btn ${enquire ? 'btn-gold' : 'btn-outline'} btn-block" data-wa-enquire href="${waLink(s.whatsapp, waText)}" target="_blank" rel="noopener">${ICON.wa} ${enquire ? 'Enquire on WhatsApp' : 'Ask about this on WhatsApp'}</a>
+      <a class="btn ${enquire ? 'btn-gold' : 'btn-outline'} btn-block" data-wa-enquire href="${waLink(s.whatsapp, waText)}" target="_blank" rel="noopener">${ICON.wa} ${enquire ? 'Confirm My Pre-Order on WhatsApp' : 'Ask about this on WhatsApp'}</a>
+      ${enquire ? html`<p class="reassure">We’ll confirm availability, your final total and your estimated dispatch date before you pay.</p>` : ''}
       <p class="added" data-added hidden>Added to your cart. <a href="/cart">View cart &amp; checkout →</a></p>
     </form>
 
     <div class="ship-box">
-      <div><strong>${enquire ? 'Pre-order lead time' : 'Order preparation'}</strong><span>${enquire ? (p.lead_time || s.preorder_time) : s.prep_time + ' after payment'}</span></div>
       ${deliveryMethods(s).length ? deliveryMethods(s).map((m) => html`<div><strong>${m.name}</strong><span>${feeText(m.fee)} · ${timeText(m)}</span></div>`)
         : html`<div><strong>Delivery</strong><span>Fee confirmed on WhatsApp</span></div>`}
       ${parseInt(s.free_delivery_over_cents, 10) > 0 ? html`<div><strong>Free delivery</strong><span>on orders over ${money(s.free_delivery_over_cents)}</span></div>` : ''}
@@ -354,8 +405,9 @@ function product(s, { p, base, preselect }) {
     <dl class="details">${details.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
 
     ${p.description ? html`<details class="acc" open><summary>Description</summary><div>${richText(p.description)}</div></details>` : ''}
+    ${extra ? html`<details class="acc extra"><summary>${extra[1]}</summary><div>${richText(extra[2])}</div></details>` : ''}
     <details class="acc"><summary>Hair care</summary><div>${richText(care)}<p><a href="/hair-care">Full hair-care guide →</a></p></div></details>
-    <details class="acc"><summary>Delivery &amp; returns</summary><div><p>Delivery only (no collection)${deliveryMethods(s).length ? ': ' + deliveryMethods(s).map((m) => `${m.name} ${feeText(m.fee)}`).join(' · ') : ''}. ${enquire ? `Pre-order lead time: ${p.lead_time || s.preorder_time}, then delivery.` : `We prepare your order within ${s.prep_time} of payment, then it is delivered.`} <a href="/delivery">Delivery info</a> · <a href="/returns">Returns</a></p></div></details>
+    <details class="acc"><summary>Delivery &amp; returns</summary><div><p>Delivery only (no collection)${deliveryMethods(s).length ? ': ' + deliveryMethods(s).map((m) => `${m.name} ${feeText(m.fee)}`).join(' · ') : ''}. Before dispatch: ${enquire ? leadText(p, s) : `${s.prep_time} after payment`}. After dispatch: depends on your delivery option. <a href="/delivery">Delivery info</a> · <a href="/returns">Returns</a></p></div></details>
   </div>
 </section>
 <section class="help-band slim"><div class="wrap help"><h2>Need help choosing?</h2><a class="btn btn-outline" href="${waLink(s.whatsapp, `Hi, I need help choosing. I’m looking at ${p.name}.`)}" target="_blank" rel="noopener">${ICON.wa} Chat to us on WhatsApp</a></div></section>
@@ -405,7 +457,7 @@ function checkout(s, { base, cardEnabled }) {
     </div>
     <h2>2. Delivery</h2>
     ${deliveryMethods(s).length ? html`<div class="pay-opts">
-      ${deliveryMethods(s).map((m, i) => html`<label class="pay-opt"><input type="radio" name="delivery_method" value="${m.id}" data-type="${m.type}" data-name="${m.name}" data-time="${timeText(m)}" ${i === 0 ? raw('checked') : ''} required><span><strong>${m.name} – ${feeText(m.fee)}</strong><em>${m.type === 'paxi' ? 'Collect from the PEP store of your choice. ' : 'Delivered to your address. '}${timeText(m)}.</em></span></label>`)}
+      ${deliveryMethods(s).map((m, i) => html`<label class="pay-opt"><input type="radio" name="delivery_method" value="${m.id}" data-type="${m.type}" data-name="${m.name}" data-time="${timeText(m)}" ${i === 0 ? raw('checked') : ''} required><span><strong>${m.name} – ${feeText(m.fee)}</strong><em>${m.type === 'paxi' ? `Sent to the PEP store (PAXI point) you choose – you collect it there.${m.time ? ` ${m.time} after dispatch.` : ''}` : `Delivered to your address. ${timeText(m)}.`}</em></span></label>`)}
     </div>` : html`<p class="warn-box">Online delivery is not set up yet – please <a href="${waLink(s.whatsapp, 'Hi, I would like to place an order.')}">order on WhatsApp</a>.</p>`}
     <div class="addr" data-addr="address">
       <label>Street address<input name="address1" autocomplete="address-line1" required maxlength="150"></label>
@@ -529,11 +581,11 @@ function track(s, { error }) {
   return layout(s, { title: 'Track your order', body, noindex: true });
 }
 
-function infoPage(s, { title, eyebrow, text, base, path, draft }) {
+function infoPage(s, { title, eyebrow, text, base, path, confirmKey }) {
   const body = html`
 <section class="page-head"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1></section>
 <div class="wrap narrow prose">
-  ${draft ? draftNotice(s) : ''}
+  ${confirmKey ? draftNotice(s, confirmKey) : ''}
   ${richText(fillPolicy(text, s))}
 </div>`;
   return layout(s, { title, body, canonical: base + path });
@@ -543,8 +595,8 @@ function contact(s, { base }) {
   const body = html`
 <section class="page-head"><p class="eyebrow">We’re here to help</p><h1>Contact us</h1><p>The quickest way to reach us is WhatsApp – for orders, help choosing hair, or questions about your delivery.</p></section>
 <div class="wrap contact-grid">
-  <a class="contact-card" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I would like some assistance please.')}" target="_blank" rel="noopener">${ICON.wa}<strong>WhatsApp</strong><span>Chat to us</span></a>
-  <a class="contact-card" href="mailto:${s.email}"><span class="ic">✉</span><strong>Email</strong><span>${s.email}</span></a>
+  <a class="contact-card" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I would like some assistance please.')}" target="_blank" rel="noopener">${ICON.wa}<strong>WhatsApp</strong><span>${waNumber(s)}</span></a>
+  ${emailPublic(s) ? html`<a class="contact-card" href="mailto:${s.email}"><span class="ic">✉</span><strong>Email</strong><span>${s.email}</span></a>` : ''}
   ${s.instagram ? html`<a class="contact-card" href="${s.instagram}" target="_blank" rel="noopener">${ICON.ig}<strong>Instagram</strong><span>Follow us</span></a>` : ''}
   ${s.tiktok ? html`<a class="contact-card" href="${s.tiktok}" target="_blank" rel="noopener">${ICON.tt}<strong>TikTok</strong><span>Watch our hair</span></a>` : ''}
 </div>

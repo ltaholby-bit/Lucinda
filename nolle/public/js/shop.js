@@ -89,7 +89,7 @@
         var ln = P.optionNames.find(function (n) { return /length/i.test(n); });
         lenEl.textContent = (ln && sel[ln]) || 'Select an option above';
       }
-      var waText = 'Hi Nolle’ Luxury Hair, I’m interested in: ' + P.name + ' (' + P.kind + ')';
+      var waText = 'Hi Nolle’ Luxury Hair, ' + (P.enquire ? 'I’d like to pre-order: ' : 'I’m interested in: ') + P.name + ' (' + P.kind + ')';
       if (v) {
         priceEl.textContent = money(v.price);
         var lbl = label(v);
@@ -97,7 +97,7 @@
         waText += ', ' + money(v.price) + (P.category === 'bundles' ? ' for 3 bundles' : '');
         if (P.enquire) {
           stockEl.className = 'stock pre';
-          stockEl.textContent = 'Pre-order – please enquire on WhatsApp for availability and delivery time.';
+          stockEl.textContent = 'Pre-order – we confirm availability before you pay.';
         } else if (v.stock <= 0) {
           stockEl.className = 'stock out';
           stockEl.textContent = 'Sold out – enquire on WhatsApp and we’ll let you know when it’s back.';
@@ -126,6 +126,7 @@
         b.setAttribute('aria-pressed', b.getAttribute('data-delivery') === dSel);
       });
       var dv = $('[data-delivery-value]'); if (dv) dv.textContent = dm ? dm.name : 'please choose';
+      var ad = $('[data-after-dispatch]'); if (ad && dm && P.enquire) ad.textContent = dm.after;
       var wt = $('[data-wa-total]');
       if (v && dm) {
         var dfee = P.freeOver && v.price >= P.freeOver ? 0 : dm.fee;

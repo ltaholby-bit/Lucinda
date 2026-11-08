@@ -84,6 +84,9 @@ CREATE TABLE IF NOT EXISTS reviews (
 if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'lead_time')) {
   db.exec("ALTER TABLE products ADD COLUMN lead_time TEXT DEFAULT ''");
 }
+if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'extra_prices')) {
+  db.exec("ALTER TABLE products ADD COLUMN extra_prices TEXT DEFAULT ''");
+}
 
 for (const [col, def] of [['delivery_method', "TEXT DEFAULT ''"], ['delivery_type', "TEXT DEFAULT 'address'"], ['delivery_time', "TEXT DEFAULT ''"], ['paxi_point', "TEXT DEFAULT ''"]]) {
   if (!db.prepare('PRAGMA table_info(orders)').all().some((c) => c.name === col)) db.exec(`ALTER TABLE orders ADD COLUMN ${col} ${def}`);
@@ -100,7 +103,7 @@ const DEFAULT_DELIVERY_METHODS = [
 const DEFAULT_SETTINGS = {
   shop_name: 'Nolle’ Luxury Hair',
   slogan: 'YOUR HAIR. YOUR CROWN.',
-  intro: 'Nolle’ Luxury Hair offers premium wigs, bundle sets and closures, carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.',
+  intro: 'Nolle’ Luxury Hair offers Raw Indian, Premium Virgin and SDD Indian hair – bundles, closures, frontals and complete sets – carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.',
   whatsapp: '27616029381',
   email: 'info@graceandcompanies.co.za',
   phone_display: '+27 61 602 9381',
@@ -112,32 +115,40 @@ const DEFAULT_SETTINGS = {
   free_delivery_over_cents: '0',
   prep_time: '1–2 business days',
   courier_name: 'Courier',
-  preorder_time: 'Confirmed when you order',
+  preorder_time: 'Confirmed on WhatsApp before you pay',
   payment_hours: '24',
   bank_name: '', bank_account_name: '', bank_account_number: '', bank_branch_code: '', bank_account_type: '',
   policies_confirmed: '0',
+  policy_delivery_confirmed: '0',
+  policy_returns_confirmed: '0',
+  policy_privacy_confirmed: '0',
+  email_public: '0',
   care_default: `- Detangle gently from the ends upwards with a wide-tooth comb.
 - Wash with a sulphate-free shampoo and conditioner every 7–10 wears.
 - Let the hair air-dry; use heat protectant before any styling tools.
 - Sleep with a satin bonnet or on a satin pillowcase.
 - Store wigs on a wig stand or in the satin bag provided.`,
   policy_delivery: `## Delivery across South Africa
-We deliver nationwide. Choose the option that suits you at checkout; the fee is shown before you pay.
+We deliver nationwide. You choose your delivery option and see its fee before you pay:
 
 {delivery_options}
 
 ## How long it takes
-- Preparing your order: {prep_time} after payment is confirmed.
-- Delivery: the time shown for your delivery option, after dispatch (main centres are usually quicker; outlying areas may take longer).
+Your delivery time has two parts:
 
-## Tracking
-Once your order is dispatched we will send you the courier name and tracking number. You can also check your order at any time on our Track Order page.
+- Before dispatch: the time we need to get your order ready. For pre-orders this is the lead time shown on each product (for example 7–10 working days after payment for our Premium Virgin collection). Ready-to-ship orders: {prep_time} after payment.
+- After dispatch: the time for your delivery option (see above). Main centres are usually quicker; outlying areas may take longer.
 
-## Pre-orders
-Full payment is required to confirm a pre-order. Pre-order lead times are shown on each product (for example 7–10 working days for our Premium Virgin collection), plus delivery time. Wig making requires additional preparation time; your completion date will be confirmed when you order.
+We confirm your estimated dispatch date on WhatsApp before you pay.
 
 ## PEP PAXI
-Choose PEP PAXI to have your parcel sent to the PEP store (PAXI point) of your choice. You collect it there once you receive the PAXI SMS.
+Your parcel is sent to the PEP store (PAXI point) you choose, and you collect it there once you receive the PAXI SMS.
+
+## Tracking
+Once your order is dispatched we send you the tracking number. You can also check your order at any time on our Track Order page.
+
+## Pre-orders and wig making
+Full payment is required to confirm a pre-order. Wig making requires additional preparation time; your completion date will be confirmed when you order.
 
 ## Collection
 Delivery only – we do not offer collection.`,
@@ -201,6 +212,7 @@ function setSetting(k, v) { setSettingStmt.run(k, String(v ?? '')); }
 /* ---------------- Products ---------------- */
 const CATEGORIES = {
   wigs: { label: 'Wigs', kind: 'Complete wig', kindLong: 'You are buying a complete, ready-to-wear wig.' },
+  sets: { label: 'Bundle + Closure Sets', kind: '3 bundles + closure', kindLong: 'You are buying THREE bundles and ONE matching closure. The price shown is the total for the full set.' },
   bundles: { label: 'Bundle Sets', kind: 'Set of 3 bundles', kindLong: 'You are buying a set of THREE bundles. The price shown is for all three. Closure/frontal not included.' },
   closures: { label: 'Closures & Frontals', kind: 'Closure / frontal only', kindLong: 'You are buying the closure or frontal on its own. Bundles are not included.' },
 };
@@ -398,10 +410,10 @@ function expireUnpaid() {
 /* ---------------- Seed sample products (first run only) ---------------- */
 function insertProducts(list, isSample) {
   list.forEach((s, i) => {
-    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, option_names, images, featured, is_sample, sort)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, extra_prices, option_names, images, featured, is_sample, sort)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       s.slug, s.name, s.category, s.availability, s.short || '', s.description || '', s.texture || '', s.colour || '', s.lace || '', s.density || '',
-      s.includes || '', s.lead_time || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, i);
+      s.includes || '', s.lead_time || '', s.extra_prices || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, s.sort ?? i);
     s.variants.forEach((v, j) => {
       const [opts, price, stock] = Array.isArray(v) ? v : [v.options, v.price, v.stock || 0];
       db.prepare('INSERT INTO variants (product_id, options, price_cents, stock, sort) VALUES (?, ?, ?, ?, ?)')
@@ -456,6 +468,45 @@ function seed() {
   insertProducts(samples, true);
 }
 seed();
+
+/* One-time update (Nov 2026) for shops created before the pre-order changes.
+   Text is only replaced while it is still exactly as originally loaded, so anything
+   edited in the admin is left alone. */
+const LEGACY_DELIVERY_POLICY = "## Delivery across South Africa\nWe deliver nationwide. Choose the option that suits you at checkout; the fee is shown before you pay.\n\n{delivery_options}\n\n## How long it takes\n- Preparing your order: {prep_time} after payment is confirmed.\n- Delivery: the time shown for your delivery option, after dispatch (main centres are usually quicker; outlying areas may take longer).\n\n## Tracking\nOnce your order is dispatched we will send you the courier name and tracking number. You can also check your order at any time on our Track Order page.\n\n## Pre-orders\nFull payment is required to confirm a pre-order. Pre-order lead times are shown on each product (for example 7–10 working days for our Premium Virgin collection), plus delivery time. Wig making requires additional preparation time; your completion date will be confirmed when you order.\n\n## PEP PAXI\nChoose PEP PAXI to have your parcel sent to the PEP store (PAXI point) of your choice. You collect it there once you receive the PAXI SMS.\n\n## Collection\nDelivery only – we do not offer collection.";
+const LEGACY_INTRO = "Nolle’ Luxury Hair offers premium wigs, bundle sets and closures, carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.";
+function migratePreorderUpdate() {
+  if (db.prepare("SELECT 1 FROM settings WHERE key = 'migr_preorder_2026_11'").get()) return;
+  if (!TEST_FIXTURES) {
+    const { SETS } = require('./catalogue');
+    tx(() => {
+      // Single-bundle price lists move out of the description into their own collapsed section.
+      const rows = db.prepare("SELECT id, description FROM products WHERE description LIKE '%## Single-bundle price%' AND (extra_prices IS NULL OR extra_prices = '')").all();
+      for (const p of rows) {
+        const m = /(^|\n)(## Single-bundle price[^\n]*(?:\n- [^\n]*)+)/.exec(p.description);
+        if (!m) continue;
+        const block = m[2].replace(/^## Single-bundle price\b(?!s)/, '## Single-bundle prices');
+        const desc = p.description.replace(m[2], '').replace(/\n{3,}/g, '\n\n').trim();
+        db.prepare('UPDATE products SET description = ?, extra_prices = ? WHERE id = ?').run(desc, block, p.id);
+      }
+      // Lead time now means "time before dispatch".
+      db.prepare("UPDATE products SET lead_time = '' WHERE lead_time = 'Confirmed when you order'").run();
+      db.prepare("UPDATE products SET lead_time = '7–10 working days' WHERE lead_time = '7–10 working days, plus delivery'").run();
+      const upd = db.prepare('UPDATE settings SET value = ? WHERE key = ? AND value = ?');
+      upd.run(DEFAULT_SETTINGS.preorder_time, 'preorder_time', 'Confirmed when you order');
+      upd.run(DEFAULT_SETTINGS.policy_delivery, 'policy_delivery', LEGACY_DELIVERY_POLICY);
+      upd.run(DEFAULT_SETTINGS.intro, 'intro', LEGACY_INTRO);
+      // Policies are now confirmed one by one.
+      if ((db.prepare("SELECT value FROM settings WHERE key = 'policies_confirmed'").get() || {}).value === '1') {
+        for (const k of ['policy_delivery_confirmed', 'policy_returns_confirmed', 'policy_privacy_confirmed']) setSettingStmt.run(k, '1');
+      }
+      // New: 3 bundles + matching closure sets.
+      const missing = SETS.filter((x) => !db.prepare('SELECT 1 FROM products WHERE slug = ?').get(x.slug));
+      if (missing.length) insertProducts(missing, false);
+    });
+  }
+  setSettingStmt.run('migr_preorder_2026_11', '1');
+}
+migratePreorderUpdate();
 
 
 module.exports = {

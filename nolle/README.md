@@ -38,21 +38,23 @@ Choose product → select options → add to cart → enter delivery details →
 - **Stock goes down as soon as an order is placed**, so two people can't buy the last unit.
 - **EFT orders stay “Awaiting payment”** until you confirm the money is in your account. Each order gets a unique reference like `NLH-7KQ2XA` and a payment deadline (24 hours by default).
 - If an order isn't paid by the deadline it **expires automatically and its stock is released**. You can give a client 24 more hours from the order page. If money arrives after the order expired, you can still mark it paid, and the stock is taken again if it's still available.
-- **Pre-order items** show “Enquire on WhatsApp” instead of “Add to cart”. Paid pre-orders can be added later.
+- **Pre-order items** show **“Confirm My Pre-Order on WhatsApp”** instead of “Add to cart”, with the line “We’ll confirm availability, your final total and your estimated dispatch date before you pay.” Beside the button: *Before dispatch* (the range’s lead time) and *After dispatch* (the chosen delivery option; PEP PAXI is collected at the client’s chosen PEP point).
+- **While everything is pre-order**, the homepage says so: the main button is **Shop Pre-Orders**, “How it works” explains the WhatsApp steps (choose hair and delivery → send on WhatsApp → we confirm availability, total and dispatch estimate → pay to confirm), and the “Ready to Ship” section only appears once a product is ready to ship with stock.
 - **Delivery only, no collection.** Delivery options (courier, PEP PAXI, local delivery) each have their own fee and are set in *Settings*. An option with no fee is hidden from clients.
 - **WhatsApp orders:** pre-order product pages let the client choose a delivery option too, so the WhatsApp message includes the product, options, price, delivery and total with delivery.
 
 ### The catalogue
 
-The shop starts with 12 products from the three price lists (`lib/catalogue.js`). All are **Pre-order (“Enquire on WhatsApp”)**:
+The shop starts with 15 products from the three price lists (`lib/catalogue.js`). All are **Pre-order**:
 
 | Range | Products | Options |
 | --- | --- | --- |
 | Raw Indian Hair | Straight & Wavy bundles, Curly bundles, HD closure (5x5/6x6), HD frontal (13x4/13x6) | Texture, size, length. Curly closures/frontals +R87 |
 | Premium Virgin | Straight bundles, Curly bundles, 4x4 closure, 13x4 frontal, 5x5 & HD closures | Texture/size, length. Lead time 7–10 working days |
 | SDD Indian | Bundles (straight, bouncy curl, Caribbean curl +R43/bundle), HD closure, HD frontal | Texture/size, length |
+| **Sets: 3 bundles + matching closure** | Raw Indian + 5x5 HD closure; Premium Virgin + 4x4 closure; SDD Indian + 5x5 HD closure | Texture, length (bundles and closure the same length). One total = 3 × bundle + closure; the breakdown is in a collapsed section |
 
-- Bundles are priced as a **set of 3 bundles of the same length**. Where a price list gives a per-bundle price, the set price is 3 × that price. Each bundle product also lists the single-bundle prices, and invites clients to ask on WhatsApp for mixed lengths.
+- Bundles are priced as a **set of 3 bundles of the same length**. Where a price list gives a per-bundle price, the set price is 3 × that price. Single-bundle prices are in a collapsed “Single-bundle prices” section on each bundle page (editable in the admin as “Extra prices”), and clients are invited to ask on WhatsApp for mixed lengths.
 - Combinations that are not on a price list (e.g. 13x4 HD frontal in 24") are greyed out.
 - When you have hair in hand, open the product in the admin, change it to **Ready to ship** and enter the stock. It then moves to “Ready to Ship” with an Add to cart button.
 

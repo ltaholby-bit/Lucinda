@@ -45,6 +45,9 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     assert.match(await page.locator('h1.slogan').innerText(), /YOUR HAIR\.\s*YOUR CROWN\./);
     assert.ok(await page.getByRole('link', { name: 'Shop Available Hair' }).isVisible());
     assert.match(await page.content(), /deliver nationwide/i);
+    // Shop has ready stock and pre-orders: both sections, and both ways of ordering explained
+    assert.ok(await page.locator('main #ready').isVisible()); assert.ok(await page.locator('main #pre-order').isVisible());
+    assert.deepEqual(await page.locator('.steps-title').allInnerTexts(), ['Ready-to-ship hair', 'Pre-orders']);
     assert.ok(await page.locator('[data-wa-float]').isVisible());
     await shot(page, 'home');
     for (const u of ['/', '/shop', '/product/body-wave-13x4-frontal-wig', '/contact', '/delivery']) {
@@ -98,8 +101,8 @@ const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, `${String(
     // Pre-order product: no Add to cart, WhatsApp enquiry instead
     await page.goto(BASE + '/product/deep-wave-5x5-hd-closure');
     assert.equal(await page.locator('[data-add]').count(), 0);
-    assert.match(await page.locator('[data-wa-enquire]').innerText(), /Enquire on WhatsApp/i);
-    log('Pre-order product shows “Enquire on WhatsApp” instead of Add to cart');
+    assert.match(await page.locator('[data-wa-enquire]').innerText(), /Confirm my pre-order on WhatsApp/i);
+    log('Pre-order product shows “Confirm my pre-order on WhatsApp” instead of Add to cart');
 
     // 4. Cart shows delivery and total before payment
     await page.goto(BASE + '/cart');

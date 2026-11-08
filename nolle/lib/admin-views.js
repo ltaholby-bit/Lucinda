@@ -11,8 +11,8 @@ function alayout(s, { title, body, flash, nav = true }) {
 <title>${title} · Admin · ${s.shop_name}</title>
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=1">
-<link rel="stylesheet" href="/static/css/admin.css?v=1">
+<link rel="stylesheet" href="/static/css/style.css?v=2">
+<link rel="stylesheet" href="/static/css/admin.css?v=2">
 </head><body class="admin">
 ${nav ? html`<header class="a-head">
   <a class="logo" href="/admin"><span class="logo-name">Nolle’</span><span class="logo-sub">Admin</span></a>
@@ -27,7 +27,7 @@ ${nav ? html`<header class="a-head">
 ${flash ? html`<p class="flash ${flash.type || ''}">${flash.msg}</p>` : ''}
 ${body}
 </main>
-<script src="/static/js/admin.js?v=1" defer></script>
+<script src="/static/js/admin.js?v=2" defer></script>
 </body></html>`;
 }
 
@@ -194,12 +194,13 @@ ${!isNew ? html`<p class="a-links">Shop page: <a href="/product/${p.slug}" targe
   </div>
   <label>Short summary<small>One or two lines shown near the price</small><textarea name="short" rows="2" maxlength="300">${p.short}</textarea></label>
   <label>Full description<textarea name="description" rows="4">${p.description}</textarea></label>
+  <label>Extra prices (shown in a collapsed section)<small>Start with a heading line, e.g. “## Single-bundle prices”, then one “- ” line per price. Leave empty if not needed.</small><textarea name="extra_prices" rows="4">${p.extra_prices || ''}</textarea></label>
 
   <h2>Hair details</h2>
   <div class="two">${f('texture', 'Texture', 'e.g. Body wave')}${f('colour', 'Colour', 'e.g. Natural black (1B)')}</div>
   <div class="two">${f('lace', 'Lace size / type', 'e.g. 13x4 HD lace frontal (wigs & closures)')}${f('density', 'Density', 'e.g. 180% (wigs)')}</div>
   <div class="two">${f('length', 'Length', 'Only if length is NOT an option below')}${f('includes', 'What’s included', 'e.g. 3 bundles, approx. 100 g each')}</div>
-  ${f('lead_time', 'Pre-order lead time', 'Shown on pre-order products, e.g. “7–10 working days, plus delivery”. Empty = the default from Settings')}
+  ${f('lead_time', 'Time before dispatch (pre-orders)', 'After payment, e.g. “7–10 working days”. Shown next to the order button. Empty = the default from Settings')}
   <label>Hair-care notes<small>Leave empty to use the standard care text from Settings</small><textarea name="care" rows="3">${p.care}</textarea></label>
 
   <h2>Options, prices &amp; stock</h2>
@@ -278,7 +279,8 @@ function settings(s, { flash, cardEnabled, mailOn, methods = [] }) {
 <form method="post" action="/admin/settings" class="a-form" data-settings-form>
 <section class="a-card"><h2>Contact &amp; social</h2>
   ${t('whatsapp', 'WhatsApp number', 'International format, e.g. 27821234567 (no + or spaces)')}
-  ${t('email', 'Email shown to clients and used for order notifications', '', 'email')}
+  ${t('email', 'Email address', 'Used for order notifications. Use a Nolle’ address, e.g. info@nolleluxuryhair.co.za', 'email')}
+  <label class="check"><input type="checkbox" name="email_public" value="1" ${s.email_public === '1' ? raw('checked') : ''}> Show this email on the website (tick only once it is set up and tested)</label>
   ${t('phone_display', 'Phone number shown on site (optional)')}
   ${t('location', 'Area shown publicly', 'City or province only, e.g. “Johannesburg”. Never your home address.')}
   ${t('instagram', 'Instagram link', 'https://instagram.com/…', 'url')}
@@ -305,7 +307,7 @@ function settings(s, { flash, cardEnabled, mailOn, methods = [] }) {
   <input type="hidden" name="dm_count" value="${methods.length + 1}">
   <div class="two"><label>Free delivery over (R)<small>0 = never free</small><input name="free_delivery_over" value="${rands('free_delivery_over_cents')}" inputmode="decimal"></label>
   ${t('prep_time', 'Time to prepare a ready-to-ship order', 'Your time, after payment. e.g. 1–2 business days')}</div>
-  ${t('preorder_time', 'Default pre-order lead time', 'Used when a pre-order product has no lead time of its own')}
+  ${t('preorder_time', 'Default time before dispatch (pre-orders)', 'Shown when a pre-order product has no time of its own, e.g. “Confirmed on WhatsApp before you pay”')}
   ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch a courier order, e.g. The Courier Guy')}
 </section>
 <section class="a-card"><h2>EFT payment</h2>
@@ -322,7 +324,10 @@ function settings(s, { flash, cardEnabled, mailOn, methods = [] }) {
   ${ta('policy_delivery', 'Delivery page')}
   ${ta('policy_returns', 'Returns & refunds page')}
   ${ta('policy_privacy', 'Privacy page')}
-  <label class="check"><input type="checkbox" name="policies_confirmed" value="1" ${s.policies_confirmed === '1' ? raw('checked') : ''}> I have confirmed these policies (removes the “draft” notice)</label>
+  <p class="muted small">Tick a policy once you have confirmed it – this removes its “draft” notice on the site.</p>
+  <label class="check"><input type="checkbox" name="policy_delivery_confirmed" value="1" ${s.policy_delivery_confirmed === '1' || s.policies_confirmed === '1' ? raw('checked') : ''}> Delivery policy confirmed</label>
+  <label class="check"><input type="checkbox" name="policy_returns_confirmed" value="1" ${s.policy_returns_confirmed === '1' || s.policies_confirmed === '1' ? raw('checked') : ''}> Returns &amp; refunds policy confirmed</label>
+  <label class="check"><input type="checkbox" name="policy_privacy_confirmed" value="1" ${s.policy_privacy_confirmed === '1' || s.policies_confirmed === '1' ? raw('checked') : ''}> Privacy policy confirmed</label>
 </section>
 <div class="a-actions sticky"><button class="btn btn-gold">Save settings</button></div>
 </form>`,

@@ -1,5 +1,5 @@
-/* Checks the real Nolle' catalogue (from the price lists) on a phone.
-   Run:  npm run test:catalogue */
+/* Checks the real Nolle' catalogue (from the price lists) on a phone, as a client sees it
+   while everything is pre-order. Run:  npm run test:catalogue */
 'use strict';
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
@@ -12,7 +12,8 @@ const PORT = 3998;
 const BASE = `http://localhost:${PORT}`;
 const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'nolle-cat-'));
 const log = (m) => console.log(`  ✓ ${m}`);
-const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
+const NB = ' ';
+const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
 
 (async () => {
   const srv = spawn(process.execPath, ['--no-warnings', 'server.js'], {
@@ -23,78 +24,130 @@ const R = (n) => 'R' + n.toLocaleString('en-ZA').replace(/[,\s]/g, ' ');
   const page = await (await browser.newContext({ ...devices['iPhone 13'] })).newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  const waText = async () => decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
   try {
     console.log('Catalogue test (iPhone 13)');
 
+    // 1. Homepage is clearly pre-order
     await page.goto(BASE + '/');
-    assert.match(await page.locator('.section-head h2').first().innerText(), /Available to Pre-order/);
-    assert.equal(await page.locator('.grid .card').count(), 4);
+    assert.ok(await page.getByRole('link', { name: 'Shop Pre-Orders' }).isVisible());
+    const home = await page.locator('main').innerText();
+    for (const gone of [/ready to ship/i, /real stock/i, /checkout as a guest/i, /guest checkout/i]) assert.doesNotMatch(home, gone);
+    assert.equal(await page.locator('main #ready').count(), 0);
+    assert.match(await page.locator('#pre-order h2').innerText(), /Available to Pre-order/);
+    assert.equal(await page.locator('#pre-order .card').count(), 4);
+    assert.deepEqual((await page.locator('.steps strong').allInnerTexts()),
+      ['Choose your hair and delivery', 'Send your selection on WhatsApp', 'We confirm the details', 'Pay to confirm']);
+    assert.match(await page.locator('.steps').innerText(), /Availability, your final total and your estimated dispatch date/);
     const nav = await page.locator('#site-nav').innerText();
-    assert.match(nav, /Bundle Sets/i); assert.match(nav, /Closures & Frontals/i); assert.doesNotMatch(nav, /Wigs/i);
-    log('Homepage shows 4 pre-order products; menu only lists categories that have products (no Wigs)');
+    assert.match(nav, /Bundle \+ Closure Sets/i); assert.match(nav, /Bundle Sets/i); assert.match(nav, /Closures & Frontals/i); assert.doesNotMatch(nav, /Wigs/i);
+    log('Homepage: “Shop Pre-Orders”, no “ready to ship / real stock / guest checkout”, WhatsApp pre-order steps');
 
+    // 4. Contact details
+    const footer = await page.locator('.site-footer').innerText();
+    assert.doesNotMatch(footer, /graceandcompanies/i);
+    assert.match(footer, /WhatsApp: \+27 61 602 9381/);
+    await page.goto(BASE + '/contact');
+    assert.doesNotMatch(await page.locator('main').innerText(), /graceandcompanies/i);
+    assert.match(await page.locator('main').innerText(), /\+27 61 602 9381/);
+    log('No Grace&Co email shown until a Nolle’ email is set; WhatsApp number shown in footer and on Contact');
+
+    // Shop: pre-order only
     await page.goto(BASE + '/shop');
-    assert.equal(await page.locator('#pre-order .card').count(), 12);
-    assert.match(await page.locator('#ready').innerText(), /Ready-to-ship stock will be listed here/);
-    assert.equal(await page.locator('.chip').count(), 3); // All, Bundle Sets, Closures & Frontals
+    assert.match(await page.locator('h1').innerText(), /Shop Pre-Orders/);
+    assert.equal(await page.locator('#ready').count(), 0);
+    assert.equal(await page.locator('#pre-order .card').count(), 15);
+    assert.equal(await page.locator('.chip').count(), 4); // All, Sets, Bundle Sets, Closures & Frontals
     for (const t of await page.locator('#pre-order .card').allInnerTexts()) {
-      if (/Set of 3 bundles/i.test(t)) assert.match(t, /for a set of 3 bundles/);
+      if (/^Set of 3 bundles/im.test(t)) assert.match(t, /for a set of 3 bundles/);
+      if (/^3 bundles \+ closure/im.test(t)) assert.match(t, /for 3 bundles \+ closure/);
     }
-    log('Shop: 12 pre-order products; every bundle price says “for a set of 3 bundles”');
+    log('Shop: 15 pre-order products, no empty “Ready to Ship” section; bundle and set prices labelled');
 
-    // Raw Indian straight & wavy: set of 3 = 3 x per-bundle price
+    // Product page: button, reassurance, timing beside the button, single-bundle prices collapsed
     await page.goto(BASE + '/product/raw-indian-straight-wavy-bundles');
     assert.equal(await page.locator('[data-add]').count(), 0);
+    assert.match(await page.locator('[data-wa-enquire]').innerText(), /Confirm my pre-order on WhatsApp/i);
+    assert.equal(await page.locator('.reassure').innerText(), 'We’ll confirm availability, your final total and your estimated dispatch date before you pay.');
+    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+Confirmed on WhatsApp before you pay/);
+    assert.match(await page.locator('.timing').innerText(), /After dispatch\s+Courier to your door – 2–4 business days/);
+    assert.doesNotMatch(await page.locator('details.acc[open]').first().innerText(), /per bundle/);
+    assert.equal(await page.locator('details.extra').getAttribute('open'), null);
+    assert.match(await page.locator('details.extra summary').innerText(), /Single-bundle prices/);
     await page.getByRole('button', { name: '20"', exact: true }).click();
     assert.equal(await page.locator('[data-price]').innerText(), R(2779 * 3));
     await page.getByRole('button', { name: 'Wavy', exact: true }).click();
-    const wa = decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
-    assert.match(wa, /Raw Indian Hair Bundles – Straight & Wavy/); assert.match(wa, /Wavy · 20"/); assert.match(wa, /for 3 bundles/);
-    assert.match(wa, /Delivery: Courier to your door \(R120\)/); assert.match(wa, /Total with delivery: R8 457/);
-    assert.match(await page.locator('[data-wa-total]').innerText(), /Total with delivery: R8 457/);
+    let wa = await waText();
+    assert.match(wa, /I’d like to pre-order: Raw Indian Hair Bundles – Straight & Wavy/); assert.match(wa, /Wavy · 20"/); assert.match(wa, /for 3 bundles/);
+    assert.match(wa, /Delivery: Courier to your door \(R120\)/); assert.ok(wa.includes('Total with delivery: ' + R(8457)));
     await page.locator('[data-delivery=paxi]').click();
-    const wa2 = decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
-    assert.match(wa2, /Delivery: PEP PAXI \(collect at a PEP store\) \(R60\)/); assert.match(wa2, /Total with delivery: R8 397/);
-    assert.match(await page.locator('.ship-box').innerText(), /Pre-order lead time/i);
-    log(`Raw 20" set of 3 = ${R(2779 * 3)}; WhatsApp message has product, texture, length and “for 3 bundles”`);
+    assert.match(await page.locator('[data-after-dispatch]').innerText(), /PEP PAXI – collected at your chosen PEP point/);
+    wa = await waText();
+    assert.match(wa, /Delivery: PEP PAXI \(collect at a PEP store\) \(R60\)/); assert.ok(wa.includes('Total with delivery: ' + R(8397)));
+    log(`Product: “Confirm My Pre-Order on WhatsApp” + reassurance line; before/after dispatch shown; PAXI = collected at chosen PEP point; ${R(8337)} + R60 in message`);
 
-    // Raw HD frontal: 13x4 has no 24"; curly adds R87
+    // 2. Range lead time beside the button (Virgin 7–10 working days)
+    await page.goto(BASE + '/product/virgin-curly-bundles');
+    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
+    log('Premium Virgin: “Before dispatch: 7–10 working days after payment” beside the button');
+
+    // 3. 3 bundles + matching closure, one total
+    await page.goto(BASE + '/product/raw-indian-bundles-closure-set');
+    assert.match(await page.locator('.kind-box').innerText(), /3 bundles \+ closure/);
+    await page.getByRole('button', { name: 'Curly', exact: true }).click();
+    await page.getByRole('button', { name: '18"', exact: true }).click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(2996 * 3 + 2692 + 87));
+    assert.match(await page.locator('details.extra summary').innerText(), /Price breakdown/);
+    await page.goto(BASE + '/product/virgin-bundles-closure-set');
+    await page.getByRole('button', { name: 'Straight', exact: true }).click();
+    await page.getByRole('button', { name: '16"', exact: true }).click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(1375 * 3 + 850));
+    wa = await waText();
+    assert.match(wa, /Premium Virgin 3 Bundles \+ 4x4 Closure \(3 bundles \+ closure\) – Straight · 16"/);
+    log(`Sets: Raw curly 18" = ${R(2996 * 3 + 2779)}, Virgin straight 16" = ${R(1375 * 3 + 850)} – one total, breakdown collapsed`);
+
+    // Other price rules still hold
     await page.goto(BASE + '/product/raw-indian-hd-frontal');
-    assert.match(await page.locator('.kind-box').innerText(), /Frontal only/);
     await page.getByRole('button', { name: '13x4 HD frontal', exact: true }).click();
     assert.ok(await page.getByRole('button', { name: '24"', exact: true }).evaluate((b) => b.classList.contains('na')));
-    await page.getByRole('button', { name: '20"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(3712));
-    await page.getByRole('button', { name: 'Curly', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(3712 + 87));
-    await page.getByRole('button', { name: '13x6 HD frontal', exact: true }).click();
-    await page.getByRole('button', { name: '24"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(6947 + 87));
-    log('Frontal: 13x4 24" greyed out (not on price list); curly +R87; 13x6 curly 24" = ' + R(7034));
-
-    // Virgin 7-10 working days, SDD Caribbean +R43 per bundle
-    await page.goto(BASE + '/product/virgin-curly-bundles');
-    assert.match(await page.locator('.ship-box').innerText(), /7–10 working days/);
     await page.goto(BASE + '/product/sdd-indian-bundles');
     await page.getByRole('button', { name: 'Caribbean curl', exact: true }).click();
     await page.getByRole('button', { name: '28"', exact: true }).click();
     assert.equal(await page.locator('[data-price]').innerText(), R((3647 + 43) * 3));
-    log('Virgin lead time 7–10 working days; SDD Caribbean curl 28" set = ' + R((3647 + 43) * 3));
+    log('Frontal 13x4 24" greyed out; SDD Caribbean curl +R43 per bundle');
 
-    for (const u of ['/', '/shop', '/product/raw-indian-hd-frontal', '/delivery']) {
+    // 2. Delivery page: before/after dispatch, PAXI, draft notice until confirmed
+    await page.goto(BASE + '/delivery');
+    let prose = await page.locator('.prose').innerText();
+    assert.match(prose, /Courier to your door: R120 – 2–4 business days after dispatch/);
+    assert.match(prose, /PEP PAXI \(collect at a PEP store\): R60 – Collected at your chosen PEP point/);
+    assert.match(prose, /Before dispatch:/); assert.match(prose, /After dispatch:/);
+    assert.match(prose, /draft/i);
+    await page.goto(BASE + '/admin/login');
+    await page.fill('[name=password]', 'x');
+    await page.getByRole('button', { name: 'Log in' }).click();
+    await page.waitForURL(BASE + '/admin');
+    await page.goto(BASE + '/admin/settings');
+    await page.check('[name=policy_delivery_confirmed]');
+    await page.getByRole('button', { name: 'Save settings' }).click();
+    await page.goto(BASE + '/delivery');
+    assert.equal(await page.locator('.draft-note').count(), 0);
+    await page.goto(BASE + '/returns');
+    assert.equal(await page.locator('.draft-note').count(), 1);
+    log('Delivery page shows before/after dispatch and PAXI collection; its draft notice goes once confirmed (returns stays draft)');
+
+    for (const u of ['/', '/shop', '/product/raw-indian-bundles-closure-set', '/product/raw-indian-hd-frontal', '/delivery', '/contact']) {
       await page.goto(BASE + u);
       const [sw, cw] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
       assert.ok(sw <= cw, `${u} scrolls sideways`);
     }
-    await page.goto(BASE + '/delivery');
-    assert.match(await page.locator('.prose').innerText(), /Courier to your door: R120/);
-    assert.match(await page.locator('.prose').innerText(), /PEP PAXI \(collect at a PEP store\): R60/);
     log('No sideways scrolling');
     assert.deepEqual(errors, []);
     log('No JavaScript errors');
     console.log('\nAll catalogue checks passed.');
   } catch (e) {
     console.error('\nFAILED:', e.message);
+    await page.screenshot({ path: path.join(os.tmpdir(), 'nolle-catalogue-failure.png'), fullPage: true }).catch(() => {});
     process.exitCode = 1;
   } finally {
     await browser.close(); srv.kill(); fs.rmSync(DATA, { recursive: true, force: true });

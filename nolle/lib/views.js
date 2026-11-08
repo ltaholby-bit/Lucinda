@@ -63,7 +63,7 @@ function priceLabel(p) {
 }
 function bundleNote(p) {
   if (p.category === 'bundles') return html`<span class="price-note">for a set of 3 bundles</span>`;
-  if (p.category === 'sets') return html`<span class="price-note">for 3 bundles + closure</span>`;
+  if (p.category === 'sets') return html`<span class="price-note">for ${p.cat.kind}</span>`;
   return '';
 }
 
@@ -92,7 +92,7 @@ ${image ? html`<meta property="og:image" content="${image}"><meta name="twitter:
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=2">
+<link rel="stylesheet" href="/static/css/style.css?v=3">
 ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>`) : ''}
 </head>
 <body class="${bodyClass}" data-wa="${String(s.whatsapp).replace(/\D/g, '')}">
@@ -152,7 +152,7 @@ ${body}
   <div class="wrap footer-base">© ${year} ${s.shop_name}. All rights reserved.</div>
 </footer>
 <a class="wa-float" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I would like some assistance please.')}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" data-wa-float>${ICON.wa}<span>Chat with us</span></a>
-<script src="/static/js/shop.js?v=2" defer></script>
+<script src="/static/js/shop.js?v=3" defer></script>
 </body>
 </html>`;
 }
@@ -170,6 +170,7 @@ function productCard(p) {
       <h3>${p.name}</h3>
       ${p.is_sample ? html`<p class="sample-flag">Sample listing</p>` : ''}
       <p class="price">${priceLabel(p)} ${bundleNote(p)}</p>
+      ${p.wig_option ? html`<p class="card-extra">Wig making available</p>` : ''}
     </div>
   </a>
 </article>`;
@@ -335,6 +336,8 @@ function product(s, { p, base, preselect }) {
     preselect: preselect || null, image: images[0],
     delivery: deliveryMethods(s).map((m) => ({ id: m.id, name: m.name, fee: m.fee, after: afterText(m) })),
     freeOver: parseInt(s.free_delivery_over_cents, 10) || 0,
+    wig: p.wig_option ? { fee: s.wig_fee_cents === '' || s.wig_fee_cents == null ? null : parseInt(s.wig_fee_cents, 10), time: s.wig_time } : null,
+    beforeText: enquire ? leadText(p, s) : `${s.prep_time} after payment`,
   };
   const details = [
     ['What you’re buying', p.cat.kind],
@@ -348,6 +351,8 @@ function product(s, { p, base, preselect }) {
   const care = p.care || s.care_default;
   const waText = `Hi Nolle’ Luxury Hair, ${enquire ? 'I’d like to pre-order' : 'I’m interested in'}: ${p.name}. ${base}/product/${p.slug}`;
   const methods = deliveryMethods(s);
+  const wigFee = s.wig_fee_cents === '' || s.wig_fee_cents == null ? null : parseInt(s.wig_fee_cents, 10);
+  const beforeText = enquire ? leadText(p, s) : `${s.prep_time} after payment`;
   const extra = p.extra_prices ? /^## (.+)\n?([\s\S]*)$/.exec(p.extra_prices.trim()) : null;
   const body = html`
 <nav class="crumbs wrap" aria-label="Breadcrumb"><a href="/shop">Shop</a> / <a href="/shop?cat=${p.category}">${p.cat.label}</a> / <span>${p.name}</span></nav>
@@ -371,20 +376,29 @@ function product(s, { p, base, preselect }) {
 
     <form class="buy-form" data-buy-form>
       ${p.option_names.map((name) => {
-        const values = [...new Set(p.variants.map((v) => v.options[name]).filter(Boolean))];
+        let values = [...new Set(p.variants.map((v) => v.options[name]).filter(Boolean))];
+        // Lengths in size order, even when ranges offer different lengths (e.g. 10" only in some)
+        if (/length/i.test(name) && values.every((x) => !Number.isNaN(parseFloat(x)))) values = values.sort((x, y) => parseFloat(x) - parseFloat(y));
         return html`<fieldset class="opt" data-opt="${name}">
           <legend>${name}: <span data-opt-value></span></legend>
           <div class="opt-values">${values.map((val) => html`<button type="button" class="opt-btn" data-value="${val}">${val}</button>`)}</div>
         </fieldset>`;
       })}
       <p class="stock" data-stock aria-live="polite"></p>
+      ${p.wig_option ? html`<fieldset class="opt" data-wig-opt>
+        <legend>Wig making: <span data-wig-value></span></legend>
+        <div class="opt-values">
+          <button type="button" class="opt-btn" data-wig="0">No – just the hair</button>
+          <button type="button" class="opt-btn" data-wig="1">Yes – make it into a wig · ${wigFee != null ? '+' + money(wigFee) : 'price on WhatsApp'}</button>
+        </div>
+      </fieldset>` : ''}
       ${enquire && deliveryMethods(s).length ? html`<fieldset class="opt" data-delivery-opt>
         <legend>Delivery: <span data-delivery-value></span></legend>
         <div class="opt-values">${deliveryMethods(s).map((m) => html`<button type="button" class="opt-btn" data-delivery="${m.id}">${m.name} · ${feeText(m.fee)}</button>`)}</div>
       </fieldset>
       <p class="wa-total" data-wa-total aria-live="polite"></p>` : ''}
       <div class="timing">
-        <div><strong>Before dispatch</strong><span>${enquire ? leadText(p, s) : `${s.prep_time} after payment`}</span></div>
+        <div><strong>Before dispatch</strong><span data-before-dispatch>${beforeText}</span></div>
         ${methods.length ? html`<div><strong>After dispatch</strong><span data-after-dispatch>${enquire ? afterText(methods[0]) : methods.map(afterText).join(' · ')}</span></div>` : ''}
       </div>
       ${enquire ? '' : html`<div class="qty-row">

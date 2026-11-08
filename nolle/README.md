@@ -45,16 +45,18 @@ Choose product → select options → add to cart → enter delivery details →
 
 ### The catalogue
 
-The shop starts with 15 products from the three price lists (`lib/catalogue.js`). All are **Pre-order**:
+The shop starts with 16 products from the three price lists (`lib/catalogue.js`). All are **Pre-order**, with **7–10 working days before dispatch** (after payment):
 
 | Range | Products | Options |
 | --- | --- | --- |
 | Raw Indian Hair | Straight & Wavy bundles, Curly bundles, HD closure (5x5/6x6), HD frontal (13x4/13x6) | Texture, size, length. Curly closures/frontals +R87 |
 | Premium Virgin | Straight bundles, Curly bundles, 4x4 closure, 13x4 frontal, 5x5 & HD closures | Texture/size, length. Lead time 7–10 working days |
 | SDD Indian | Bundles (straight, bouncy curl, Caribbean curl +R43/bundle), HD closure, HD frontal | Texture/size, length |
+| **Best seller: 3 bundles + 13x4 frontal** | One product: choose Raw Indian, Premium Virgin or SDD Indian, texture and length | One total = 3 × bundle + frontal (curly Raw frontal +R87) |
 | **Sets: 3 bundles + matching closure** | Raw Indian + 5x5 HD closure; Premium Virgin + 4x4 closure; SDD Indian + 5x5 HD closure | Texture, length (bundles and closure the same length). One total = 3 × bundle + closure; the breakdown is in a collapsed section |
 
 - Bundles are priced as a **set of 3 bundles of the same length**. Where a price list gives a per-bundle price, the set price is 3 × that price. Single-bundle prices are in a collapsed “Single-bundle prices” section on each bundle page (editable in the admin as “Extra prices”), and clients are invited to ask on WhatsApp for mixed lengths.
+- **Wig making** is offered on all sets: clients choose “Yes – make it into a wig”. Set the fee and time in Settings → Wig-making service; with no fee the WhatsApp message asks for a quote. Tick “Offer the wig-making service” on any other product to offer it there too.
 - Combinations that are not on a price list (e.g. 13x4 HD frontal in 24") are greyed out.
 - When you have hair in hand, open the product in the admin, change it to **Ready to ship** and enter the stock. It then moves to “Ready to Ship” with an Add to cart button.
 

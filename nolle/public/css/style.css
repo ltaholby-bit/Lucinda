@@ -178,6 +178,7 @@ p { margin: 0 0 1em; }
 .timing div { display: flex; justify-content: space-between; gap: 1rem; }
 .timing strong { font-weight: 500; white-space: nowrap; }
 .timing span { color: var(--ink-soft); text-align: right; }
+.card-extra { font-size: .74rem; letter-spacing: .06em; color: var(--gold-dark); margin: .35rem 0 0; }
 .reassure { margin: -.3rem 0 0; font-size: .88rem; color: var(--ink-soft); text-align: center; }
 .acc.extra summary { font-size: 1.1rem; }
 .steps-title { text-align: center; font-size: 1.3rem; margin: 1.6rem 0 .8rem; }

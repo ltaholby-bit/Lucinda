@@ -11,8 +11,8 @@ function alayout(s, { title, body, flash, nav = true }) {
 <title>${title} · Admin · ${s.shop_name}</title>
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=2">
-<link rel="stylesheet" href="/static/css/admin.css?v=2">
+<link rel="stylesheet" href="/static/css/style.css?v=3">
+<link rel="stylesheet" href="/static/css/admin.css?v=3">
 </head><body class="admin">
 ${nav ? html`<header class="a-head">
   <a class="logo" href="/admin"><span class="logo-name">Nolle’</span><span class="logo-sub">Admin</span></a>
@@ -27,7 +27,7 @@ ${nav ? html`<header class="a-head">
 ${flash ? html`<p class="flash ${flash.type || ''}">${flash.msg}</p>` : ''}
 ${body}
 </main>
-<script src="/static/js/admin.js?v=2" defer></script>
+<script src="/static/js/admin.js?v=3" defer></script>
 </body></html>`;
 }
 
@@ -200,6 +200,7 @@ ${!isNew ? html`<p class="a-links">Shop page: <a href="/product/${p.slug}" targe
   <div class="two">${f('texture', 'Texture', 'e.g. Body wave')}${f('colour', 'Colour', 'e.g. Natural black (1B)')}</div>
   <div class="two">${f('lace', 'Lace size / type', 'e.g. 13x4 HD lace frontal (wigs & closures)')}${f('density', 'Density', 'e.g. 180% (wigs)')}</div>
   <div class="two">${f('length', 'Length', 'Only if length is NOT an option below')}${f('includes', 'What’s included', 'e.g. 3 bundles, approx. 100 g each')}</div>
+  <label class="check"><input type="checkbox" name="wig_option" value="1" ${p.wig_option ? raw('checked') : ''}> Offer the wig-making service on this product (fee and time are set in Settings)</label>
   ${f('lead_time', 'Time before dispatch (pre-orders)', 'After payment, e.g. “7–10 working days”. Shown next to the order button. Empty = the default from Settings')}
   <label>Hair-care notes<small>Leave empty to use the standard care text from Settings</small><textarea name="care" rows="3">${p.care}</textarea></label>
 
@@ -309,6 +310,11 @@ function settings(s, { flash, cardEnabled, mailOn, methods = [] }) {
   ${t('prep_time', 'Time to prepare a ready-to-ship order', 'Your time, after payment. e.g. 1–2 business days')}</div>
   ${t('preorder_time', 'Default time before dispatch (pre-orders)', 'Shown when a pre-order product has no time of its own, e.g. “Confirmed on WhatsApp before you pay”')}
   ${t('courier_name', 'Usual courier', 'Pre-filled when you dispatch a courier order, e.g. The Courier Guy')}
+</section>
+<section class="a-card"><h2>Wig-making service</h2>
+  <p class="muted small">Shown on products where “Offer the wig-making service” is ticked (all bundle + closure/frontal sets). Leave the fee empty to have it quoted on WhatsApp.</p>
+  <div class="two"><label>Wig-making fee (R)<small>Empty = “price on WhatsApp”</small><input name="wig_fee" value="${s.wig_fee_cents === '' ? '' : ((parseInt(s.wig_fee_cents, 10) || 0) / 100).toFixed(2).replace(/\.00$/, '')}" inputmode="decimal" placeholder="quoted on WhatsApp"></label>
+  ${t('wig_time', 'Wig-making time', 'Added to “Before dispatch”, e.g. “completion date confirmed on WhatsApp”')}</div>
 </section>
 <section class="a-card"><h2>EFT payment</h2>
   ${t('payment_hours', 'Hours a client has to pay', 'Unpaid orders are cancelled after this and stock is released', 'number')}

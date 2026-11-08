@@ -84,6 +84,9 @@ CREATE TABLE IF NOT EXISTS reviews (
 if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'lead_time')) {
   db.exec("ALTER TABLE products ADD COLUMN lead_time TEXT DEFAULT ''");
 }
+if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'wig_option')) {
+  db.exec('ALTER TABLE products ADD COLUMN wig_option INTEGER DEFAULT 0');
+}
 if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'extra_prices')) {
   db.exec("ALTER TABLE products ADD COLUMN extra_prices TEXT DEFAULT ''");
 }
@@ -123,6 +126,8 @@ const DEFAULT_SETTINGS = {
   policy_returns_confirmed: '0',
   policy_privacy_confirmed: '0',
   email_public: '0',
+  wig_fee_cents: '',
+  wig_time: 'completion date confirmed on WhatsApp',
   care_default: `- Detangle gently from the ends upwards with a wide-tooth comb.
 - Wash with a sulphate-free shampoo and conditioner every 7–10 wears.
 - Let the hair air-dry; use heat protectant before any styling tools.
@@ -234,6 +239,10 @@ function hydrateProduct(p) {
 /* Closures and frontals share a category but are labelled separately. */
 function kindFor(category, name) {
   const c = CATEGORIES[category] || { label: category, kind: '', kindLong: '' };
+  if (category === 'sets') {
+    const piece = /frontal/i.test(name || '') ? 'frontal' : 'closure';
+    return { ...c, kind: `3 bundles + ${piece}`, kindLong: `You are buying THREE bundles and ONE matching ${piece}. The price shown is the total for the full set.` };
+  }
   if (category !== 'closures') return c;
   const frontal = /frontal/i.test(name || '');
   const w = frontal ? 'frontal' : 'closure';
@@ -410,10 +419,10 @@ function expireUnpaid() {
 /* ---------------- Seed sample products (first run only) ---------------- */
 function insertProducts(list, isSample) {
   list.forEach((s, i) => {
-    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, extra_prices, option_names, images, featured, is_sample, sort)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, extra_prices, option_names, images, featured, is_sample, sort, wig_option)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       s.slug, s.name, s.category, s.availability, s.short || '', s.description || '', s.texture || '', s.colour || '', s.lace || '', s.density || '',
-      s.includes || '', s.lead_time || '', s.extra_prices || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, s.sort ?? i);
+      s.includes || '', s.lead_time || '', s.extra_prices || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, s.sort ?? i, s.wig_option ? 1 : 0);
     s.variants.forEach((v, j) => {
       const [opts, price, stock] = Array.isArray(v) ? v : [v.options, v.price, v.stock || 0];
       db.prepare('INSERT INTO variants (product_id, options, price_cents, stock, sort) VALUES (?, ?, ?, ?, ?)')
@@ -507,6 +516,25 @@ function migratePreorderUpdate() {
   setSettingStmt.run('migr_preorder_2026_11', '1');
 }
 migratePreorderUpdate();
+
+/* One-time update: 7–10 working days for Raw Indian and SDD Indian (only where no time
+   was set), wig making on all sets, and the 3 bundles + 13x4 frontal best-seller set. */
+const RAW_SDD_SLUGS = ['raw-indian-straight-wavy-bundles', 'raw-indian-curly-bundles', 'raw-indian-hd-closure', 'raw-indian-hd-frontal',
+  'sdd-indian-bundles', 'sdd-indian-hd-closure', 'sdd-indian-hd-frontal', 'raw-indian-bundles-closure-set', 'sdd-indian-bundles-closure-set'];
+function migrateWigAndFrontalSet() {
+  if (db.prepare("SELECT 1 FROM settings WHERE key = 'migr_wig_frontal_2026_11'").get()) return;
+  if (!TEST_FIXTURES) {
+    const { SETS } = require('./catalogue');
+    tx(() => {
+      db.prepare(`UPDATE products SET lead_time = '7–10 working days' WHERE (lead_time IS NULL OR lead_time = '') AND slug IN (${RAW_SDD_SLUGS.map(() => '?').join(',')})`).run(...RAW_SDD_SLUGS);
+      db.prepare("UPDATE products SET wig_option = 1 WHERE category = 'sets'").run();
+      const missing = SETS.filter((x) => !db.prepare('SELECT 1 FROM products WHERE slug = ?').get(x.slug));
+      if (missing.length) insertProducts(missing, false);
+    });
+  }
+  setSettingStmt.run('migr_wig_frontal_2026_11', '1');
+}
+migrateWigAndFrontalSet();
 
 
 module.exports = {

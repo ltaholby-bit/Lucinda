@@ -53,6 +53,7 @@
     var P = JSON.parse(pdEl.textContent);
     var sel = {};
     var dSel = P.delivery && P.delivery.length ? P.delivery[0].id : null;
+    var wigSel = '0';
     var form = $('[data-buy-form]');
     var priceEl = $('[data-price]'), stockEl = $('[data-stock]'), addBtn = $('[data-add]'), qtyEl = $('[data-qty]');
     var waBtn = $('[data-wa-enquire]'), addedEl = $('[data-added]'), lenEl = $('[data-detail-length]');
@@ -66,6 +67,16 @@
 
     function render() {
       var v = current();
+      // Wig-making add-on: adds its fee (if set) and goes into the WhatsApp message
+      var wigOn = !!(P.wig && wigSel === '1');
+      var wigFee = wigOn && P.wig.fee ? P.wig.fee : 0;
+      var price = v ? v.price + wigFee : 0;
+      $$('[data-wig]').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-wig') === wigSel);
+        b.setAttribute('aria-pressed', b.getAttribute('data-wig') === wigSel);
+      });
+      var wv = $('[data-wig-value]'); if (wv) wv.textContent = wigOn ? 'Yes – make it into a wig' : 'No – just the hair';
+      var bd = $('[data-before-dispatch]'); if (bd && P.beforeText) bd.textContent = P.beforeText + (wigOn ? ', plus wig making (' + P.wig.time + ')' : '');
       $$('[data-opt]').forEach(function (fs) {
         var name = fs.getAttribute('data-opt');
         $('[data-opt-value]', fs).textContent = sel[name] || 'please choose';
@@ -91,10 +102,11 @@
       }
       var waText = 'Hi Nolle’ Luxury Hair, ' + (P.enquire ? 'I’d like to pre-order: ' : 'I’m interested in: ') + P.name + ' (' + P.kind + ')';
       if (v) {
-        priceEl.textContent = money(v.price);
+        priceEl.textContent = money(price);
         var lbl = label(v);
         if (lbl) waText += ' – ' + lbl;
         waText += ', ' + money(v.price) + (P.category === 'bundles' ? ' for 3 bundles' : '');
+        if (wigOn) waText += P.wig.fee ? '. Wig making: yes (+' + money(P.wig.fee) + ')' : '. Wig making: yes – please quote the wig-making fee';
         if (P.enquire) {
           stockEl.className = 'stock pre';
           stockEl.textContent = 'Pre-order – we confirm availability before you pay.';
@@ -106,8 +118,8 @@
           stockEl.textContent = v.stock <= 2 ? 'In stock – only ' + v.stock + ' left' : 'In stock – ready to ship';
         }
         if (addBtn) {
-          addBtn.disabled = P.enquire || v.stock <= 0;
-          addBtn.textContent = v.stock <= 0 ? 'Sold out' : 'Add to cart – ' + money(v.price);
+          addBtn.disabled = P.enquire || v.stock <= 0 || wigOn;
+          addBtn.textContent = wigOn ? 'Wig making is arranged on WhatsApp' : v.stock <= 0 ? 'Sold out' : 'Add to cart – ' + money(v.price);
           qtyEl.max = Math.max(1, v.stock);
           if (+qtyEl.value > v.stock) qtyEl.value = Math.max(1, v.stock);
         }
@@ -129,10 +141,11 @@
       var ad = $('[data-after-dispatch]'); if (ad && dm && P.enquire) ad.textContent = dm.after;
       var wt = $('[data-wa-total]');
       if (v && dm) {
-        var dfee = P.freeOver && v.price >= P.freeOver ? 0 : dm.fee;
+        var dfee = P.freeOver && price >= P.freeOver ? 0 : dm.fee;
         var dtxt = dfee ? money(dfee) : 'free';
-        if (wt) wt.textContent = 'Total with delivery: ' + money(v.price + dfee) + ' (' + money(v.price) + ' + ' + dtxt + ' delivery)';
-        waText += '. Delivery: ' + dm.name + ' (' + dtxt + '). Total with delivery: ' + money(v.price + dfee);
+        var quoted = wigOn && !P.wig.fee ? ' + wig making (quoted on WhatsApp)' : '';
+        if (wt) wt.textContent = 'Total with delivery: ' + money(price + dfee) + ' (' + money(v.price) + (wigFee ? ' + ' + money(wigFee) + ' wig making' : '') + ' + ' + dtxt + ' delivery)' + quoted;
+        waText += '. Delivery: ' + dm.name + ' (' + dtxt + '). Total with delivery: ' + money(price + dfee) + (quoted ? ', before wig making' : '');
       } else if (wt) wt.textContent = '';
       waText += '. ' + P.url + (v ? '?v=' + v.id : '');
       if (waBtn) waBtn.href = waLink(waText);
@@ -163,6 +176,9 @@
 
     $$('[data-delivery]').forEach(function (b) {
       b.addEventListener('click', function () { dSel = b.getAttribute('data-delivery'); render(); });
+    });
+    $$('[data-wig]').forEach(function (b) {
+      b.addEventListener('click', function () { wigSel = b.getAttribute('data-wig'); if (addedEl) addedEl.hidden = true; render(); });
     });
 
     // thumbnails

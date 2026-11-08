@@ -36,6 +36,7 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
     assert.equal(await page.locator('main #ready').count(), 0);
     assert.match(await page.locator('#pre-order h2').innerText(), /Available to Pre-order/);
     assert.equal(await page.locator('#pre-order .card').count(), 4);
+    assert.match(await page.locator('#pre-order .card').first().innerText(), /3 Bundles \+ 13x4 Frontal Set/);
     assert.deepEqual((await page.locator('.steps strong').allInnerTexts()),
       ['Choose your hair and delivery', 'Send your selection on WhatsApp', 'We confirm the details', 'Pay to confirm']);
     assert.match(await page.locator('.steps').innerText(), /Availability, your final total and your estimated dispatch date/);
@@ -56,20 +57,20 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
     await page.goto(BASE + '/shop');
     assert.match(await page.locator('h1').innerText(), /Shop Pre-Orders/);
     assert.equal(await page.locator('#ready').count(), 0);
-    assert.equal(await page.locator('#pre-order .card').count(), 15);
+    assert.equal(await page.locator('#pre-order .card').count(), 16);
     assert.equal(await page.locator('.chip').count(), 4); // All, Sets, Bundle Sets, Closures & Frontals
     for (const t of await page.locator('#pre-order .card').allInnerTexts()) {
       if (/^Set of 3 bundles/im.test(t)) assert.match(t, /for a set of 3 bundles/);
-      if (/^3 bundles \+ closure/im.test(t)) assert.match(t, /for 3 bundles \+ closure/);
+      if (/^3 bundles \+ (closure|frontal)/im.test(t)) { assert.match(t, /for 3 bundles \+ (closure|frontal)/); assert.match(t, /Wig making available/); }
     }
-    log('Shop: 15 pre-order products, no empty “Ready to Ship” section; bundle and set prices labelled');
+    log('Shop: 16 pre-order products, no empty “Ready to Ship” section; bundle and set prices labelled');
 
     // Product page: button, reassurance, timing beside the button, single-bundle prices collapsed
     await page.goto(BASE + '/product/raw-indian-straight-wavy-bundles');
     assert.equal(await page.locator('[data-add]').count(), 0);
     assert.match(await page.locator('[data-wa-enquire]').innerText(), /Confirm my pre-order on WhatsApp/i);
     assert.equal(await page.locator('.reassure').innerText(), 'We’ll confirm availability, your final total and your estimated dispatch date before you pay.');
-    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+Confirmed on WhatsApp before you pay/);
+    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
     assert.match(await page.locator('.timing').innerText(), /After dispatch\s+Courier to your door – 2–4 business days/);
     assert.doesNotMatch(await page.locator('details.acc[open]').first().innerText(), /per bundle/);
     assert.equal(await page.locator('details.extra').getAttribute('open'), null);
@@ -106,6 +107,25 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
     assert.match(wa, /Premium Virgin 3 Bundles \+ 4x4 Closure \(3 bundles \+ closure\) – Straight · 16"/);
     log(`Sets: Raw curly 18" = ${R(2996 * 3 + 2779)}, Virgin straight 16" = ${R(1375 * 3 + 850)} – one total, breakdown collapsed`);
 
+    // Best seller: 3 bundles + 13x4 frontal, with the wig-making add-on (no fee set = quoted on WhatsApp)
+    await page.goto(BASE + '/product/bundles-13x4-frontal-set');
+    assert.match(await page.locator('.kind-box').innerText(), /3 bundles \+ frontal/);
+    await page.getByRole('button', { name: 'Premium Virgin', exact: true }).click();
+    await page.getByRole('button', { name: 'Curly', exact: true }).click();
+    await page.getByRole('button', { name: '20"', exact: true }).click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(2300 * 3 + 2000));
+    assert.ok(await page.getByRole('button', { name: 'Wavy', exact: true }).evaluate((b) => b.classList.contains('na')));
+    await page.locator('[data-wig="1"]').click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(2300 * 3 + 2000));
+    assert.match(await page.locator('[data-before-dispatch]').innerText(), /7–10 working days after payment, plus wig making \(completion date confirmed on WhatsApp\)/);
+    wa = await waText();
+    assert.match(wa, /3 Bundles \+ 13x4 Frontal Set \(3 bundles \+ frontal\) – Premium Virgin · Curly · 20"/);
+    assert.match(wa, /Wig making: yes – please quote the wig-making fee/); assert.match(wa, /before wig making/);
+    await page.goto(BASE + '/product/sdd-indian-bundles');
+    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
+    assert.equal(await page.locator('[data-wig]').count(), 0);
+    log(`13x4 frontal set: Premium Virgin curly 20" = ${R(8900)}; wig making adds “please quote” and “plus wig making” to timing; SDD 7–10 working days`);
+
     // Other price rules still hold
     await page.goto(BASE + '/product/raw-indian-hd-frontal');
     await page.getByRole('button', { name: '13x4 HD frontal', exact: true }).click();
@@ -130,6 +150,18 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
     await page.goto(BASE + '/admin/settings');
     await page.check('[name=policy_delivery_confirmed]');
     await page.getByRole('button', { name: 'Save settings' }).click();
+    await page.goto(BASE + '/admin/settings');
+    await page.fill('[name=wig_fee]', '1500');
+    await page.getByRole('button', { name: 'Save settings' }).click();
+    await page.goto(BASE + '/product/bundles-13x4-frontal-set');
+    await page.getByRole('button', { name: 'Premium Virgin', exact: true }).click();
+    await page.getByRole('button', { name: 'Curly', exact: true }).click();
+    await page.getByRole('button', { name: '20"', exact: true }).click();
+    await page.locator('[data-wig="1"]').click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(8900 + 1500));
+    wa = await waText();
+    assert.ok(wa.includes('Wig making: yes (+' + R(1500) + ')')); assert.ok(wa.includes('Total with delivery: ' + R(8900 + 1500 + 120)));
+    log(`With a wig-making fee of R1 500 set in admin: price ${R(10400)}, total with courier ${R(10520)}`);
     await page.goto(BASE + '/delivery');
     assert.equal(await page.locator('.draft-note').count(), 0);
     await page.goto(BASE + '/returns');

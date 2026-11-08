@@ -442,7 +442,7 @@ async function handleAdmin(req, res, url) {
   if (p === '/admin/settings') {
     if (req.method === 'POST') {
       const b = await formBody(req);
-      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'preorder_time', 'courier_name', 'payment_hours',
+      const keys = ['whatsapp', 'email', 'phone_display', 'location', 'instagram', 'tiktok', 'slogan', 'intro', 'hero_image', 'prep_time', 'preorder_time', 'courier_name', 'wig_time', 'payment_hours',
         'bank_name', 'bank_account_name', 'bank_account_number', 'bank_branch_code', 'bank_account_type', 'care_default', 'policy_haircare', 'policy_delivery', 'policy_returns', 'policy_privacy'];
       for (const k of keys) if (k in b) store.setSetting(k, String(b[k]).trim());
       store.setSetting('whatsapp', String(b.whatsapp || '').replace(/\D/g, '').replace(/^0/, '27'));
@@ -463,6 +463,10 @@ async function handleAdmin(req, res, url) {
       store.setSetting('payment_hours', Math.max(1, parseInt(b.payment_hours, 10) || 24));
       for (const k of ['policy_delivery_confirmed', 'policy_returns_confirmed', 'policy_privacy_confirmed', 'email_public']) store.setSetting(k, b[k] === '1' ? '1' : '0');
       store.setSetting('policies_confirmed', '0'); // replaced by the per-policy settings above
+      if ('wig_fee' in b) {
+        const wf = String(b.wig_fee).trim();
+        store.setSetting('wig_fee_cents', wf === '' ? '' : String(toCents(wf) ?? ''));
+      }
       return back('/admin/settings', 'Settings saved.');
     }
     return page(res, admin.settings(s, { flash, cardEnabled: payfast.enabled(), mailOn: mailConfigured(), methods: store.deliveryMethods(s, { all: true }) }));
@@ -478,6 +482,7 @@ function saveProduct(id, b) {
     short: b.short || '', description: b.description || '', texture: b.texture || '', colour: b.colour || '', length: b.length || '',
     lace: b.lace || '', density: b.density || '', includes: b.includes || '', care: b.care || '', video: b.video || '',
     lead_time: String(b.lead_time || '').slice(0, 80),
+    wig_option: b.wig_option === '1' ? 1 : 0,
     extra_prices: String(b.extra_prices || '').slice(0, 6000),
     option_names: String(b.option_names || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3),
     images: store.safeJSON(b.images, []).filter((x) => typeof x === 'string' && /^\/(uploads|static)\//.test(x)).slice(0, 12),
@@ -505,7 +510,7 @@ function saveProduct(id, b) {
   if (clash) draft.slug = `${draft.slug}-${Date.now().toString(36).slice(-4)}`;
 
   return store.tx(() => {
-    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'extra_prices', 'active', 'featured', 'sort'];
+    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'extra_prices', 'wig_option', 'active', 'featured', 'sort'];
     const vals = cols.map((c) => draft[c]);
     if (id) {
       store.db.prepare(`UPDATE products SET ${cols.map((c) => c + ' = ?').join(', ')}, option_names = ?, images = ?, is_sample = 0 WHERE id = ?`)

@@ -45,16 +45,6 @@ const ICON = {
 };
 
 const PLACEHOLDER = '/static/img/photo-coming-soon.svg';
-const LOOKBOOK = [
-  ['brown-straight-portrait', 'Long silky straight hair in rich brown', 'tall'],
-  ['backs-five-textures', 'Five Nolle’ textures from behind: brown straight, body wave, straight, deep curly and bone straight', 'wide'],
-  ['wavy-black-portrait', 'Shoulder-length black body wave', 'tall'],
-  ['duo-curly-and-wavy', 'Deep curly and body wave hair side by side', 'wide'],
-  ['straight-black-portrait', 'Long black straight hair with face-framing layers', 'tall'],
-  ['group-styling-tools', 'Nolle’ models styling their hair with a brush and dryer', 'wide'],
-  ['straight-black-styling', 'Long black straight hair being styled', 'tall'],
-  ['trio-profiles', 'Three profiles showing long straight black and brown hair', 'wide'],
-];
 const img0 = (p) => (p.images && p.images[0]) || PLACEHOLDER;
 
 function priceLabel(p) {
@@ -92,7 +82,7 @@ ${image ? html`<meta property="og:image" content="${image}"><meta name="twitter:
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=3">
+<link rel="stylesheet" href="/static/css/style.css?v=4">
 ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>`) : ''}
 </head>
 <body class="${bodyClass}" data-wa="${String(s.whatsapp).replace(/\D/g, '')}">
@@ -104,7 +94,7 @@ ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).repl
     <a class="logo" href="/" aria-label="${s.shop_name} home"><span class="logo-name">Nolle’</span><span class="logo-sub">Luxury Hair</span></a>
     <nav id="site-nav" class="site-nav" aria-label="Main">
       <a href="/shop">Shop</a>
-      ${usedCategories().map((k) => html`<a href="/shop?cat=${k}">${CATEGORIES[k].label}</a>`)}
+      ${usedCategories().map((k) => html`<a href="/shop?cat=${k}">${CATEGORIES[k].nav || CATEGORIES[k].label}</a>`)}
       <a href="/hair-care">Hair Care</a>
       <a href="/delivery">Delivery</a>
       <a href="/track">Track Order</a>
@@ -152,7 +142,7 @@ ${body}
   <div class="wrap footer-base">© ${year} ${s.shop_name}. All rights reserved.</div>
 </footer>
 <a class="wa-float" href="${waLink(s.whatsapp, 'Hi Nolle’ Luxury Hair, I would like some assistance please.')}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" data-wa-float>${ICON.wa}<span>Chat with us</span></a>
-<script src="/static/js/shop.js?v=3" defer></script>
+<script src="/static/js/shop.js?v=4" defer></script>
 </body>
 </html>`;
 }
@@ -260,14 +250,6 @@ ${!ready.length && !pre.length ? html`<section class="section wrap"><p class="em
     <p>${s.intro}</p>
     <div class="trust">${trust.map(([t, d]) => html`<div><strong>${t}</strong><span>${d}</span></div>`)}</div>
   </div>
-</section>
-
-<section class="section wrap">
-  <div class="section-head center"><p class="eyebrow">Real hair, real women</p><h2>The Nolle’ Look</h2><p class="muted">Bone straight, body wave, deep curly and rich brown – every texture photographed on our own models.</p></div>
-  <div class="lookbook">
-    ${LOOKBOOK.map(([src, alt, cls]) => html`<figure class="${cls || ''}"><img src="/static/img/brand/${src}.jpg" alt="${alt}" loading="lazy"></figure>`)}
-  </div>
-  ${s.instagram || s.tiktok ? html`<p class="center follow">See more on ${s.instagram ? html`<a href="${s.instagram}" target="_blank" rel="noopener">Instagram</a>` : ''}${s.instagram && s.tiktok ? ' and ' : ''}${s.tiktok ? html`<a href="${s.tiktok}" target="_blank" rel="noopener">TikTok</a>` : ''}</p>` : ''}
 </section>
 
 <section class="section wrap">

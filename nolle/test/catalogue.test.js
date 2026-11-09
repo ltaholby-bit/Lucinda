@@ -41,7 +41,7 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
       ['Choose your hair and delivery', 'Send your selection on WhatsApp', 'We confirm the details', 'Pay to confirm']);
     assert.match(await page.locator('.steps').innerText(), /Availability, your final total and your estimated dispatch date/);
     const nav = await page.locator('#site-nav').innerText();
-    assert.match(nav, /Bundle \+ Closure Sets/i); assert.match(nav, /Bundle Sets/i); assert.match(nav, /Closures & Frontals/i); assert.doesNotMatch(nav, /Wigs/i);
+    assert.match(nav, /Complete Sets/i); assert.match(nav, /Bundles/i); assert.match(nav, /Closures & Frontals/i); assert.doesNotMatch(nav, /Wigs/i);
     log('Homepage: “Shop Pre-Orders”, no “ready to ship / real stock / guest checkout”, WhatsApp pre-order steps');
 
     // 4. Contact details

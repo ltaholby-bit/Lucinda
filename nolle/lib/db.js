@@ -216,10 +216,10 @@ function setSetting(k, v) { setSettingStmt.run(k, String(v ?? '')); }
 
 /* ---------------- Products ---------------- */
 const CATEGORIES = {
-  wigs: { label: 'Wigs', kind: 'Complete wig', kindLong: 'You are buying a complete, ready-to-wear wig.' },
-  sets: { label: 'Bundle + Closure Sets', kind: '3 bundles + closure', kindLong: 'You are buying THREE bundles and ONE matching closure. The price shown is the total for the full set.' },
-  bundles: { label: 'Bundle Sets', kind: 'Set of 3 bundles', kindLong: 'You are buying a set of THREE bundles. The price shown is for all three. Closure/frontal not included.' },
-  closures: { label: 'Closures & Frontals', kind: 'Closure / frontal only', kindLong: 'You are buying the closure or frontal on its own. Bundles are not included.' },
+  wigs: { label: 'Wigs', nav: 'Wigs', kind: 'Complete wig', kindLong: 'You are buying a complete, ready-to-wear wig.' },
+  sets: { label: 'Complete Sets', nav: 'Complete Sets', kind: '3 bundles + closure', kindLong: 'You are buying THREE bundles and ONE matching closure. The price shown is the total for the full set.' },
+  bundles: { label: 'Bundle Sets', nav: 'Bundles', kind: 'Set of 3 bundles', kindLong: 'You are buying a set of THREE bundles. The price shown is for all three. Closure/frontal not included.' },
+  closures: { label: 'Closures & Frontals', nav: 'Closures & Frontals', kind: 'Closure / frontal only', kindLong: 'You are buying the closure or frontal on its own. Bundles are not included.' },
 };
 
 function hydrateProduct(p) {

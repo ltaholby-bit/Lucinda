@@ -11,8 +11,8 @@ function alayout(s, { title, body, flash, nav = true }) {
 <title>${title} · Admin · ${s.shop_name}</title>
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=3">
-<link rel="stylesheet" href="/static/css/admin.css?v=3">
+<link rel="stylesheet" href="/static/css/style.css?v=4">
+<link rel="stylesheet" href="/static/css/admin.css?v=4">
 </head><body class="admin">
 ${nav ? html`<header class="a-head">
   <a class="logo" href="/admin"><span class="logo-name">Nolle’</span><span class="logo-sub">Admin</span></a>
@@ -27,7 +27,7 @@ ${nav ? html`<header class="a-head">
 ${flash ? html`<p class="flash ${flash.type || ''}">${flash.msg}</p>` : ''}
 ${body}
 </main>
-<script src="/static/js/admin.js?v=3" defer></script>
+<script src="/static/js/admin.js?v=4" defer></script>
 </body></html>`;
 }
 

@@ -11,8 +11,8 @@ function alayout(s, { title, body, flash, nav = true }) {
 <title>${title} · Admin · ${s.shop_name}</title>
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css?v=4">
-<link rel="stylesheet" href="/static/css/admin.css?v=4">
+<link rel="stylesheet" href="/static/css/style.css?v=5">
+<link rel="stylesheet" href="/static/css/admin.css?v=5">
 </head><body class="admin">
 ${nav ? html`<header class="a-head">
   <a class="logo" href="/admin"><span class="logo-name">Nolle’</span><span class="logo-sub">Admin</span></a>
@@ -27,7 +27,7 @@ ${nav ? html`<header class="a-head">
 ${flash ? html`<p class="flash ${flash.type || ''}">${flash.msg}</p>` : ''}
 ${body}
 </main>
-<script src="/static/js/admin.js?v=4" defer></script>
+<script src="/static/js/admin.js?v=5" defer></script>
 </body></html>`;
 }
 
@@ -201,11 +201,13 @@ ${!isNew ? html`<p class="a-links">Shop page: <a href="/product/${p.slug}" targe
   <div class="two">${f('lace', 'Lace size / type', 'e.g. 13x4 HD lace frontal (wigs & closures)')}${f('density', 'Density', 'e.g. 180% (wigs)')}</div>
   <div class="two">${f('length', 'Length', 'Only if length is NOT an option below')}${f('includes', 'What’s included', 'e.g. 3 bundles, approx. 100 g each')}</div>
   <label class="check"><input type="checkbox" name="wig_option" value="1" ${p.wig_option ? raw('checked') : ''}> Offer the wig-making service on this product (fee and time are set in Settings)</label>
+  <label class="check"><input type="checkbox" name="show_price" value="1" ${p.show_price !== 0 ? raw('checked') : ''}> Show the price on the website (untick to show “Request a quote” instead, while a price is being confirmed)</label>
+  ${f('texture_group', 'Texture group (bundle sets)', 'Groups this product under a texture button on the Shop page: Straight, Wavy, Body Wave, Bouncy Curls or Curly')}
   ${f('lead_time', 'Time before dispatch (pre-orders)', 'After payment, e.g. “7–10 working days”. Shown next to the order button. Empty = the default from Settings')}
   <label>Hair-care notes<small>Leave empty to use the standard care text from Settings</small><textarea name="care" rows="3">${p.care}</textarea></label>
 
   <h2>Options, prices &amp; stock</h2>
-  <p class="muted small">Each row is one option the client can choose (e.g. a length), with its own price and stock. Prices in rands. For bundle sets, the price is for all 3 bundles.</p>
+  <p class="muted small">Each row is one option the client can choose (e.g. a length), with its own price and stock. Prices in rands. For bundle sets, the price is for all 3 bundles. <strong>Leave a price empty for “price pending”</strong> – that option shows “Request a quote” instead of a price.</p>
   <label>Option names<small>Comma-separated, e.g. “Length” or “Length, Density”. Leave empty if there is only one version.</small><input name="option_names" value="${(p.option_names || []).join(', ')}" data-option-names></label>
   <div data-variants-editor></div>
   <button type="button" class="btn btn-outline btn-sm" data-add-variant>+ Add option row</button>
@@ -238,13 +240,13 @@ function stock(s, { rows, flash }) {
   return alayout(s, {
     title: 'Stock & prices', flash, body: html`
 <h1>Stock &amp; prices</h1>
-<p class="muted">Change any number and press Save. Stock goes down automatically when an order is placed, and comes back if an unpaid order expires or is cancelled.</p>
+<p class="muted">Change any number and press Save. An empty price means “price pending” – the client sees “Request a quote” instead. Stock goes down automatically when an order is placed, and comes back if an unpaid order expires or is cancelled.</p>
 <form method="post" action="/admin/stock" class="a-card">
 <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Product</th><th>Option</th><th>Price (R)</th><th>In stock</th></tr></thead><tbody>
 ${rows.map((r) => html`<tr class="${r.availability === 'ready' && r.stock <= 0 ? 'row-out' : ''}">
   <td><a href="/admin/products/${r.product_id}">${r.name}</a><br><span class="muted small">${r.availability === 'ready' ? 'Ready to ship' : 'Pre-order'}${r.category === 'bundles' ? ' · price for 3 bundles' : ''}</span></td>
   <td>${r.label || '–'}</td>
-  <td><input class="num" name="price_${r.id}" value="${(r.price_cents / 100).toFixed(2).replace(/\.00$/, '')}" inputmode="decimal"></td>
+  <td><input class="num" name="price_${r.id}" value="${r.price_cents > 0 ? (r.price_cents / 100).toFixed(2).replace(/\.00$/, '') : ''}" inputmode="decimal" placeholder="pending"></td>
   <td><input class="num" name="stock_${r.id}" value="${r.stock}" type="number" min="0"></td>
 </tr>`)}
 </tbody></table></div>

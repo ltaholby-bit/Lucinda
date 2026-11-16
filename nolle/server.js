@@ -190,7 +190,12 @@ async function handlePublic(req, res, url) {
   }
   if ((m = /^\/product\/([a-z0-9-]+)\/?$/.exec(p))) {
     const prod = store.getProductBySlug(m[1]);
-    if (!prod || !prod.active) return page(res, views.notFound(s), 404);
+    if (!prod || !prod.active) {
+      // Listings that were replaced (bundles are now listed by texture) keep their links working.
+      const to = require('./lib/catalogue').LEGACY_REDIRECTS[m[1]];
+      if (to) return redirect(res, to, 301);
+      return page(res, views.notFound(s), 404);
+    }
     const v = parseInt(url.searchParams.get('v'), 10);
     return page(res, views.product(s, { p: prod, base, preselect: prod.variants.some((x) => x.id === v) ? v : null }));
   }
@@ -327,8 +332,11 @@ async function handleAdmin(req, res, url) {
       for (const v of prod.variants) if (v.stock <= 1) lowStock.push({ name: prod.name, label: store.variantLabel(prod, v), stock: v.stock });
     }
     const samples = store.db.prepare('SELECT COUNT(*) n FROM products WHERE is_sample = 1').get().n;
+    const pending = store.db.prepare("SELECT COUNT(DISTINCT p.id) n FROM products p JOIN variants v ON v.product_id = p.id WHERE p.active = 1 AND v.price_cents = 0").get().n;
     const warnings = [];
     if (!/^27\d{9}$/.test(s.whatsapp) || s.whatsapp === '27000000000') warnings.push('Your WhatsApp number is not set. <a href="/admin/settings">Add it in Settings</a>.');
+    if (pending) warnings.push(`${pending} product(s) still have prices pending – clients see “Request a quote” instead of a price. <a href="/admin/stock">Add the prices</a> when they are confirmed.`);
+    if (pending) warnings.push(`${pending} product(s) still have prices pending – clients see “Request a quote” instead of a price. <a href="/admin/stock">Add the prices</a> when they are confirmed.`);
     if (!s.bank_account_number) warnings.push('Bank details are not shown on the site, so clients are asked to get them from you on WhatsApp after ordering. (Optional: add them in <a href="/admin/settings">Settings</a> to show them automatically.)');
     const allMethods = store.deliveryMethods(s, { all: true });
     if (!allMethods.some((m) => m.fee != null)) warnings.push('No delivery option has a fee yet, so online checkout cannot be used. <a href="/admin/settings">Add delivery fees in Settings</a>.');
@@ -400,7 +408,10 @@ async function handleAdmin(req, res, url) {
         for (const [k, v] of Object.entries(b)) {
           let mm;
           if ((mm = /^stock_(\d+)$/.exec(k))) { const n = parseInt(v, 10); if (Number.isFinite(n) && n >= 0) store.db.prepare('UPDATE variants SET stock = ? WHERE id = ?').run(n, +mm[1]); }
-          if ((mm = /^price_(\d+)$/.exec(k))) { const c = toCents(v); if (c) store.db.prepare('UPDATE variants SET price_cents = ? WHERE id = ?').run(c, +mm[1]); }
+          if ((mm = /^price_(\d+)$/.exec(k))) {
+            const c = String(v).trim() === '' ? 0 : toCents(v);
+            if (c != null && c >= 0) store.db.prepare('UPDATE variants SET price_cents = ? WHERE id = ?').run(c, +mm[1]);
+          }
         }
       });
       return back('/admin/stock', 'Stock and prices saved.');
@@ -483,6 +494,8 @@ function saveProduct(id, b) {
     lace: b.lace || '', density: b.density || '', includes: b.includes || '', care: b.care || '', video: b.video || '',
     lead_time: String(b.lead_time || '').slice(0, 80),
     wig_option: b.wig_option === '1' ? 1 : 0,
+    show_price: b.show_price === '1' ? 1 : 0,
+    texture_group: String(b.texture_group || '').slice(0, 40),
     extra_prices: String(b.extra_prices || '').slice(0, 6000),
     option_names: String(b.option_names || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3),
     images: store.safeJSON(b.images, []).filter((x) => typeof x === 'string' && /^\/(uploads|static)\//.test(x)).slice(0, 12),
@@ -493,8 +506,9 @@ function saveProduct(id, b) {
   const rawVariants = store.safeJSON(b.variants, []);
   const variants = [];
   for (const v of rawVariants) {
-    const price = toCents(v.price);
-    if (price == null || price <= 0) return { error: 'Every option row needs a price.', draft };
+    // An empty price means “price pending”: stored as 0, shown as “Request a quote”.
+    const price = String(v.price ?? '').trim() === '' ? 0 : toCents(v.price);
+    if (price == null || price < 0) return { error: 'A price must be a number, or empty for “price pending”.', draft };
     const options = {};
     for (const n of draft.option_names) {
       const val = String((v.options || {})[n] || '').trim();
@@ -510,7 +524,7 @@ function saveProduct(id, b) {
   if (clash) draft.slug = `${draft.slug}-${Date.now().toString(36).slice(-4)}`;
 
   return store.tx(() => {
-    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'extra_prices', 'wig_option', 'active', 'featured', 'sort'];
+    const cols = ['slug', 'name', 'category', 'availability', 'short', 'description', 'texture', 'colour', 'length', 'lace', 'density', 'includes', 'care', 'video', 'lead_time', 'extra_prices', 'wig_option', 'show_price', 'texture_group', 'active', 'featured', 'sort'];
     const vals = cols.map((c) => draft[c]);
     if (id) {
       store.db.prepare(`UPDATE products SET ${cols.map((c) => c + ' = ?').join(', ')}, option_names = ?, images = ?, is_sample = 0 WHERE id = ?`)

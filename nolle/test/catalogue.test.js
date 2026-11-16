@@ -1,5 +1,5 @@
-/* Checks the real Nolle' catalogue (from the price lists) on a phone, as a client sees it
-   while everything is pre-order. Run:  npm run test:catalogue */
+/* Checks the real Nolle' catalogue on a phone, as a client sees it while everything is
+   pre-order and ordering happens on WhatsApp. Run:  npm run test:catalogue */
 'use strict';
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
@@ -24,156 +24,157 @@ const R = (n) => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
   const page = await (await browser.newContext({ ...devices['iPhone 13'] })).newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  const waText = async () => decodeURIComponent(await page.locator('[data-wa-enquire]').getAttribute('href'));
+  const waText = async (sel = '[data-wa-enquire]') => decodeURIComponent(await page.locator(sel).getAttribute('href'));
+  const chip = (t) => page.locator(`[data-texture-filter] [data-texture="${t}"]`);
   try {
     console.log('Catalogue test (iPhone 13)');
 
-    // 1. Homepage is clearly pre-order
+    /* 1. Homepage: pre-order is clear, and the quote journey is spelled out */
     await page.goto(BASE + '/');
     assert.ok(await page.getByRole('link', { name: 'Shop Pre-Orders' }).isVisible());
+    assert.match(await page.locator('.hero-copy .lead').innerText(), /Luxury bundles, closures and frontals, complete sets and custom-made wigs\./);
+    assert.match(await page.locator('.hero-copy').innerText(), /Pre-order on WhatsApp\./);
+    assert.ok(await page.locator('.cta-row').getByRole('link', { name: /Get help on WhatsApp/i }).isVisible());
+    assert.match(await page.locator('.hero-note').innerText(), /Nationwide delivery across South Africa/);
     const home = await page.locator('main').innerText();
-    for (const gone of [/ready to ship/i, /real stock/i, /checkout as a guest/i, /guest checkout/i]) assert.doesNotMatch(home, gone);
-    assert.equal(await page.locator('main #ready').count(), 0);
-    assert.match(await page.locator('#pre-order h2').innerText(), /Available to Pre-order/);
-    assert.equal(await page.locator('#pre-order .card').count(), 4);
-    assert.match(await page.locator('#pre-order .card').first().innerText(), /3 Bundles \+ 13x4 Frontal Set/);
-    assert.deepEqual((await page.locator('.steps strong').allInnerTexts()),
-      ['Choose your hair and delivery', 'Send your selection on WhatsApp', 'We confirm the details', 'Pay to confirm']);
-    assert.match(await page.locator('.steps').innerText(), /Availability, your final total and your estimated dispatch date/);
-    const nav = await page.locator('#site-nav').innerText();
-    assert.match(nav, /Complete Sets/i); assert.match(nav, /Bundles/i); assert.match(nav, /Closures & Frontals/i); assert.doesNotMatch(nav, /Wigs/i);
-    log('Homepage: “Shop Pre-Orders”, no “ready to ship / real stock / guest checkout”, WhatsApp pre-order steps');
+    for (const gone of [/ready to ship/i, /real stock/i, /guest checkout/i, /Order now/i]) assert.doesNotMatch(home, gone);
+    assert.match(await page.locator('#pre-order').innerText(), /Choose your set and request a quote on WhatsApp\. We’ll confirm availability, your total including delivery and your estimated dispatch date before you pay\./);
+    log('Homepage: “Shop Pre-Orders”, new hero wording, quote intro, no ready-to-ship claims');
 
-    // 4. Contact details
+    /* 2. How to order */
+    assert.deepEqual(await page.locator('.steps strong').allInnerTexts(),
+      ['Choose your hair', 'Request a quote', 'Review your quote', 'Pay to confirm']);
+    const steps = await page.locator('.steps').innerText();
+    assert.match(steps, /Select your preferred texture, length and delivery option/);
+    assert.match(steps, /Tap “Request a quote” and send your selection on WhatsApp/);
+    assert.match(steps, /We confirm availability, your total including delivery and your estimated dispatch date before you pay/);
+    assert.match(steps, /Full payment confirms your order\. We’ll send your tracking details once your order has been dispatched/);
+    assert.equal(await page.locator('.section-head h2').filter({ hasText: 'How to order' }).count(), 1);
+    log('How to order: the four quote steps, in your wording');
+
+    /* 3. Welcome + trust boxes */
+    const intro = await page.locator('.intro-band').innerText();
+    assert.match(intro, /Explore our Raw Indian, Premium Virgin and SDD Indian hair collections\. Shop bundles, closures, frontals and complete sets\. We check and pack every order by hand\./);
+    assert.match(intro, /Courier to your door or collection at a PEP PAXI point\./);
+    assert.match(intro, /We confirm availability, your final total and estimated dispatch date on WhatsApp\./);
+    assert.match(intro, /3 bundles \+ a matching closure or frontal, all for one price\./);
+    log('Welcome to Nolle’ and the three boxes match the mock-up');
+
+    /* 4. Cards: quote button, no repeated labels, prices only where confirmed */
+    const card = page.locator('#pre-order .card').first();
+    assert.match(await card.innerText(), /Request a quote/i);
+    const cq = decodeURIComponent(await card.locator('[data-quote]').getAttribute('href'));
+    assert.match(cq, /wa\.me\/27616029381/);
+    assert.match(cq, /quote for: 3 Bundles \+ 13x4 Frontal Set/);
+    assert.doesNotMatch(await card.innerText(), /for 3 bundles \+ frontal/i); // repeats the product name
+    assert.match(await card.innerText(), /Wig making available/);
+    log('Product cards: “Request a quote” opens WhatsApp with the product name; repeated labels gone');
+
+    /* 5. Footer */
     const footer = await page.locator('.site-footer').innerText();
+    assert.match(footer, /Online store based in Johannesburg\. Delivery across South Africa\./);
+    assert.match(footer, /Browse all hair/);
+    assert.doesNotMatch(footer, /All available hair/);
     assert.doesNotMatch(footer, /graceandcompanies/i);
-    assert.match(footer, /WhatsApp: \+27 61 602 9381/);
-    await page.goto(BASE + '/contact');
-    assert.doesNotMatch(await page.locator('main').innerText(), /graceandcompanies/i);
-    assert.match(await page.locator('main').innerText(), /\+27 61 602 9381/);
-    log('No Grace&Co email shown until a Nolle’ email is set; WhatsApp number shown in footer and on Contact');
+    assert.equal(await page.locator('.site-footer .logo-sub').evaluate((e) => e.getClientRects().length), 1, 'LUXURY HAIR on one line');
+    const contactCol = page.locator('.site-footer .footer-grid > div').last();
+    assert.match(await contactCol.innerText(), /Track my order/);
+    assert.equal(await contactCol.getByText('Contact us').count(), 1);
+    const tel = page.locator('.site-footer a[href^="tel:"]');
+    assert.equal(await tel.innerText(), '+27 61 602 9381');
+    assert.equal(await tel.evaluate((e) => e.getClientRects().length), 1, 'phone number on one line');
+    log('Footer: Johannesburg line, Browse all hair, tappable number on one line, Track my order under Contact');
 
-    // Shop: pre-order only
+    /* 6. Shop by category, with texture buttons above the bundle photos */
     await page.goto(BASE + '/shop');
-    assert.match(await page.locator('h1').innerText(), /Shop Pre-Orders/);
-    assert.equal(await page.locator('#ready').count(), 0);
-    assert.equal(await page.locator('#pre-order .card').count(), 16);
-    assert.equal(await page.locator('.chip').count(), 4); // All, Sets, Bundle Sets, Closures & Frontals
-    for (const t of await page.locator('#pre-order .card').allInnerTexts()) {
-      if (/^Set of 3 bundles/im.test(t)) assert.match(t, /for a set of 3 bundles/);
-      if (/^3 bundles \+ (closure|frontal)/im.test(t)) { assert.match(t, /for 3 bundles \+ (closure|frontal)/); assert.match(t, /Wig making available/); }
+    assert.deepEqual(await page.locator('.cat-title').allInnerTexts(), ['Complete Sets', 'Bundle Sets', 'Closures & Frontals', 'Wigs']);
+    await page.goto(BASE + '/shop?cat=bundles');
+    assert.deepEqual(await page.locator('[data-texture-filter] .chip').allInnerTexts(),
+      ['All textures', 'Straight', 'Wavy', 'Body Wave', 'Bouncy Curls', 'Curly']);
+    const names = await page.locator('.card h3').allInnerTexts();
+    for (const n of ['Straight – 3-Bundle Set', 'Wavy – 3-Bundle Set', 'Body Wave – 3-Bundle Set', 'Bouncy Curls – 3-Bundle Set',
+      'Caribbean Curls – 3-Bundle Set', 'Cambodian Curls – 3-Bundle Set', 'Virgin Curls – 3-Bundle Set', 'Indian Royal Curls – 3-Bundle Set']) {
+      assert.ok(names.includes(n), `missing ${n}`);
     }
-    log('Shop: 16 pre-order products, no empty “Ready to Ship” section; bundle and set prices labelled');
+    await chip('Curly').click();
+    assert.deepEqual(await page.locator('.card:visible h3').allInnerTexts(),
+      ['Caribbean Curls – 3-Bundle Set', 'Cambodian Curls – 3-Bundle Set', 'Virgin Curls – 3-Bundle Set', 'Indian Royal Curls – 3-Bundle Set', 'Raw Indian Curly – 3-Bundle Set']);
+    await chip('Body Wave').click();
+    assert.deepEqual(await page.locator('.card:visible h3').allInnerTexts(), ['Body Wave – 3-Bundle Set']);
+    await chip('').click();
+    assert.equal(await page.locator('.card:visible').count(), 9);
+    log('Shop: textures above the bundle photos (Straight, Wavy, Body Wave, Bouncy Curls, Curly) and they filter the list');
 
-    // Product page: button, reassurance, timing beside the button, single-bundle prices collapsed
-    await page.goto(BASE + '/product/raw-indian-straight-wavy-bundles');
-    assert.equal(await page.locator('[data-add]').count(), 0);
-    assert.match(await page.locator('[data-wa-enquire]').innerText(), /Confirm my pre-order on WhatsApp/i);
-    assert.equal(await page.locator('.reassure').innerText(), 'We’ll confirm availability, your final total and your estimated dispatch date before you pay.');
-    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
-    assert.match(await page.locator('.timing').innerText(), /After dispatch\s+Courier to your door – 2–4 business days/);
-    assert.doesNotMatch(await page.locator('details.acc[open]').first().innerText(), /per bundle/);
-    assert.equal(await page.locator('details.extra').getAttribute('open'), null);
-    assert.match(await page.locator('details.extra summary').innerText(), /Single-bundle prices/);
-    await page.getByRole('button', { name: '20"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(2779 * 3));
-    await page.getByRole('button', { name: 'Wavy', exact: true }).click();
-    let wa = await waText();
-    assert.match(wa, /I’d like to pre-order: Raw Indian Hair Bundles – Straight & Wavy/); assert.match(wa, /Wavy · 20"/); assert.match(wa, /for 3 bundles/);
-    assert.match(wa, /Delivery: Courier to your door \(R120\)/); assert.ok(wa.includes('Total with delivery: ' + R(8457)));
-    await page.locator('[data-delivery=paxi]').click();
-    assert.match(await page.locator('[data-after-dispatch]').innerText(), /PEP PAXI – collected at your chosen PEP point/);
-    wa = await waText();
-    assert.match(wa, /Delivery: PEP PAXI \(collect at a PEP store\) \(R60\)/); assert.ok(wa.includes('Total with delivery: ' + R(8397)));
-    log(`Product: “Confirm My Pre-Order on WhatsApp” + reassurance line; before/after dispatch shown; PAXI = collected at chosen PEP point; ${R(8337)} + R60 in message`);
-
-    // 2. Range lead time beside the button (Virgin 7–10 working days)
-    await page.goto(BASE + '/product/virgin-curly-bundles');
-    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
-    log('Premium Virgin: “Before dispatch: 7–10 working days after payment” beside the button');
-
-    // 3. 3 bundles + matching closure, one total
-    await page.goto(BASE + '/product/raw-indian-bundles-closure-set');
-    assert.match(await page.locator('.kind-box').innerText(), /3 bundles \+ closure/);
-    await page.getByRole('button', { name: 'Curly', exact: true }).click();
-    await page.getByRole('button', { name: '18"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(2996 * 3 + 2692 + 87));
-    assert.match(await page.locator('details.extra summary').innerText(), /Price breakdown/);
-    await page.goto(BASE + '/product/virgin-bundles-closure-set');
-    await page.getByRole('button', { name: 'Straight', exact: true }).click();
-    await page.getByRole('button', { name: '16"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(1375 * 3 + 850));
-    wa = await waText();
-    assert.match(wa, /Premium Virgin 3 Bundles \+ 4x4 Closure \(3 bundles \+ closure\) – Straight · 16"/);
-    log(`Sets: Raw curly 18" = ${R(2996 * 3 + 2779)}, Virgin straight 16" = ${R(1375 * 3 + 850)} – one total, breakdown collapsed`);
-
-    // Best seller: 3 bundles + 13x4 frontal, with the wig-making add-on (no fee set = quoted on WhatsApp)
-    await page.goto(BASE + '/product/bundles-13x4-frontal-set');
-    assert.match(await page.locator('.kind-box').innerText(), /3 bundles \+ frontal/);
-    await page.getByRole('button', { name: 'Premium Virgin', exact: true }).click();
-    await page.getByRole('button', { name: 'Curly', exact: true }).click();
-    await page.getByRole('button', { name: '20"', exact: true }).click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(2300 * 3 + 2000));
-    assert.ok(await page.getByRole('button', { name: 'Wavy', exact: true }).evaluate((b) => b.classList.contains('na')));
-    await page.locator('[data-wig="1"]').click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(2300 * 3 + 2000));
-    assert.match(await page.locator('[data-before-dispatch]').innerText(), /7–10 working days after payment, plus wig making \(completion date confirmed on WhatsApp\)/);
-    wa = await waText();
-    assert.match(wa, /3 Bundles \+ 13x4 Frontal Set \(3 bundles \+ frontal\) – Premium Virgin · Curly · 20"/);
-    assert.match(wa, /Wig making: yes – please quote the wig-making fee/); assert.match(wa, /before wig making/);
-    await page.goto(BASE + '/product/sdd-indian-bundles');
-    assert.match(await page.locator('.timing').innerText(), /Before dispatch\s+7–10 working days after payment/);
-    assert.equal(await page.locator('[data-wig]').count(), 0);
-    log(`13x4 frontal set: Premium Virgin curly 20" = ${R(8900)}; wig making adds “please quote” and “plus wig making” to timing; SDD 7–10 working days`);
-
-    // Other price rules still hold
-    await page.goto(BASE + '/product/raw-indian-hd-frontal');
-    await page.getByRole('button', { name: '13x4 HD frontal', exact: true }).click();
-    assert.ok(await page.getByRole('button', { name: '24"', exact: true }).evaluate((b) => b.classList.contains('na')));
-    await page.goto(BASE + '/product/sdd-indian-bundles');
-    await page.getByRole('button', { name: 'Caribbean curl', exact: true }).click();
+    /* 7. Prices from the price list; pending where not confirmed */
+    await page.goto(BASE + '/product/caribbean-curls-3-bundle-set');
     await page.getByRole('button', { name: '28"', exact: true }).click();
     assert.equal(await page.locator('[data-price]').innerText(), R((3647 + 43) * 3));
-    log('Frontal 13x4 24" greyed out; SDD Caribbean curl +R43 per bundle');
-
-    // 2. Delivery page: before/after dispatch, PAXI, draft notice until confirmed
-    await page.goto(BASE + '/delivery');
-    let prose = await page.locator('.prose').innerText();
-    assert.match(prose, /Courier to your door: R120 – 2–4 business days after dispatch/);
-    assert.match(prose, /PEP PAXI \(collect at a PEP store\): R60 – Collected at your chosen PEP point/);
-    assert.match(prose, /Before dispatch:/); assert.match(prose, /After dispatch:/);
-    assert.match(prose, /draft/i);
-    await page.goto(BASE + '/admin/login');
-    await page.fill('[name=password]', 'x');
-    await page.getByRole('button', { name: 'Log in' }).click();
-    await page.waitForURL(BASE + '/admin');
-    await page.goto(BASE + '/admin/settings');
-    await page.check('[name=policy_delivery_confirmed]');
-    await page.getByRole('button', { name: 'Save settings' }).click();
-    await page.goto(BASE + '/admin/settings');
-    await page.fill('[name=wig_fee]', '1500');
-    await page.getByRole('button', { name: 'Save settings' }).click();
-    await page.goto(BASE + '/product/bundles-13x4-frontal-set');
-    await page.getByRole('button', { name: 'Premium Virgin', exact: true }).click();
-    await page.getByRole('button', { name: 'Curly', exact: true }).click();
+    await page.goto(BASE + '/product/virgin-curls-3-bundle-set');
     await page.getByRole('button', { name: '20"', exact: true }).click();
-    await page.locator('[data-wig="1"]').click();
-    assert.equal(await page.locator('[data-price]').innerText(), R(8900 + 1500));
-    wa = await waText();
-    assert.ok(wa.includes('Wig making: yes (+' + R(1500) + ')')); assert.ok(wa.includes('Total with delivery: ' + R(8900 + 1500 + 120)));
-    log(`With a wig-making fee of R1 500 set in admin: price ${R(10400)}, total with courier ${R(10520)}`);
-    await page.goto(BASE + '/delivery');
-    assert.equal(await page.locator('.draft-note').count(), 0);
-    await page.goto(BASE + '/returns');
-    assert.equal(await page.locator('.draft-note').count(), 1);
-    log('Delivery page shows before/after dispatch and PAXI collection; its draft notice goes once confirmed (returns stays draft)');
+    assert.equal(await page.locator('[data-price]').innerText(), R(2300 * 3));
+    for (const slug of ['cambodian-curls-3-bundle-set', 'indian-royal-curls-3-bundle-set', 'body-wave-3-bundle-set']) {
+      await page.goto(BASE + '/product/' + slug);
+      assert.equal(await page.locator('[data-price]').innerText(), 'Price on request');
+      assert.equal(await page.locator('details.extra').count(), 0);
+      assert.match(await page.locator('[data-wa-enquire]').innerText(), /Request a quote/i);
+    }
+    log(`Caribbean 28" = ${R((3647 + 43) * 3)}, Virgin Curls 20" = ${R(6900)}; Cambodian, Indian Royal and Body Wave show “Price on request”`);
 
-    for (const u of ['/', '/shop', '/product/raw-indian-bundles-closure-set', '/product/raw-indian-hd-frontal', '/delivery', '/contact']) {
+    /* 8. Straight set: three collections in one listing, single-bundle prices collapsed */
+    await page.goto(BASE + '/product/straight-3-bundle-set');
+    await page.getByRole('button', { name: 'SDD Indian', exact: true }).click();
+    await page.getByRole('button', { name: '20"', exact: true }).click();
+    assert.equal(await page.locator('[data-price]').innerText(), R(2171 * 3));
+    assert.match(await page.locator('details.extra summary').innerText(), /Single-bundle prices/);
+    assert.equal(await page.locator('details.extra').getAttribute('open'), null);
+    assert.match(await waText(), /quote for: Straight – 3-Bundle Set/);
+    assert.match(await waText(), /SDD Indian · 20"/);
+    log(`Straight set: SDD Indian 20" = ${R(6513)}; single-bundle prices stay collapsed`);
+
+    /* 9. Wigs: named per texture or cut, priced separately, quote only */
+    await page.goto(BASE + '/shop?cat=wigs');
+    const wigs = await page.locator('.card h3').allInnerTexts();
+    for (const n of ['Caribbean Curls Wig', 'Cambodian Curls Wig', 'Virgin Curls Wig', 'Indian Royal Curls Wig', 'Pixie Wig', 'Short Bob Wig']) {
+      assert.ok(wigs.includes(n), `missing ${n}`);
+    }
+    await page.goto(BASE + '/product/caribbean-curls-wig');
+    assert.equal(await page.locator('[data-price]').innerText(), 'Price on request');
+    assert.match(await page.locator('.kind-box').innerText(), /complete wig/i);
+    assert.match(await page.locator('main').innerText(), /wig price is quoted separately from the 3-bundle set price/i);
+    assert.equal(await page.locator('video').count(), 1);
+    log('Wigs: six listings, each “Price on request”, wig price kept separate from the 3-bundle price');
+
+    /* 10. Closure and frontal photos show the lace and parting */
+    for (const [slug, label, img] of [['raw-indian-hd-closure', /Closure only/i, 'closure-single'], ['raw-indian-hd-frontal', /Frontal only/i, 'frontal-on-hanger']]) {
+      await page.goto(BASE + '/product/' + slug);
+      assert.match(await page.locator('.kind-box').innerText(), label);
+      assert.match(await page.locator('[data-main-img]').getAttribute('src'), new RegExp(`/static/img/product/${img}\\.jpg`));
+      assert.ok((await page.locator('.thumbs .thumb').count()) >= 2, 'has a second photo');
+    }
+    log('Closure and frontal cards use the real lace photos and keep their “Closure only” / “Frontal only” labels');
+
+    /* 11. Links that changed still work */
+    for (const [from, to] of [['virgin-curly-bundles', '/product/virgin-curls-3-bundle-set'], ['raw-indian-straight-wavy-bundles', '/product/straight-3-bundle-set']]) {
+      const r = await fetch(`${BASE}/product/${from}`, { redirect: 'manual' });
+      assert.equal(r.status, 301);
+      assert.equal(new URL(r.headers.get('location'), BASE).pathname, to);
+    }
+    log('Old product links redirect to the new texture listings');
+
+    /* 12. Phone layout */
+    for (const u of ['/', '/shop', '/shop?cat=bundles', '/product/straight-3-bundle-set', '/product/caribbean-curls-wig', '/contact']) {
       await page.goto(BASE + u);
       const [sw, cw] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
       assert.ok(sw <= cw, `${u} scrolls sideways`);
+      const left = await page.locator('h1').first().evaluate((e) => e.getBoundingClientRect().left);
+      assert.ok(left >= 16, `${u} heading sits against the edge (${left}px)`);
     }
-    log('No sideways scrolling');
+    await page.goto(BASE + '/');
+    await page.locator('.site-footer').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    assert.ok(await page.locator('.wa-float').evaluate((e) => e.classList.contains('tucked')), 'float tucks away at the footer');
+    log('No sideways scrolling, headings clear of the edge, WhatsApp button stays clear of the footer links');
+
     assert.deepEqual(errors, []);
     log('No JavaScript errors');
     console.log('\nAll catalogue checks passed.');

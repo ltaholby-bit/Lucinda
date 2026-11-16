@@ -50,7 +50,8 @@ Back in **Setup Node.js App**, open the app, click **Run NPM Install**, wait for
 1. Open https://nolleluxuryhair.co.za and you should see the shop.
 2. Open https://nolleluxuryhair.co.za/admin and log in with your `ADMIN_PASSWORD`.
 3. In **Settings**, check the WhatsApp number, email, delivery fees and policies.
-4. On your phone, open a product, tap **Confirm My Pre-Order on WhatsApp**, and check that the message arrives with the product, options, delivery and total.
+4. On your phone, open a product, tap **Request a quote**, and check that the WhatsApp message arrives with the product name, options, delivery and total.
+5. On the Shop page, tap a texture (Straight, Wavy, Body Wave, Bouncy Curls, Curly) and check the list filters.
 
 If the page shows an error, open **Setup Node.js App** → your app → check the Node.js version (22.13+) and press **Restart**.
 The error log is the Passenger log file you chose (e.g. `logs/nolle-shop.log`) or `nolle-shop/stderr.log`.

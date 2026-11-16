@@ -87,6 +87,9 @@ if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'lea
 if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'wig_option')) {
   db.exec('ALTER TABLE products ADD COLUMN wig_option INTEGER DEFAULT 0');
 }
+for (const [col, def] of [['show_price', 'INTEGER DEFAULT 1'], ['texture_group', "TEXT DEFAULT ''"]]) {
+  if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === col)) db.exec(`ALTER TABLE products ADD COLUMN ${col} ${def}`);
+}
 if (!db.prepare('PRAGMA table_info(products)').all().some((c) => c.name === 'extra_prices')) {
   db.exec("ALTER TABLE products ADD COLUMN extra_prices TEXT DEFAULT ''");
 }
@@ -106,11 +109,11 @@ const DEFAULT_DELIVERY_METHODS = [
 const DEFAULT_SETTINGS = {
   shop_name: 'Nolle’ Luxury Hair',
   slogan: 'YOUR HAIR. YOUR CROWN.',
-  intro: 'Nolle’ Luxury Hair offers Raw Indian, Premium Virgin and SDD Indian hair – bundles, closures, frontals and complete sets – carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.',
+  intro: 'Explore our Raw Indian, Premium Virgin and SDD Indian hair collections. Shop bundles, closures, frontals and complete sets. We check and pack every order by hand.',
   whatsapp: '27616029381',
   email: 'info@graceandcompanies.co.za',
   phone_display: '+27 61 602 9381',
-  location: 'Melrose / Sandton, Johannesburg',
+  location: 'Johannesburg',
   instagram: 'https://www.instagram.com/noelleluxury',
   tiktok: 'https://www.tiktok.com/@n.luxury.hair',
   hero_image: '',
@@ -216,10 +219,10 @@ function setSetting(k, v) { setSettingStmt.run(k, String(v ?? '')); }
 
 /* ---------------- Products ---------------- */
 const CATEGORIES = {
-  wigs: { label: 'Wigs', nav: 'Wigs', kind: 'Complete wig', kindLong: 'You are buying a complete, ready-to-wear wig.' },
   sets: { label: 'Complete Sets', nav: 'Complete Sets', kind: '3 bundles + closure', kindLong: 'You are buying THREE bundles and ONE matching closure. The price shown is the total for the full set.' },
   bundles: { label: 'Bundle Sets', nav: 'Bundles', kind: 'Set of 3 bundles', kindLong: 'You are buying a set of THREE bundles. The price shown is for all three. Closure/frontal not included.' },
   closures: { label: 'Closures & Frontals', nav: 'Closures & Frontals', kind: 'Closure / frontal only', kindLong: 'You are buying the closure or frontal on its own. Bundles are not included.' },
+  wigs: { label: 'Wigs', nav: 'Wigs', kind: 'Complete wig', kindLong: 'You are buying a complete wig. The wig price is separate from the 3-bundle set price.' },
 };
 
 function hydrateProduct(p) {
@@ -228,9 +231,11 @@ function hydrateProduct(p) {
   p.images = safeJSON(p.images, []);
   p.variants = db.prepare('SELECT * FROM variants WHERE product_id = ? ORDER BY sort, id').all(p.id)
     .map((v) => ({ ...v, options: safeJSON(v.options, {}) }));
-  const prices = p.variants.map((v) => v.price_cents);
+  // A price of 0 means “price pending”. Pre-order prices can also be hidden per product.
+  const prices = p.variants.map((v) => v.price_cents).filter((c) => c > 0);
   p.min_price = prices.length ? Math.min(...prices) : 0;
   p.max_price = prices.length ? Math.max(...prices) : 0;
+  p.price_visible = prices.length > 0 && (p.availability === 'ready' || p.show_price !== 0);
   p.total_stock = p.variants.reduce((a, v) => a + Math.max(0, v.stock), 0);
   p.sold_out = p.availability === 'ready' && p.total_stock <= 0;
   p.cat = kindFor(p.category, p.name);
@@ -324,7 +329,7 @@ function priceCart(lines) {
       kind_label: kindFor(row.category, row.name).kind,
       category: row.category,
       unit_cents: row.price_cents, qty, stock: row.stock,
-      purchasable: row.active === 1 && row.availability === 'ready',
+      purchasable: row.active === 1 && row.availability === 'ready' && row.price_cents > 0,
       image: safeJSON(row.images, [])[0] || '',
     });
   }
@@ -419,10 +424,11 @@ function expireUnpaid() {
 /* ---------------- Seed sample products (first run only) ---------------- */
 function insertProducts(list, isSample) {
   list.forEach((s, i) => {
-    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, extra_prices, option_names, images, featured, is_sample, sort, wig_option)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    const r = db.prepare(`INSERT INTO products (slug, name, category, availability, short, description, texture, colour, lace, density, includes, lead_time, extra_prices, option_names, images, featured, is_sample, sort, wig_option, texture_group, video)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       s.slug, s.name, s.category, s.availability, s.short || '', s.description || '', s.texture || '', s.colour || '', s.lace || '', s.density || '',
-      s.includes || '', s.lead_time || '', s.extra_prices || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, s.sort ?? i, s.wig_option ? 1 : 0);
+      s.includes || '', s.lead_time || '', s.extra_prices || '', JSON.stringify(s.option_names), JSON.stringify(s.images), s.featured ? 1 : 0, isSample ? 1 : 0, s.sort ?? i, s.wig_option ? 1 : 0,
+      s.texture_group || '', s.video || '');
     s.variants.forEach((v, j) => {
       const [opts, price, stock] = Array.isArray(v) ? v : [v.options, v.price, v.stock || 0];
       db.prepare('INSERT INTO variants (product_id, options, price_cents, stock, sort) VALUES (?, ?, ?, ?, ?)')
@@ -535,6 +541,29 @@ function migrateWigAndFrontalSet() {
   setSettingStmt.run('migr_wig_frontal_2026_11', '1');
 }
 migrateWigAndFrontalSet();
+
+/* One-time update: bundle sets listed by texture (with the four curl listings), wigs,
+   and the new welcome/footer wording. The old collection-first bundle listings are hidden,
+   not deleted, so nothing that was edited is lost. */
+const LEGACY_INTRO_2 = 'Nolle’ Luxury Hair offers Raw Indian, Premium Virgin and SDD Indian hair – bundles, closures, frontals and complete sets – carefully selected for softness, fullness and natural movement. Every order is checked and packed by hand, and we deliver nationwide across South Africa.';
+function migrateQuoteAndTextures() {
+  if (db.prepare("SELECT 1 FROM settings WHERE key = 'migr_quote_textures_2026_11'").get()) return;
+  if (!TEST_FIXTURES) {
+    const { BUNDLES, WIGS, OLD_BUNDLE_SLUGS } = require('./catalogue');
+    tx(() => {
+      const fresh = [...BUNDLES, ...WIGS].filter((x) => !db.prepare('SELECT 1 FROM products WHERE slug = ?').get(x.slug));
+      if (fresh.some((x) => x.category === 'bundles')) {
+        db.prepare(`UPDATE products SET active = 0 WHERE slug IN (${OLD_BUNDLE_SLUGS.map(() => '?').join(',')})`).run(...OLD_BUNDLE_SLUGS);
+      }
+      if (fresh.length) insertProducts(fresh, false);
+      const upd = db.prepare('UPDATE settings SET value = ? WHERE key = ? AND value = ?');
+      upd.run(DEFAULT_SETTINGS.intro, 'intro', LEGACY_INTRO_2);
+      upd.run(DEFAULT_SETTINGS.location, 'location', 'Melrose / Sandton, Johannesburg');
+    });
+  }
+  setSettingStmt.run('migr_quote_textures_2026_11', '1');
+}
+migrateQuoteAndTextures();
 
 
 module.exports = {

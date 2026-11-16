@@ -30,6 +30,37 @@
     if (src) sessionStorage.setItem('nolle_src', src.slice(0, 40));
   } catch (e) {}
 
+  /* ---------- texture buttons on the shop page ---------- */
+  var tf = $('[data-texture-filter]');
+  if (tf) tf.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-texture]');
+    if (!b) return;
+    var want = b.getAttribute('data-texture');
+    $$('[data-texture]', tf).forEach(function (x) {
+      var on = x === b;
+      x.classList.toggle('on', on);
+      x.setAttribute('aria-pressed', on);
+    });
+    $$('.card[data-texture]', tf.parentNode).forEach(function (c) {
+      c.hidden = !!want && c.getAttribute('data-texture') !== want;
+    });
+  });
+
+  /* ---------- keep the floating WhatsApp button clear of WhatsApp links ---------- */
+  var float = $('[data-wa-float]');
+  if (float && 'IntersectionObserver' in window) {
+    var zones = $$('[data-wa-zone]');
+    if (zones.length) {
+      var hiding = 0;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { hiding += en.isIntersecting ? 1 : -1; });
+        hiding = Math.max(0, hiding);
+        float.classList.toggle('tucked', hiding > 0);
+      }, { rootMargin: '0px 0px -12% 0px' });
+      zones.forEach(function (z) { io.observe(z); });
+    }
+  }
+
   /* ---------- mobile nav ---------- */
   var toggle = $('.nav-toggle');
   if (toggle) toggle.addEventListener('click', function () {
@@ -100,12 +131,14 @@
         var ln = P.optionNames.find(function (n) { return /length/i.test(n); });
         lenEl.textContent = (ln && sel[ln]) || 'Select an option above';
       }
-      var waText = 'Hi Nolle’ Luxury Hair, ' + (P.enquire ? 'I’d like to pre-order: ' : 'I’m interested in: ') + P.name + ' (' + P.kind + ')';
+      var waText = 'Hi Nolle’ Luxury Hair, ' + (P.enquire ? 'I’d like a quote for: ' : 'I’m interested in: ') + P.name + ' (' + P.kind + ')';
       if (v) {
-        priceEl.textContent = money(price);
+        var pending = !(v.price > 0) || !P.showPrice;
+        priceEl.textContent = pending ? 'Price on request' : money(price);
+        var pn = $('[data-price-note]'); if (pn) pn.hidden = pending;
         var lbl = label(v);
         if (lbl) waText += ' – ' + lbl;
-        waText += ', ' + money(v.price) + (P.category === 'bundles' ? ' for 3 bundles' : '');
+        if (!pending) waText += ', ' + money(v.price) + (P.category === 'bundles' ? ' for 3 bundles' : '');
         if (wigOn) waText += P.wig.fee ? '. Wig making: yes (+' + money(P.wig.fee) + ')' : '. Wig making: yes – please quote the wig-making fee';
         if (P.enquire) {
           stockEl.className = 'stock pre';
@@ -144,8 +177,12 @@
         var dfee = P.freeOver && price >= P.freeOver ? 0 : dm.fee;
         var dtxt = dfee ? money(dfee) : 'free';
         var quoted = wigOn && !P.wig.fee ? ' + wig making (quoted on WhatsApp)' : '';
-        if (wt) wt.textContent = 'Total with delivery: ' + money(price + dfee) + ' (' + money(v.price) + (wigFee ? ' + ' + money(wigFee) + ' wig making' : '') + ' + ' + dtxt + ' delivery)' + quoted;
-        waText += '. Delivery: ' + dm.name + ' (' + dtxt + '). Total with delivery: ' + money(price + dfee) + (quoted ? ', before wig making' : '');
+        var pend = !(v.price > 0) || !P.showPrice;
+        if (wt) wt.textContent = pend
+          ? 'Delivery ' + dtxt + ' – we confirm your total on WhatsApp.'
+          : 'Total with delivery: ' + money(price + dfee) + ' (' + money(v.price) + (wigFee ? ' + ' + money(wigFee) + ' wig making' : '') + ' + ' + dtxt + ' delivery)' + quoted;
+        waText += '. Delivery: ' + dm.name + ' (' + dtxt + ')';
+        if (!pend) waText += '. Total with delivery: ' + money(price + dfee) + (quoted ? ', before wig making' : '');
       } else if (wt) wt.textContent = '';
       waText += '. ' + P.url + (v ? '?v=' + v.id : '');
       if (waBtn) waBtn.href = waLink(waText);

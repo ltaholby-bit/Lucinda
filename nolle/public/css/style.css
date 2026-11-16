@@ -87,7 +87,7 @@ p { margin: 0 0 1em; }
 .hero-note { display: flex; align-items: center; gap: .5rem; color: var(--gold-dark); font-size: .92rem; letter-spacing: .03em; margin: .5rem 0 0; }
 
 /* Sections */
-.section { padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+.section { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
 .section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .5rem 1.5rem; margin-bottom: 1.6rem; }
 .section-head h2 { margin: 0; }
 .section-head p { margin: 0; flex-basis: 100%; }
@@ -170,6 +170,21 @@ p { margin: 0 0 1em; }
 .timing div { display: flex; justify-content: space-between; gap: 1rem; }
 .timing strong { font-weight: 500; white-space: nowrap; }
 .timing span { color: var(--ink-soft); text-align: right; }
+.card-body { display: flex; flex-direction: column; }
+.card-body .price { margin-bottom: auto; }
+.card-body .btn-sm { margin-top: .7rem; letter-spacing: .04em; font-size: .7rem; padding-inline: .6rem; white-space: nowrap; }
+.card { display: flex; flex-direction: column; }
+.card-img { display: block; }
+.card-body h3 a { color: inherit; text-decoration: none; }
+.card-body h3 a:hover { color: var(--gold-dark); }
+.cat-title { font-size: 1.5rem; margin: 1.8rem 0 .6rem; }
+.cat-block + .cat-block { margin-top: 2rem; }
+.chips.textures { padding: 0 0 1rem; }
+.chips.textures .chip { font: 400 .85rem var(--sans); cursor: pointer; }
+.chips.textures .chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.nowrap { white-space: nowrap; }
+.wa-float.tucked { opacity: 0; pointer-events: none; transform: translateY(8px); }
+.wa-float { transition: opacity .25s, transform .25s; }
 .card-extra { font-size: .74rem; letter-spacing: .06em; color: var(--gold-dark); margin: .35rem 0 0; }
 .reassure { margin: -.3rem 0 0; font-size: .88rem; color: var(--ink-soft); text-align: center; }
 .acc.extra summary { font-size: 1.1rem; }
@@ -285,6 +300,7 @@ p { margin: 0 0 1em; }
 .site-footer a:hover { color: var(--gold-light); }
 .site-footer .muted { color: #bfa9a4; }
 .logo-footer { align-items: flex-start; }
+.logo-sub { white-space: nowrap; }
 .logo-footer .logo-sub { color: #e9dbd6; }
 .slogan-sm { font-family: var(--serif); letter-spacing: .12em; color: var(--gold-light); margin: .8rem 0 .3rem; }
 .socials { display: flex; gap: .8rem; }

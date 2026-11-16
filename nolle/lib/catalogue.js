@@ -342,7 +342,7 @@ const BUNDLES = [
   {
     ...BUNDLE_BASE, slug: 'cambodian-curls-3-bundle-set', name: 'Cambodian Curls – 3-Bundle Set', texture: 'Cambodian curls', texture_group: 'Curly',
     ...bundleCopy('Cambodian curls'),
-    images: PIMG('cambodian-curls-bundles'), video: '/static/video/cambodian-curls-bundles.mp4',
+    images: PIMG('cambodian-curls-bundles', 'cambodian-curls-closeup', 'cambodian-curls-flat'), video: '/static/video/cambodian-curls-closeup.mp4',
     ...pendingSet(),
   },
   {
@@ -373,7 +373,7 @@ const wigCopy = (what) => ({
 });
 const WIGS = [
   { slug: 'caribbean-curls-wig', name: 'Caribbean Curls Wig', texture: 'Caribbean curls', ...wigCopy(' in our Caribbean curls'), images: PIMG('caribbean-curls-wig'), video: '/static/video/caribbean-curls-wig.mp4' },
-  { slug: 'cambodian-curls-wig', name: 'Cambodian Curls Wig', texture: 'Cambodian curls', ...wigCopy(' in our Cambodian curls'), images: [...PIMG('cambodian-curls-bundles'), ...IMG('duo-curly-and-wavy')] },
+  { slug: 'cambodian-curls-wig', name: 'Cambodian Curls Wig', texture: 'Cambodian curls', ...wigCopy(' in our Cambodian curls'), images: [...PIMG('cambodian-curls-closeup'), ...IMG('duo-curly-and-wavy')] },
   { slug: 'virgin-curls-wig', name: 'Virgin Curls Wig', texture: 'Virgin curls', ...wigCopy(' in our virgin curls'), images: IMG('duo-curly-and-wavy', 'backs-curly-and-wavy') },
   { slug: 'indian-royal-curls-wig', name: 'Indian Royal Curls Wig', texture: 'Indian Royal curls', ...wigCopy(' in our Indian Royal curls'), images: IMG('backs-curly-and-wavy', 'duo-curly-and-wavy') },
   { slug: 'pixie-wig', name: 'Pixie Wig', texture: '', ...wigCopy(' in a short pixie cut'), images: IMG('group-open-box') },

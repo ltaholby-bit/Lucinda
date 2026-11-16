@@ -565,6 +565,23 @@ function migrateQuoteAndTextures() {
 }
 migrateQuoteAndTextures();
 
+/* One-time update: extra Cambodian Curls photos and the closer video. Only applied while the
+   product still carries exactly what was loaded before, so admin edits are left alone. */
+function migrateCambodianMedia() {
+  if (db.prepare("SELECT 1 FROM settings WHERE key = 'migr_cambodian_media_2026_11'").get()) return;
+  if (!TEST_FIXTURES) {
+    const was = JSON.stringify(['/static/img/product/cambodian-curls-bundles.jpg']);
+    const now = JSON.stringify(['cambodian-curls-bundles', 'cambodian-curls-closeup', 'cambodian-curls-flat'].map((n) => `/static/img/product/${n}.jpg`));
+    db.prepare("UPDATE products SET images = ?, video = '/static/video/cambodian-curls-closeup.mp4' WHERE slug = 'cambodian-curls-3-bundle-set' AND images = ? AND video = '/static/video/cambodian-curls-bundles.mp4'")
+      .run(now, was);
+    db.prepare("UPDATE products SET images = ? WHERE slug = 'cambodian-curls-wig' AND images = ?")
+      .run(JSON.stringify(['/static/img/product/cambodian-curls-closeup.jpg', '/static/img/brand/duo-curly-and-wavy.jpg']),
+        JSON.stringify(['/static/img/product/cambodian-curls-bundles.jpg', '/static/img/brand/duo-curly-and-wavy.jpg']));
+  }
+  setSettingStmt.run('migr_cambodian_media_2026_11', '1');
+}
+migrateCambodianMedia();
+
 
 module.exports = {
   db, DATA_DIR, CATEGORIES, ShopError, tx, safeJSON,
